@@ -111,26 +111,61 @@ echo "🔧 Updating Podfile for unique bundle identifiers..."
 PODFILE="$PROJECT_ROOT/ios/Podfile"
 
 if [ -f "$PODFILE" ]; then
-    # Add post_install hook to ensure unique bundle identifiers for pods
-    if ! grep -q "config.build_settings\['PRODUCT_BUNDLE_IDENTIFIER'\]" "$PODFILE"; then
-        # Add before the closing end
-        sed -i '' '/end$/i\
-  # Ensure unique bundle identifiers for all pods\
-  installer.pods_project.targets.each do |target|\
-    target.build_configurations.each do |config|\
-      # Skip the main app target\
-      next if target.name == "Runner"\
-      \
-      # Make pod bundle identifiers unique\
-      if config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"]\
-        current_bundle_id = config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"]\
-        if current_bundle_id == "'$MAIN_BUNDLE_ID'"\
-          config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"] = current_bundle_id + ".pod"\
-        end\
-      end\
-    end\
-  end' "$PODFILE"
-        echo "✅ Added unique bundle identifier logic to Podfile"
+    # Check if our bundle identifier logic is already in the Podfile
+    if ! grep -q "Make pod bundle identifiers unique" "$PODFILE"; then
+        # Create backup of original Podfile
+        cp "$PODFILE" "$PODFILE.backup.$(date +%Y%m%d_%H%M%S)"
+        echo "✅ Created Podfile backup"
+        
+        # Remove existing post_install hook entirely to avoid conflicts
+        if grep -q "post_install do |installer|" "$PODFILE"; then
+            echo "✅ Found existing post_install hook, will replace with enhanced version..."
+            
+            # Remove existing post_install hook
+            sed -i '' '/post_install do |installer|/,/^end$/d' "$PODFILE"
+            echo "✅ Removed existing post_install hook"
+        fi
+        
+        # Add the comprehensive post_install hook that combines everything
+        cat >> "$PODFILE" << 'EOF'
+
+# Enhanced post_install hook with bundle identifier collision prevention (v1)
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+    target.build_configurations.each do |config|
+      # Core iOS settings (from original Podfile)
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+      config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
+      # Disable code signing for pods to avoid conflicts
+      config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+      config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
+      
+      # Firebase workaround: Disable problematic Firebase targets (from original)
+      FIREBASE_DISABLED = ENV['FIREBASE_DISABLED'] == 'true'
+      if FIREBASE_DISABLED && target.name.include?('Firebase')
+        config.build_settings['EXCLUDED_SOURCE_FILE_NAMES'] = ['**/*.swift']
+        config.build_settings['SWIFT_VERSION'] = '5.0'
+      end
+      
+      # Bundle identifier collision prevention (v1)
+      # Skip the main app target
+      next if target.name == "Runner"
+      
+      # Make pod bundle identifiers unique
+      if config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
+        current_bundle_id = config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
+        if current_bundle_id == "com.twinklub.twinklub" || current_bundle_id == "com.example.quikapptest07"
+          config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"] = current_bundle_id + ".pod"
+        end
+      end
+    end
+  end
+end
+EOF
+        
+        echo "✅ Added comprehensive post_install hook with bundle identifier collision prevention (v1)"
     else
         echo "ℹ️ Podfile already has bundle identifier logic"
     fi

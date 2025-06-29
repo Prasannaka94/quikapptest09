@@ -125,22 +125,47 @@ echo "🔧 Updating Podfile with enhanced bundle identifier logic..."
 PODFILE="$PROJECT_ROOT/ios/Podfile"
 
 if [ -f "$PODFILE" ]; then
-    # Remove any existing bundle identifier logic first
-    sed -i '' '/# Ensure unique bundle identifiers/,/end/d' "$PODFILE"
+    # Create backup of original Podfile
+    cp "$PODFILE" "$PODFILE.backup.$(date +%Y%m%d_%H%M%S)"
+    echo "✅ Created Podfile backup"
     
-    # Add enhanced post_install hook
+    # Remove any existing bundle identifier logic and post_install hooks
+    sed -i '' '/# Ensure unique bundle identifiers/,/end/d' "$PODFILE"
+    sed -i '' '/# Enhanced bundle identifier collision prevention/,/^end$/d' "$PODFILE"
+    
+    # Remove existing post_install hook entirely to avoid conflicts
+    if grep -q "post_install do |installer|" "$PODFILE"; then
+        echo "✅ Found existing post_install hook, will replace with enhanced version..."
+        
+        # Remove existing post_install hook
+        sed -i '' '/post_install do |installer|/,/^end$/d' "$PODFILE"
+        echo "✅ Removed existing post_install hook"
+    fi
+    
+    # Add the comprehensive post_install hook that combines everything
     cat >> "$PODFILE" << 'EOF'
 
-# Enhanced bundle identifier collision prevention
+# Enhanced post_install hook with bundle identifier collision prevention
 post_install do |installer|
   installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
     target.build_configurations.each do |config|
-      # Fix modular headers issue (from Firebase fix)
-      config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
-      
-      # Ensure proper deployment target
+      # Core iOS settings (from original Podfile)
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+      config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
+      # Disable code signing for pods to avoid conflicts
+      config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+      config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
       
+      # Firebase workaround: Disable problematic Firebase targets (from original)
+      FIREBASE_DISABLED = ENV['FIREBASE_DISABLED'] == 'true'
+      if FIREBASE_DISABLED && target.name.include?('Firebase')
+        config.build_settings['EXCLUDED_SOURCE_FILE_NAMES'] = ['**/*.swift']
+        config.build_settings['SWIFT_VERSION'] = '5.0'
+      end
+      
+      # Enhanced bundle identifier collision prevention
       # Ensure unique bundle identifiers for all pods
       if config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
         current_bundle_id = config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
@@ -154,7 +179,7 @@ post_install do |installer|
         end
       end
       
-      # Firebase specific fixes
+      # Firebase specific fixes for bundle collision
       if target.name.start_with?('Firebase') || target.name.start_with?('firebase')
         config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
         config.build_settings['DEFINES_MODULE'] = 'YES'
@@ -168,7 +193,8 @@ post_install do |installer|
   end
 end
 EOF
-    echo "✅ Added enhanced bundle identifier logic to Podfile"
+    
+    echo "✅ Added comprehensive post_install hook with bundle identifier collision prevention"
 else
     echo "⚠️ Podfile not found"
 fi
