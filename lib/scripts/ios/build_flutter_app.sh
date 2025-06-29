@@ -134,73 +134,29 @@ EOF
     fi
 }
 
-# Function to handle Firebase compilation issues
-handle_firebase_issues() {
-    log_warn "Firebase compilation issues detected, applying emergency workaround..."
+# Function to apply Firebase Xcode 16.0 compatibility fixes
+apply_firebase_xcode16_fixes() {
+    log_info "🔧 Applying Firebase Xcode 16.0 compatibility fixes..."
     
-    # Create backup of pubspec.yaml
-    cp pubspec.yaml pubspec.yaml.backup
-    
-    # Remove Firebase dependencies temporarily
-    sed -i.tmp '/firebase_core:/d' pubspec.yaml
-    sed -i.tmp '/firebase_messaging:/d' pubspec.yaml
-    sed -i.tmp '/_flutterfire_internals:/d' pubspec.yaml
-    sed -i.tmp '/firebase_core_platform_interface:/d' pubspec.yaml
-    sed -i.tmp '/firebase_core_web:/d' pubspec.yaml
-    sed -i.tmp '/firebase_messaging_platform_interface:/d' pubspec.yaml
-    sed -i.tmp '/firebase_messaging_web:/d' pubspec.yaml
-    rm -f pubspec.yaml.tmp
-    
-    log_info "Firebase dependencies temporarily removed from pubspec.yaml"
-    
-    # Clean project state
-    flutter clean
-    
-    # Fix bundle identifier conflicts before regenerating iOS files
-    log_info "Fixing bundle identifier conflicts..."
-    
-    # Clean up any remaining com.example references in iOS files
-    if [ -f "ios/Runner.xcodeproj/project.pbxproj" ]; then
-        cp "ios/Runner.xcodeproj/project.pbxproj" "ios/Runner.xcodeproj/project.pbxproj.backup"
-        sed -i.tmp 's/com\.example\.quikapptest07/com.twinklub.twinklub/g' "ios/Runner.xcodeproj/project.pbxproj"
-        sed -i.tmp 's/com\.example\.[a-zA-Z0-9_]*/com.twinklub.twinklub/g' "ios/Runner.xcodeproj/project.pbxproj"
-        rm -f "ios/Runner.xcodeproj/project.pbxproj.tmp"
-        log_info "Bundle identifier conflicts cleaned up"
+    # Apply the Firebase fixes if Firebase is enabled
+    if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
+        if [ -f "lib/scripts/ios/fix_firebase_xcode16.sh" ]; then
+            chmod +x lib/scripts/ios/fix_firebase_xcode16.sh
+            if lib/scripts/ios/fix_firebase_xcode16.sh; then
+                log_success "✅ Firebase Xcode 16.0 fixes applied successfully"
+            else
+                log_error "❌ Failed to apply Firebase Xcode 16.0 fixes"
+                return 1
+            fi
+        else
+            log_warn "⚠️ Firebase Xcode 16.0 fix script not found"
+            return 1
+        fi
+    else
+        log_info "ℹ️ Firebase disabled, skipping Firebase-specific fixes"
     fi
     
-    # Get dependencies
-    flutter pub get
-    
-    # Determine organization from bundle ID
-    local ORG_NAME="com.twinklub"
-    if [ -n "${BUNDLE_ID:-}" ]; then
-        ORG_NAME=$(echo "$BUNDLE_ID" | cut -d. -f1-2)
-    fi
-    
-    log_info "Using organization: $ORG_NAME"
-    
-    # Regenerate iOS files with correct organization
-    flutter create --platforms ios --org "$ORG_NAME" .
-    
-    # Clean and reinstall CocoaPods
-    cd ios
-    rm -rf Pods Podfile.lock
-    
-    # Use the bundle identifier collision fix to ensure proper Podfile
-    if [ -f "../lib/scripts/ios/fix_bundle_identifier_collision_v2.sh" ]; then
-        log_info "Applying bundle identifier collision fixes..."
-        cd ..
-        chmod +x lib/scripts/ios/fix_bundle_identifier_collision_v2.sh
-        ./lib/scripts/ios/fix_bundle_identifier_collision_v2.sh || true
-        cd ios
-    fi
-    
-    # Install pods with Firebase disabled
-    FIREBASE_DISABLED=true pod install --repo-update --verbose
-    cd ..
-    
-    log_warn "Firebase functionality disabled for this build"
-    export FIREBASE_DISABLED=true
+    return 0
 }
 
 # Function to install dependencies
@@ -230,54 +186,33 @@ install_dependencies() {
         log_info "Removed existing Podfile.lock"
     fi
     
-    # Install pods with proven ios-workflow2 approach
-    log_info "Installing CocoaPods with proven approach..."
+    # Apply Firebase Xcode 16.0 fixes first if needed
+    if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
+        log_info "🔧 Firebase enabled, applying Xcode 16.0 compatibility fixes..."
+        cd ..
+        if ! apply_firebase_xcode16_fixes; then
+            log_error "❌ Failed to apply Firebase Xcode 16.0 fixes"
+            return 1
+        fi
+        cd ios
+    fi
+    
+    # Install pods with enhanced approach
+    log_info "Installing CocoaPods with enhanced approach..."
     if pod install --repo-update --verbose; then
-        log_success "CocoaPods installation completed"
+        log_success "CocoaPods installation completed successfully"
     else
         log_warn "First attempt failed, trying with legacy mode..."
         if pod install --repo-update --verbose --legacy; then
             log_success "CocoaPods installation completed with legacy mode"
         else
-            log_warn "Legacy mode failed, trying Firebase workaround..."
-            
-            # Firebase workaround: Remove Firebase pods if they cause issues
-            if [ -f "Podfile" ]; then
-                log_info "Applying Firebase workaround - removing problematic Firebase pods..."
-                
-                # Create backup
-                cp Podfile Podfile.backup
-                
-                # Remove Firebase-related lines from Podfile
-                sed -i.tmp '/firebase/d' Podfile
-                sed -i.tmp '/Firebase/d' Podfile
-                rm -f Podfile.tmp
-                
-                # Apply bundle identifier collision fixes to prevent conflicts
-                if [ -f "../lib/scripts/ios/fix_bundle_identifier_collision_v2.sh" ]; then
-                    log_info "Applying bundle identifier collision fixes..."
-                    cd ..
-                    chmod +x lib/scripts/ios/fix_bundle_identifier_collision_v2.sh
-                    ./lib/scripts/ios/fix_bundle_identifier_collision_v2.sh || true
-                    cd ios
-                fi
-                
-                # Try installation again without Firebase
-                if FIREBASE_DISABLED=true pod install --repo-update --verbose; then
-                    log_success "CocoaPods installation completed without Firebase"
-                    log_warn "Firebase functionality will be disabled for this build"
-                    # Set environment variable to disable Firebase in subsequent steps
-                    export FIREBASE_DISABLED=true
-                else
-                    log_error "CocoaPods installation failed even without Firebase"
-                    cd ..
-                    return 1
-                fi
-            else
-                log_error "CocoaPods installation failed"
-                cd ..
-                return 1
-            fi
+            log_error "CocoaPods installation failed"
+            log_error "This indicates a configuration issue that must be resolved:"
+            log_error "  1. Check Firebase configuration (if PUSH_NOTIFY=true)"
+            log_error "  2. Verify bundle identifier consistency"
+            log_error "  3. Ensure Xcode 16.0 compatibility fixes are applied"
+            cd ..
+            return 1
         fi
     fi
     
@@ -389,201 +324,86 @@ create_xcode_archive() {
     fi
 }
 
-# Function to completely remove Firebase from project
-completely_remove_firebase() {
-    log_warn "🔥 Completely removing Firebase from project..."
+# Function to validate build prerequisites
+validate_build_prerequisites() {
+    log_info "🔍 Validating build prerequisites..."
     
-    # 1. Remove Firebase from pubspec.yaml
-    if [ -f "pubspec.yaml" ]; then
-        cp pubspec.yaml pubspec.yaml.firebase_backup
-        log_info "Backup created: pubspec.yaml.firebase_backup"
+    # Check if conditional Firebase injection was run
+    if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
+        log_info "🔥 Firebase enabled - validating Firebase setup..."
         
-        # Remove all Firebase-related dependencies
-        sed -i.tmp '/firebase_core:/d' pubspec.yaml
-        sed -i.tmp '/firebase_messaging:/d' pubspec.yaml
-        sed -i.tmp '/_flutterfire_internals:/d' pubspec.yaml
-        sed -i.tmp '/firebase_core_platform_interface:/d' pubspec.yaml
-        sed -i.tmp '/firebase_core_web:/d' pubspec.yaml
-        sed -i.tmp '/firebase_messaging_platform_interface:/d' pubspec.yaml
-        sed -i.tmp '/firebase_messaging_web:/d' pubspec.yaml
-        sed -i.tmp '/cloud_firestore:/d' pubspec.yaml
-        sed -i.tmp '/firebase_auth:/d' pubspec.yaml
-        sed -i.tmp '/firebase_analytics:/d' pubspec.yaml
-        sed -i.tmp '/firebase_crashlytics:/d' pubspec.yaml
-        sed -i.tmp '/firebase_performance:/d' pubspec.yaml
-        sed -i.tmp '/firebase_remote_config:/d' pubspec.yaml
-        sed -i.tmp '/firebase_storage:/d' pubspec.yaml
-        rm -f pubspec.yaml.tmp
+        # Check for Firebase config files
+        if [ ! -f "ios/Runner/GoogleService-Info.plist" ]; then
+            log_error "❌ GoogleService-Info.plist not found but Firebase is enabled"
+            log_error "   Ensure conditional_firebase_injection.sh was run successfully"
+            return 1
+        fi
         
-        log_info "✅ Firebase dependencies removed from pubspec.yaml"
+        # Check for Firebase dependencies in pubspec.yaml
+        if ! grep -q "firebase_core:" pubspec.yaml; then
+            log_error "❌ Firebase dependencies not found in pubspec.yaml but Firebase is enabled"
+            log_error "   Ensure conditional_firebase_injection.sh was run successfully"
+            return 1
+        fi
+        
+        log_success "✅ Firebase configuration validated"
+    else
+        log_info "🚫 Firebase disabled - validating Firebase-free setup..."
+        
+        # Ensure Firebase files are not present when disabled
+        if [ -f "ios/Runner/GoogleService-Info.plist" ]; then
+            log_warn "⚠️ Firebase config file found but Firebase is disabled"
+            log_info "   This will be handled by conditional Firebase injection"
+        fi
+        
+        log_success "✅ Firebase-free configuration validated"
     fi
     
-    # 2. Remove Firebase configuration files
-    if [ -f "ios/Runner/GoogleService-Info.plist" ]; then
-        mv "ios/Runner/GoogleService-Info.plist" "ios/Runner/GoogleService-Info.plist.backup"
-        log_info "✅ GoogleService-Info.plist backed up and removed"
+    # Check bundle identifier consistency
+    if grep -q "com.example" ios/Runner.xcodeproj/project.pbxproj 2>/dev/null; then
+        log_error "❌ Bundle identifier conflicts detected (com.example references found)"
+        log_error "   Ensure bundle identifier collision fixes were applied"
+        return 1
     fi
     
-    if [ -f "android/app/google-services.json" ]; then
-        mv "android/app/google-services.json" "android/app/google-services.json.backup"
-        log_info "✅ google-services.json backed up and removed"
-    fi
-    
-    # 3. Clean Flutter project state
-    log_info "🧹 Cleaning Flutter project state..."
-    flutter clean
-    rm -rf .dart_tool/
-    rm -rf build/
-    
-    # 4. Clean iOS project
-    log_info "🧹 Cleaning iOS project..."
-    if [ -d "ios" ]; then
-        cd ios
-        rm -rf Pods/
-        rm -f Podfile.lock
-        rm -rf build/
-        rm -rf .symlinks/
-        rm -rf Flutter/ephemeral/
-        cd ..
-    fi
-    
-    # 5. Fix bundle identifier conflicts
-    log_info "🔧 Fixing bundle identifier conflicts..."
-    if [ -f "ios/Runner.xcodeproj/project.pbxproj" ]; then
-        cp "ios/Runner.xcodeproj/project.pbxproj" "ios/Runner.xcodeproj/project.pbxproj.firebase_backup"
-        sed -i.tmp 's/com\.example\.quikapptest07/com.twinklub.twinklub/g' "ios/Runner.xcodeproj/project.pbxproj"
-        sed -i.tmp 's/com\.example\.[a-zA-Z0-9_]*/com.twinklub.twinklub/g' "ios/Runner.xcodeproj/project.pbxproj"
-        rm -f "ios/Runner.xcodeproj/project.pbxproj.tmp"
-        log_info "✅ Bundle identifier conflicts cleaned up"
-    fi
-    
-    # 6. Get dependencies without Firebase
-    log_info "📦 Installing dependencies without Firebase..."
-    flutter pub get
-    
-    # 7. Regenerate iOS files with correct organization
-    local ORG_NAME="com.twinklub"
-    if [ -n "${BUNDLE_ID:-}" ]; then
-        ORG_NAME=$(echo "$BUNDLE_ID" | cut -d. -f1-2)
-    fi
-    
-    log_info "🔄 Regenerating iOS files with organization: $ORG_NAME"
-    flutter create --platforms ios --org "$ORG_NAME" .
-    
-    # 8. Create a clean Podfile without Firebase
-    log_info "📝 Creating clean Podfile without Firebase..."
-    cat > ios/Podfile << 'EOF'
-platform :ios, '13.0'
-use_frameworks! :linkage => :static
-
-ENV['COCOAPODS_DISABLE_STATS'] = 'true'
-ENV['FIREBASE_DISABLED'] = 'true'
-
-project 'Runner', {
-  'Debug' => :debug,
-  'Profile' => :release,
-  'Release' => :release,
-}
-
-def flutter_root
-  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
-  unless File.exist?(generated_xcode_build_settings_path)
-    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
-  end
-
-  File.foreach(generated_xcode_build_settings_path) do |line|
-    matches = line.match(/FLUTTER_ROOT\=(.*)/)
-    return matches[1].strip if matches
-  end
-  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
-end
-
-require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
-
-flutter_ios_podfile_setup
-
-target 'Runner' do
-  use_frameworks!
-  use_modular_headers!
-
-  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-  
-  target 'RunnerTests' do
-    inherit! :search_paths
-  end
-end
-
-post_install do |installer|
-  installer.pods_project.targets.each do |target|
-    flutter_additional_ios_build_settings(target)
-    target.build_configurations.each do |config|
-      # Core iOS settings
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
-      config.build_settings['ENABLE_BITCODE'] = 'NO'
-      config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
-      config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
-      config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
-      
-      # Xcode 16.0 compatibility fixes
-      config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
-      config.build_settings['SWIFT_VERSION'] = '5.0'
-      config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-Onone'
-      config.build_settings['ENABLE_PREVIEWS'] = 'NO'
-      config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
-      
-      # Bundle identifier collision prevention
-      next if target.name == 'Runner'
-      
-      if config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
-        current_bundle_id = config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
-        if current_bundle_id.include?('com.twinklub.twinklub') || current_bundle_id.include?('com.example')
-          config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = current_bundle_id + '.pod.' + target.name.downcase
-        end
-      end
-    end
-  end
-end
-EOF
-    
-    # 9. Install CocoaPods with Firebase disabled
-    log_info "📦 Installing CocoaPods without Firebase..."
-    cd ios
-    FIREBASE_DISABLED=true pod install --repo-update --verbose
-    cd ..
-    
-    # 10. Set environment flag
-    export FIREBASE_DISABLED=true
-    echo "FIREBASE_DISABLED=true" >> "$HOME/.bashrc" 2>/dev/null || true
-    
-    log_success "✅ Firebase completely removed from project"
-    log_warn "⚠️ Push notifications and Firebase features will be disabled"
+    log_success "✅ Build prerequisites validated successfully"
+    return 0
 }
 
 # Main execution function
 main() {
     log_info "Starting Flutter iOS Build Process..."
     
-    # Step 1: Check Firebase requirement based on PUSH_NOTIFY flag
+    # Step 1: Validate build prerequisites
+    if ! validate_build_prerequisites; then
+        log_error "Build prerequisites validation failed"
+        return 1
+    fi
+    
+    # Step 2: Check Firebase requirement based on PUSH_NOTIFY flag
     check_firebase_requirement
     
-    # Step 2: Generate Podfile (if needed)
+    # Step 3: Generate Podfile (if needed)
     generate_podfile
     
-    # Step 3: Install dependencies
+    # Step 4: Install dependencies (with Firebase Xcode 16.0 fixes if needed)
     if ! install_dependencies; then
         log_error "Failed to install dependencies"
+        log_error "This is a hard failure - check Firebase configuration and Xcode compatibility"
         return 1
     fi
     
-    # Step 4: Build Flutter app
+    # Step 5: Build Flutter app
     if ! build_flutter_app; then
         log_error "Failed to build Flutter app"
+        log_error "This is a hard failure - build must succeed cleanly"
         return 1
     fi
     
-    # Step 5: Create Xcode archive
+    # Step 6: Create Xcode archive
     if ! create_xcode_archive; then
         log_error "Failed to create Xcode archive"
+        log_error "This is a hard failure - archive creation must succeed"
         return 1
     fi
     
@@ -592,8 +412,9 @@ main() {
     log_info "  - App: ${APP_NAME:-Unknown} v${VERSION_NAME:-Unknown}"
     log_info "  - Bundle ID: ${BUNDLE_ID:-Unknown}"
     log_info "  - Profile Type: ${PROFILE_TYPE:-Unknown}"
-    log_info "  - Firebase: $([ "${FIREBASE_DISABLED:-false}" = "true" ] && echo "DISABLED" || echo "ENABLED")"
+    log_info "  - Firebase: $([ "${PUSH_NOTIFY:-false}" = "true" ] && echo "ENABLED" || echo "DISABLED")"
     log_info "  - Push Notifications: ${PUSH_NOTIFY:-false}"
+    log_info "  - Xcode Compatibility: 16.0+ with enhanced fixes"
     
     return 0
 }

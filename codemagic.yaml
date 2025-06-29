@@ -2344,7 +2344,7 @@ workflows:
             chmod +x lib/scripts/ios/email_notifications.sh
             lib/scripts/ios/email_notifications.sh "started" "iOS Build Started" "iOS build for $APP_NAME ($VERSION_NAME) has started with profile type: $PROFILE_TYPE"
           fi
-          
+
           # Set flag to prevent duplicate emails in scripts
           export EMAIL_BUILD_STARTED_SENT="true"
 
@@ -2522,35 +2522,18 @@ workflows:
               export FINAL_BUILD_MESSAGE="iOS build failed: No build artifacts found for $APP_NAME"
             fi
           else
-            echo "❌ iOS build workflow failed, trying emergency Firebase-free rebuild..."
+            echo "❌ iOS build workflow failed - this is a hard failure"
+            echo "Build must succeed cleanly with proper configuration"
+            echo "Check the following:"
+            echo "  1. Firebase configuration is correct (if PUSH_NOTIFY=true)"
+            echo "  2. Bundle identifier is properly set: $BUNDLE_ID"
+            echo "  3. Xcode 16.0 compatibility fixes are applied"
+            echo "  4. All dependencies are properly configured"
             
-            # 📧 Build Failure Notification
-            # Log failure and attempt emergency rebuild
-            echo "⚠️ Initial build failed, attempting emergency Firebase-free rebuild..."
-            
-            # Run emergency Firebase removal script
-            echo "🔥 Applying emergency Firebase removal..."
-            if [ -f "lib/scripts/ios/emergency_firebase_removal.sh" ]; then
-              chmod +x lib/scripts/ios/emergency_firebase_removal.sh
-              if lib/scripts/ios/emergency_firebase_removal.sh; then
-                echo "✅ Emergency Firebase removal completed successfully"
-                # Set final build status for single email
-                export FINAL_BUILD_STATUS="success"
-                export FINAL_BUILD_MESSAGE="iOS emergency build completed successfully: $APP_NAME ($VERSION_NAME) - Firebase-free recovery build"
-              else
-                echo "❌ Emergency Firebase removal failed"
-                # Set final build status for single email
-                export FINAL_BUILD_STATUS="error"
-                export FINAL_BUILD_MESSAGE="iOS build complete failure: Both primary and emergency builds failed for $APP_NAME"
-                exit 1
-              fi
-            else
-              echo "❌ Emergency Firebase removal script not found"
-              # Set final build status for single email
-              export FINAL_BUILD_STATUS="error"
-              export FINAL_BUILD_MESSAGE="iOS build failed: Emergency Firebase removal script not found for $APP_NAME"
-              exit 1
-            fi
+            # Set final build status for single email
+            export FINAL_BUILD_STATUS="error"
+            export FINAL_BUILD_MESSAGE="iOS build failed: Build must succeed cleanly - check Firebase and dependency configuration for $APP_NAME"
+            exit 1
           fi
 
       - name: Final Validation and Summary

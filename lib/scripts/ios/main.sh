@@ -156,40 +156,19 @@ main() {
         log_info "--- Stage 6.7: Firebase Setup Skipped (Push notifications disabled) ---"
     fi
     
-    # Stage 7: Flutter Build Process (with emergency Firebase fallback)
+    # Stage 7: Flutter Build Process (must succeed for clean build)
     log_info "--- Stage 7: Building Flutter iOS App ---"
     if ! "${SCRIPT_DIR}/build_flutter_app.sh"; then
-        log_warn "⚠️ Primary build failed, attempting emergency Firebase removal..."
+        log_error "❌ Flutter build failed - this is a hard failure"
+        log_error "Build must succeed cleanly with proper Firebase configuration"
+        log_info "Check the following:"
+        log_info "  1. Firebase configuration is correct (if PUSH_NOTIFY=true)"
+        log_info "  2. Bundle identifier is properly set"
+        log_info "  3. Xcode 16.0 compatibility fixes are applied"
+        log_info "  4. CocoaPods installation succeeded"
         
-        # Make emergency script executable
-        chmod +x "${SCRIPT_DIR}/emergency_firebase_removal.sh"
-        
-        # Try emergency Firebase removal
-        if "${SCRIPT_DIR}/emergency_firebase_removal.sh"; then
-            log_success "✅ Emergency Firebase removal completed successfully"
-            log_warn "⚠️ Note: Firebase features (push notifications) are disabled in this build"
-            
-            # Skip Stage 8 since emergency script handles IPA export
-            log_info "--- Stage 8: Skipped (Emergency script handled IPA export) ---"
-            
-            # Stage 9: Build Success Status Set (Email will be sent by workflow)
-            log_info "--- Stage 9: Setting Build Success Status ---"
-            export FINAL_BUILD_STATUS="success"
-            export FINAL_BUILD_MESSAGE="iOS emergency build completed successfully: ${APP_NAME:-Unknown} (${VERSION_NAME:-Unknown}) - Firebase-free recovery build"
-            
-            log_success "iOS workflow completed successfully with emergency Firebase removal!"
-            log_info "Build Summary:"
-            log_info "   App: ${APP_NAME:-Unknown} v${VERSION_NAME:-Unknown}"
-            log_info "   Bundle ID: ${BUNDLE_ID:-Unknown}"
-            log_info "   Profile Type: ${PROFILE_TYPE:-Unknown}"
-            log_info "   Output: ${OUTPUT_DIR:-Unknown}"
-            log_warn "   Firebase: DISABLED (emergency removal applied)"
-            
-            return 0
-        else
-            send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Both primary build and emergency Firebase removal failed."
-            return 1
-        fi
+        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Flutter build failed - check Firebase configuration and dependencies."
+        return 1
     fi
     
     # Stage 8: IPA Export (only if primary build succeeded)

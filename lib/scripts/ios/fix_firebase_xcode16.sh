@@ -56,12 +56,16 @@ firebase_settings = '''
 				SWIFT_OBJC_BRIDGING_HEADER = \"Runner/Runner-Bridging-Header.h\";
 				SWIFT_VERSION = 5.0;
 				SWIFT_OPTIMIZATION_LEVEL = \"-Onone\";
+				SWIFT_COMPILATION_MODE = singlefile;
 				ENABLE_PREVIEWS = NO;
 				ENABLE_BITCODE = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				GCC_PREPROCESSOR_DEFINITIONS = \"\$(inherited) COCOAPODS=1\";
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				DEAD_CODE_STRIPPING = NO;
+				PRESERVE_DEAD_CODE_INITS_AND_TERMS = YES;
 '''
 
 # Find all build configuration sections and add Firebase settings
