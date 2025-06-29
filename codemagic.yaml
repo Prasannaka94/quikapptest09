@@ -2385,12 +2385,12 @@ workflows:
             echo "⚠️ Firebase fix script not found, continuing with build..."
           fi
                     echo "🚀 Starting iOS build process with profile type: $PROFILE_TYPE"
-          
+
           # Validate and configure profile type before build
           echo "🔍 Validating profile type configuration..."
           PROFILE_TYPE=${PROFILE_TYPE:-"ad-hoc"}
           echo "📋 Current Profile Type: $PROFILE_TYPE"
-          
+
           # Validate profile type
           case "$PROFILE_TYPE" in
             "app-store"|"ad-hoc"|"enterprise"|"development")
@@ -2401,11 +2401,11 @@ workflows:
               PROFILE_TYPE="ad-hoc"
               ;;
           esac
-          
+
           # Export validated profile type for use in scripts
           export PROFILE_TYPE="$PROFILE_TYPE"
           echo "🎯 Final Profile Type: $PROFILE_TYPE"
-          
+
           # Profile-specific configuration summary
           echo "📊 Build Configuration Summary:"
           echo "  - Bundle ID: $BUNDLE_ID"
@@ -2413,7 +2413,7 @@ workflows:
           echo "  - App Name: $APP_NAME"
           echo "  - Version: $VERSION_NAME ($VERSION_CODE)"
           echo "  - Team ID: $APPLE_TEAM_ID"
-          
+
           if [ "$PROFILE_TYPE" = "app-store" ]; then
             echo "🏪 App Store build configuration:"
             echo "  - Distribution method: App Store Connect"
@@ -2434,7 +2434,7 @@ workflows:
             echo "  - Distribution method: Development"
             echo "  - Target: Development testing"
           fi
-          
+
           if ./lib/scripts/ios/main.sh; then
             echo "✅ iOS build completed successfully"
           else

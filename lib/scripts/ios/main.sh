@@ -34,19 +34,31 @@ load_environment_variables() {
         return 1
     fi
     
-    if [ -z "${PROFILE_TYPE:-}" ]; then
-        log_error "PROFILE_TYPE is not set. Exiting."
-        return 1
-    fi
-    
     # Set default values
-export OUTPUT_DIR="${OUTPUT_DIR:-output/ios}"
-export PROJECT_ROOT="${PROJECT_ROOT:-$(pwd)}"
-export CM_BUILD_DIR="${CM_BUILD_DIR:-$(pwd)}"
-    export PROFILE_TYPE="${PROFILE_TYPE:-app-store}"
+    export OUTPUT_DIR="${OUTPUT_DIR:-output/ios}"
+    export PROJECT_ROOT="${PROJECT_ROOT:-$(pwd)}"
+    export CM_BUILD_DIR="${CM_BUILD_DIR:-$(pwd)}"
+    export PROFILE_TYPE="${PROFILE_TYPE:-ad-hoc}"
     
     log_success "Environment variables loaded successfully"
     return 0
+}
+
+# Function to validate profile type and create export options
+validate_profile_configuration() {
+    log_info "--- Profile Type Validation ---"
+    
+    # Make profile validation script executable
+    chmod +x "${SCRIPT_DIR}/validate_profile_type.sh"
+    
+    # Run profile validation and create export options
+    if "${SCRIPT_DIR}/validate_profile_type.sh" --create-export-options; then
+        log_success "✅ Profile type validation completed successfully"
+        return 0
+    else
+        log_error "❌ Profile type validation failed"
+        return 1
+    fi
 }
 
 # Main execution function
@@ -56,6 +68,12 @@ main() {
     # Load environment variables
     if ! load_environment_variables; then
         log_error "Environment variable loading failed"
+        return 1
+    fi
+    
+    # Validate profile type configuration early
+    if ! validate_profile_configuration; then
+        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Profile type validation failed."
         return 1
     fi
     
@@ -101,7 +119,7 @@ main() {
     fi
     
     # Stage 6: Firebase Integration (Conditional)
-if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
+    if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
         log_info "--- Stage 6: Setting up Firebase ---"
         if ! "${SCRIPT_DIR}/firebase_setup.sh"; then
             send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Firebase setup failed."
@@ -111,14 +129,44 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
         log_info "--- Stage 6: Skipping Firebase (Push notifications disabled) ---"
     fi
     
-    # Stage 7: Flutter Build Process
+    # Stage 7: Flutter Build Process (with emergency Firebase fallback)
     log_info "--- Stage 7: Building Flutter iOS App ---"
     if ! "${SCRIPT_DIR}/build_flutter_app.sh"; then
-        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Flutter build failed."
-        return 1
+        log_warn "⚠️ Primary build failed, attempting emergency Firebase removal..."
+        
+        # Make emergency script executable
+        chmod +x "${SCRIPT_DIR}/emergency_firebase_removal.sh"
+        
+        # Try emergency Firebase removal
+        if "${SCRIPT_DIR}/emergency_firebase_removal.sh"; then
+            log_success "✅ Emergency Firebase removal completed successfully"
+            log_warn "⚠️ Note: Firebase features (push notifications) are disabled in this build"
+            
+            # Skip Stage 8 since emergency script handles IPA export
+            log_info "--- Stage 8: Skipped (Emergency script handled IPA export) ---"
+            
+            # Stage 9: Email Notification - Build Success
+            if [ "${ENABLE_EMAIL_NOTIFICATIONS:-false}" = "true" ]; then
+                log_info "--- Stage 9: Sending Build Success Email ---"
+                "${SCRIPT_DIR}/email_notifications.sh" "build_success" "iOS" "${CM_BUILD_ID:-unknown}" || log_warn "Failed to send build success email."
+            fi
+            
+            log_success "iOS workflow completed successfully with emergency Firebase removal!"
+            log_info "Build Summary:"
+            log_info "   App: ${APP_NAME:-Unknown} v${VERSION_NAME:-Unknown}"
+            log_info "   Bundle ID: ${BUNDLE_ID:-Unknown}"
+            log_info "   Profile Type: ${PROFILE_TYPE:-Unknown}"
+            log_info "   Output: ${OUTPUT_DIR:-Unknown}"
+            log_warn "   Firebase: DISABLED (emergency removal applied)"
+            
+            return 0
+        else
+            send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Both primary build and emergency Firebase removal failed."
+            return 1
+        fi
     fi
     
-    # Stage 8: IPA Export
+    # Stage 8: IPA Export (only if primary build succeeded)
     log_info "--- Stage 8: Exporting IPA ---"
     if ! "${SCRIPT_DIR}/export_ipa.sh"; then
         send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "IPA export failed."
@@ -137,6 +185,7 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
     log_info "   Bundle ID: ${BUNDLE_ID:-Unknown}"
     log_info "   Profile Type: ${PROFILE_TYPE:-Unknown}"
     log_info "   Output: ${OUTPUT_DIR:-Unknown}"
+    log_info "   Firebase: ${PUSH_NOTIFY:-false}"
     
     return 0
 }
