@@ -2440,59 +2440,26 @@ workflows:
           else
             echo "❌ iOS build failed, trying emergency Firebase-free rebuild..."
             
-            # Run emergency Firebase removal script
+            # Emergency Firebase-free rebuild
             echo "🔥 Applying emergency Firebase removal..."
-            if [ -f "lib/scripts/ios/emergency_firebase_removal.sh" ]; then
-              chmod +x lib/scripts/ios/emergency_firebase_removal.sh
-              if lib/scripts/ios/emergency_firebase_removal.sh; then
-                echo "✅ Emergency Firebase removal completed successfully"
-              else
-                echo "❌ Emergency Firebase removal failed"
-                exit 1
-              fi
-            else
-              echo "❌ Emergency Firebase removal script not found"
-              exit 1
-            fi
-          fi
-
-      - name: Final Validation and Summary
-        script: |
-          echo "🔍 Final build validation..."
-
-          # Check for IPA file
-          if [ -f "output/ios/Runner.ipa" ]; then
-            local ipa_size=$(du -h output/ios/Runner.ipa | cut -f1)
-            echo "✅ IPA file found: output/ios/Runner.ipa ($ipa_size)"
             
-            # Validate IPA structure
-            if unzip -t "output/ios/Runner.ipa" >/dev/null 2>&1; then
-              echo "✅ IPA file is valid"
-            else
-              echo "⚠️ IPA file appears to be corrupted"
+            # Clean everything first
+            flutter clean
+            rm -rf .dart_tool/
+            rm -rf build/
+            rm -rf ios/Pods/
+            rm -f ios/Podfile.lock
+            
+            # Remove Firebase dependencies from pubspec.yaml
+            if [ -f "pubspec.yaml" ]; then
+              cp pubspec.yaml pubspec.yaml.emergency_backup
+              sed -i.tmp '/firebase/d' pubspec.yaml
+              sed -i.tmp '/Firebase/d' pubspec.yaml
+              rm -f pubspec.yaml.tmp
+              echo "✅ Firebase dependencies removed"
             fi
             
-            echo "🎯 Profile Type: $PROFILE_TYPE"
-            echo "📦 Distribution Status: READY"
-            
-          elif [ -d "output/ios/Runner.xcarchive" ]; then
-            local archive_size=$(du -h output/ios/Runner.xcarchive | cut -f1)
-            echo "⚠️ IPA export failed, but archive is available"
-            echo "📦 Archive: output/ios/Runner.xcarchive ($archive_size)"
-            echo "🔧 Manual export required in Xcode"
-            echo "📋 Check ARTIFACTS_SUMMARY.txt for manual export instructions"
-            
-          else
-            echo "❌ No build artifacts found"
-            echo "🔍 Check build logs for errors"
-          fi
-
-          # Display artifacts summary if available
-          if [ -f "output/ios/ARTIFACTS_SUMMARY.txt" ]; then
-            echo ""
-            echo "📋 Build Summary:"
-            cat output/ios/ARTIFACTS_SUMMARY.txt
-          fi
+            # Remove Firebase config files
             [ -f "ios/Runner/GoogleService-Info.plist" ] && mv "ios/Runner/GoogleService-Info.plist" "ios/Runner/GoogleService-Info.plist.emergency_backup"
             [ -f "android/app/google-services.json" ] && mv "android/app/google-services.json" "android/app/google-services.json.emergency_backup"
             
