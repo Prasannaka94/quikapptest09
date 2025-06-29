@@ -174,6 +174,7 @@ export_with_app_store_connect_api() {
     log_info "   Export Path: ${export_path}"
     log_info "   Export Options: ${export_options_path}"
     
+    # Export with collision detection
     if xcodebuild -exportArchive \
         -archivePath "$archive_path" \
         -exportPath "$export_path" \
@@ -181,7 +182,7 @@ export_with_app_store_connect_api() {
         -authenticationKeyPath "$api_key_path" \
         -authenticationKeyID "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
         -authenticationKeyIssuerID "$APP_STORE_CONNECT_ISSUER_ID" \
-        -allowProvisioningUpdates; then
+        -allowProvisioningUpdates 2>&1 | tee export_app_store_api.log; then
         
         log_success "✅ App Store Connect API export successful!"
         
@@ -198,11 +199,55 @@ export_with_app_store_connect_api() {
         return 0
     else
         log_warn "⚠️ App Store Connect API export failed"
+        
+        # Check for bundle identifier collision
+        if grep -q "CFBundleIdentifier Collision\|There is more than one bundle with the CFBundleIdentifier" export_app_store_api.log 2>/dev/null; then
+            log_error "🔧 Bundle Identifier Collision detected during export!"
+            log_info "Attempting to fix collision and retry export..."
+            
+            # Apply bundle identifier collision fixes
+            if handle_bundle_identifier_collision_during_export; then
+                log_info "🔄 Retrying App Store Connect API export after bundle ID fixes..."
+                
+                # Retry export after fixes
+                if xcodebuild -exportArchive \
+                    -archivePath "$archive_path" \
+                    -exportPath "$export_path" \
+                    -exportOptionsPlist "$export_options_path" \
+                    -authenticationKeyPath "$api_key_path" \
+                    -authenticationKeyID "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
+                    -authenticationKeyIssuerID "$APP_STORE_CONNECT_ISSUER_ID" \
+                    -allowProvisioningUpdates 2>&1 | tee export_app_store_api_retry.log; then
+                    
+                    log_success "✅ App Store Connect API export successful after bundle ID fixes!"
+                    
+                    # Verify IPA was created
+                    local ipa_file="${export_path}/Runner.ipa"
+                    if [ -f "$ipa_file" ]; then
+                        local ipa_size=$(du -h "$ipa_file" | cut -f1)
+                        log_success "✅ IPA file created: Runner.ipa (${ipa_size})"
+                        log_info "🎯 Ready for TestFlight upload with Key ID: ${APP_STORE_CONNECT_KEY_IDENTIFIER}"
+                    fi
+                    
+                    # Clean up API key file
+                    rm -f "$api_key_path"
+                    return 0
+                else
+                    log_error "❌ Export still failed after bundle ID collision fixes"
+                    # Continue to other export methods
+                fi
+            else
+                log_error "❌ Failed to apply bundle identifier collision fixes"
+                # Continue to other export methods
+            fi
+        fi
+        
         log_info "Possible causes:"
         log_info "  1. Invalid or expired p8 key"
         log_info "  2. Key ID or Issuer ID mismatch"
         log_info "  3. Bundle ID not registered in App Store Connect"
         log_info "  4. Provisioning profile issues"
+        log_info "  5. Bundle identifier collision"
         
         # Clean up API key file
         rm -f "$api_key_path"
@@ -237,17 +282,45 @@ export_with_automatic_signing() {
         -archivePath "$archive_path" \
         -exportPath "$export_path" \
         -exportOptionsPlist "$export_options_path" \
-        -allowProvisioningUpdates; then
+        -allowProvisioningUpdates 2>&1 | tee export_automatic.log; then
         
         log_success "Automatic signing export successful!"
         return 0
     else
         log_warn "Automatic signing export failed"
+        
+        # Check for bundle identifier collision
+        if grep -q "CFBundleIdentifier Collision\|There is more than one bundle with the CFBundleIdentifier" export_automatic.log 2>/dev/null; then
+            log_error "🔧 Bundle Identifier Collision detected during automatic signing export!"
+            log_info "Attempting to fix collision and retry export..."
+            
+            # Apply bundle identifier collision fixes
+            if handle_bundle_identifier_collision_during_export; then
+                log_info "🔄 Retrying automatic signing export after bundle ID fixes..."
+                
+                # Retry export after fixes
+                if xcodebuild -exportArchive \
+                    -archivePath "$archive_path" \
+                    -exportPath "$export_path" \
+                    -exportOptionsPlist "$export_options_path" \
+                    -allowProvisioningUpdates 2>&1 | tee export_automatic_retry.log; then
+                    
+                    log_success "✅ Automatic signing export successful after bundle ID fixes!"
+                    return 0
+                else
+                    log_error "❌ Automatic signing export still failed after bundle ID collision fixes"
+                fi
+            else
+                log_error "❌ Failed to apply bundle identifier collision fixes"
+            fi
+        fi
+        
         log_info "Common causes:"
         log_info "  1. No Apple Developer account configured in Xcode"
         log_info "  2. Missing provisioning profiles for bundle ID: ${BUNDLE_ID:-unknown}"
         log_info "  3. Invalid team ID: ${APPLE_TEAM_ID:-unknown}"
         log_info "  4. App Store Connect API credentials required for app-store distribution"
+        log_info "  5. Bundle identifier collision"
         return 1
     fi
 }
@@ -338,6 +411,110 @@ export_with_manual_certificates() {
         log_info "  2. Bundle ID matches provisioning profile"
         log_info "  3. Certificate is valid and not expired"
         rm -rf "$cert_dir"
+        return 1
+    fi
+}
+
+# Function to handle bundle identifier collision during export
+handle_bundle_identifier_collision_during_export() {
+    log_info "🔧 Handling Bundle Identifier Collision during export..."
+    
+    # Apply the enhanced v2 fixes if available
+    if [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh" ]; then
+        log_info "Applying enhanced Bundle Identifier Collision fixes (v2)..."
+        chmod +x "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh"
+        if "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh"; then
+            log_success "✅ Enhanced Bundle Identifier Collision fixes (v2) applied successfully"
+            
+            # Re-run pod install to apply fixes
+            log_info "🔄 Re-running pod install to apply bundle identifier fixes..."
+            cd ios && pod install --repo-update && cd ..
+            
+            return 0
+        else
+            log_warn "⚠️ Enhanced Bundle Identifier Collision fixes (v2) failed, trying v1..."
+        fi
+    fi
+    
+    # Fallback to v1 fixes
+    if [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh" ]; then
+        log_info "Applying basic Bundle Identifier Collision fixes (v1)..."
+        chmod +x "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh"
+        if "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh"; then
+            log_success "✅ Basic Bundle Identifier Collision fixes (v1) applied successfully"
+            
+            # Re-run pod install to apply fixes
+            log_info "🔄 Re-running pod install to apply bundle identifier fixes..."
+            cd ios && pod install --repo-update && cd ..
+            
+            return 0
+        else
+            log_error "❌ Basic Bundle Identifier Collision fixes (v1) failed"
+        fi
+    fi
+    
+    # Manual bundle identifier collision fix as last resort
+    log_warn "⚠️ No bundle identifier collision fix scripts found, applying manual fixes..."
+    
+    # Quick manual fix for common collision issues
+    local project_file="ios/Runner.xcodeproj/project.pbxproj"
+    
+    if [ -f "$project_file" ]; then
+        log_info "Applying manual bundle identifier collision fixes to project file..."
+        
+        # Create backup
+        cp "$project_file" "$project_file.backup.export.$(date +%Y%m%d_%H%M%S)"
+        
+        # Fix common collision patterns using sed
+        local main_bundle_id="${BUNDLE_ID:-com.twinklub.twinklub}"
+        
+        # Ensure test targets have unique bundle identifiers
+        sed -i.tmp "s/PRODUCT_BUNDLE_IDENTIFIER = ${main_bundle_id};/PRODUCT_BUNDLE_IDENTIFIER = ${main_bundle_id};/g" "$project_file"
+        sed -i.tmp "s/PRODUCT_BUNDLE_IDENTIFIER = ${main_bundle_id};\(.*RunnerTests\)/PRODUCT_BUNDLE_IDENTIFIER = ${main_bundle_id}.tests;\1/g" "$project_file"
+        sed -i.tmp "s/PRODUCT_BUNDLE_IDENTIFIER = ${main_bundle_id};\(.*RunnerUITests\)/PRODUCT_BUNDLE_IDENTIFIER = ${main_bundle_id}.uitests;\1/g" "$project_file"
+        
+        rm -f "$project_file.tmp"
+        
+        log_success "✅ Manual bundle identifier collision fixes applied"
+        
+        # Update Podfile to ensure unique bundle identifiers for pods
+        local podfile="ios/Podfile"
+        if [ -f "$podfile" ]; then
+            log_info "Updating Podfile to prevent pod bundle identifier collisions..."
+            
+            # Check if collision prevention is already in Podfile
+            if ! grep -q "Bundle identifier collision prevention" "$podfile"; then
+                cat >> "$podfile" << 'EOF'
+
+# Bundle identifier collision prevention (added during export)
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      next if target.name == "Runner"
+      
+      if config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
+        current_bundle_id = config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
+        if current_bundle_id.include?("com.twinklub.twinklub") || current_bundle_id.include?("com.example.quikapptest07")
+          config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"] = current_bundle_id + ".pod." + target.name.downcase
+        end
+      end
+    end
+  end
+end
+EOF
+                log_success "✅ Added pod bundle identifier collision prevention to Podfile"
+            else
+                log_info "Pod bundle identifier collision prevention already present in Podfile"
+            fi
+        fi
+        
+        # Re-run pod install
+        log_info "🔄 Re-running pod install to apply manual fixes..."
+        cd ios && pod install && cd ..
+        
+        return 0
+    else
+        log_error "❌ Project file not found: $project_file"
         return 1
     fi
 }

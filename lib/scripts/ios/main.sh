@@ -157,10 +157,70 @@ main() {
             send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Firebase setup failed."
             return 1
         fi
+        
+        # Apply bundle identifier collision fixes after Firebase setup
+        log_info "🔧 Applying Bundle Identifier Collision fixes after Firebase setup..."
+        if [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh" ]; then
+            chmod +x "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh"
+            if ! "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh"; then
+                log_warn "⚠️ Bundle Identifier Collision fixes (v2) failed after Firebase setup"
+                # Try v1 as fallback
+                if [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh" ]; then
+                    chmod +x "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh"
+                    "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh" || log_warn "Bundle Identifier Collision fixes failed"
+                fi
+            else
+                log_success "✅ Bundle Identifier Collision fixes applied after Firebase setup"
+            fi
+        fi
     else
         log_info "--- Stage 6.7: Firebase Setup Skipped (Push notifications disabled) ---"
     fi
     
+    # Stage 6.9: Critical Bundle Identifier Collision Prevention
+    log_info "--- Stage 6.9: Pre-Build Bundle Identifier Collision Prevention ---"
+    log_info "🔧 Applying comprehensive Bundle Identifier Collision fixes before build..."
+    
+    # Apply the enhanced v2 fixes
+    if [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh" ]; then
+        chmod +x "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh"
+        if "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh"; then
+            log_success "✅ Enhanced Bundle Identifier Collision fixes (v2) applied successfully"
+        else
+            log_warn "⚠️ Enhanced Bundle Identifier Collision fixes (v2) failed, trying v1..."
+            # Fallback to v1
+            if [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh" ]; then
+                chmod +x "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh"
+                if "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh"; then
+                    log_success "✅ Basic Bundle Identifier Collision fixes (v1) applied successfully"
+                else
+                    log_error "❌ All Bundle Identifier Collision fixes failed"
+                    send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Bundle Identifier Collision fixes failed - CFBundleIdentifier validation will fail."
+                    return 1
+                fi
+            else
+                log_error "❌ No Bundle Identifier Collision fix scripts found"
+                send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Bundle Identifier Collision fix scripts not found."
+                return 1
+            fi
+        fi
+    else
+        log_error "❌ Enhanced Bundle Identifier Collision fix script not found"
+        # Try v1 as last resort
+        if [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh" ]; then
+            chmod +x "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh"
+            if "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh"; then
+                log_success "✅ Basic Bundle Identifier Collision fixes (v1) applied as fallback"
+            else
+                log_error "❌ All Bundle Identifier Collision fixes failed"
+                return 1
+            fi
+        else
+            log_error "❌ No Bundle Identifier Collision fix scripts found at all"
+            return 1
+        fi
+    fi
+
     # Stage 7: Flutter Build Process (must succeed for clean build)
     log_info "--- Stage 7: Building Flutter iOS App ---"
     if ! "${SCRIPT_DIR}/build_flutter_app.sh"; then
