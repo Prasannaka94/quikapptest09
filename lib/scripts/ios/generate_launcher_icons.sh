@@ -48,10 +48,34 @@ validate_logo_file() {
         log_info "🎯 Using logo downloaded/created by branding_assets.sh in Stage 4"
     fi
     
-    # Verify logo properties
+    # Verify and convert logo properties
     if command -v file &> /dev/null; then
         local file_info=$(file "$logo_path")
         log_info "📋 Logo properties: $file_info"
+        
+        # Check if file is AVIF format (needs conversion)
+        if echo "$file_info" | grep -q "AVIF\|ISO Media"; then
+            log_warn "⚠️ Logo is in AVIF format, converting to PNG..."
+            
+            # Convert AVIF to PNG using sips
+            if command -v sips &> /dev/null; then
+                local temp_png="${logo_path%.png}_converted.png"
+                if sips -s format png "$logo_path" --out "$temp_png" >/dev/null 2>&1; then
+                    mv "$temp_png" "$logo_path"
+                    log_success "✅ Logo converted from AVIF to PNG format"
+                    
+                    # Re-check properties after conversion
+                    file_info=$(file "$logo_path")
+                    log_info "📋 Converted logo properties: $file_info"
+                else
+                    log_error "❌ Failed to convert AVIF to PNG"
+                    return 1
+                fi
+            else
+                log_error "❌ sips not available for AVIF conversion"
+                return 1
+            fi
+        fi
         
         if echo "$file_info" | grep -q "with alpha"; then
             log_warn "⚠️ Logo still contains alpha channel - may cause App Store validation issues"
@@ -95,6 +119,14 @@ check_flutter_launcher_icons() {
     # Run pub get to ensure dependency is installed
     log_info "📥 Installing dependencies..."
     flutter pub get
+    
+    # Fix path issue - ensure logo is also available at expected path
+    if [ -f "assets/images/logo.png" ] && [ ! -f "assets/icons/app_icon.png" ]; then
+        log_info "📋 Creating assets/icons/app_icon.png from assets/images/logo.png"
+        ensure_directory "assets/icons"
+        cp "assets/images/logo.png" "assets/icons/app_icon.png"
+        log_success "✅ Logo copied to expected path"
+    fi
 }
 
 # Function to validate flutter_launcher_icons configuration
@@ -116,6 +148,46 @@ validate_launcher_icons_config() {
     # Check for remove_alpha_ios setting
     if ! grep -A 20 "^flutter_launcher_icons:" pubspec.yaml | grep -q "remove_alpha_ios: true"; then
         log_warn "⚠️ remove_alpha_ios not set to true - may cause App Store validation issues"
+        
+        # Fix the configuration automatically
+        log_info "🔧 Fixing remove_alpha_ios configuration..."
+        if grep -A 20 "^flutter_launcher_icons:" pubspec.yaml | grep -q "remove_alpha_ios:"; then
+            # Update existing setting
+            sed -i.bak 's/remove_alpha_ios: false/remove_alpha_ios: true/' pubspec.yaml
+        else
+            # Add missing setting
+            sed -i.bak '/ios: true/a\
+  remove_alpha_ios: true' pubspec.yaml
+        fi
+        rm -f pubspec.yaml.bak
+        log_success "✅ Added remove_alpha_ios: true to configuration"
+    fi
+    
+    # Debug: Show current configuration
+    log_info "📋 Current flutter_launcher_icons configuration:"
+    grep -A 15 "^flutter_launcher_icons:" pubspec.yaml | sed 's/^/  /'
+    
+    # Verify image path exists
+    local configured_path
+    configured_path=$(grep -A 15 "^flutter_launcher_icons:" pubspec.yaml | grep "image_path:" | sed 's/.*image_path: *["\x27]*\([^"\x27]*\)["\x27]*.*/\1/')
+    
+    if [ -n "$configured_path" ]; then
+        log_info "📋 Configured image path: $configured_path"
+        if [ -f "$configured_path" ]; then
+            log_success "✅ Configured image path exists: $configured_path"
+        else
+            log_error "❌ Configured image path does not exist: $configured_path"
+            
+            # Try to find the actual logo and update configuration
+            if [ -f "assets/images/logo.png" ]; then
+                log_info "🔧 Updating image_path to use existing logo..."
+                sed -i.bak "s|image_path: .*|image_path: \"assets/images/logo.png\"|" pubspec.yaml
+                rm -f pubspec.yaml.bak
+                log_success "✅ Updated image_path to: assets/images/logo.png"
+            fi
+        fi
+    else
+        log_warn "⚠️ No image_path found in configuration"
     fi
     
     log_success "✅ flutter_launcher_icons configuration validated"
@@ -126,12 +198,27 @@ validate_launcher_icons_config() {
 generate_icons() {
     log_info "🎨 Generating iOS launcher icons..."
     
-    # Run flutter_launcher_icons
-    if dart run flutter_launcher_icons; then
+    # Run flutter_launcher_icons with verbose output
+    log_info "🚀 Running dart run flutter_launcher_icons..."
+    
+    # Run with error capture
+    local output
+    if output=$(dart run flutter_launcher_icons 2>&1); then
         log_success "✅ iOS launcher icons generated successfully"
+        echo "$output" | sed 's/^/  [FLI] /'
     else
         log_error "❌ Failed to generate iOS launcher icons"
-        return 1
+        log_error "Flutter Launcher Icons output:"
+        echo "$output" | sed 's/^/  [ERROR] /'
+        
+        # Try alternative command format
+        log_info "🔄 Trying alternative command: flutter pub run flutter_launcher_icons..."
+        if flutter pub run flutter_launcher_icons 2>&1; then
+            log_success "✅ Icons generated with alternative command"
+        else
+            log_error "❌ Both commands failed"
+            return 1
+        fi
     fi
     
     # Verify critical icons were generated

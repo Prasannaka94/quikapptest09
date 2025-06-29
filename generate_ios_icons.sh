@@ -47,9 +47,34 @@ if [ ! -f "assets/images/logo.png" ]; then
     fi
 fi
 
+# Fix path issue - ensure logo is available at both paths
+if [ -f "assets/images/logo.png" ] && [ ! -f "assets/icons/app_icon.png" ]; then
+    echo "📋 Creating assets/icons/app_icon.png from assets/images/logo.png"
+    mkdir -p assets/icons
+    cp "assets/images/logo.png" "assets/icons/app_icon.png"
+fi
+
+# Check if logo is AVIF format and convert
+if command -v file &> /dev/null; then
+    file_info=$(file assets/images/logo.png)
+    if echo "$file_info" | grep -q "AVIF\|ISO Media"; then
+        echo "⚠️ Logo is in AVIF format, converting to PNG..."
+        if command -v sips &> /dev/null; then
+            sips -s format png assets/images/logo.png --out assets/images/logo_converted.png >/dev/null 2>&1
+            mv assets/images/logo_converted.png assets/images/logo.png
+            # Also update the copy
+            cp assets/images/logo.png assets/icons/app_icon.png
+            echo "✅ Logo converted from AVIF to PNG format"
+        fi
+    fi
+fi
+
 # Generate icons
 echo "🎨 Generating iOS app icons without transparency..."
-dart run flutter_launcher_icons
+if ! dart run flutter_launcher_icons; then
+    echo "🔄 Trying alternative command..."
+    flutter pub run flutter_launcher_icons
+fi
 
 # Verify the critical 1024x1024 icon
 if [ -f "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png" ]; then
