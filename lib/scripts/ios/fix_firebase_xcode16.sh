@@ -151,10 +151,9 @@ if [ -f "$PODFILE" ]; then
         # Remove existing post_install hook
         sed -i '' '/post_install do |installer|/,/^end$/d' "$PODFILE"
         echo "✅ Removed existing post_install hook"
-    fi
-    
-    # Add comprehensive Firebase-compatible post_install hook
-    cat >> "$PODFILE" << 'EOF'
+        
+        # Add comprehensive Firebase-compatible post_install hook
+        cat >> "$PODFILE" << 'EOF'
 
 # Fix Firebase compilation issues with Xcode 16.0 - Comprehensive Version
 post_install do |installer|
@@ -286,7 +285,7 @@ if [ -f "$INFO_PLIST" ]; then
     # Add Firebase messaging configuration if not present
     if ! grep -q "FirebaseAppDelegateProxyEnabled" "$INFO_PLIST"; then
         # Create a temporary file with the new content
-        local temp_plist="/tmp/info_plist_temp_$$"
+        temp_plist="/tmp/info_plist_temp_$$"
         
         # Insert Firebase configuration before the closing </dict>
         sed 's|</dict>|	<key>FirebaseAppDelegateProxyEnabled</key>\n	<false/>\n</dict>|' "$INFO_PLIST" > "$temp_plist"
