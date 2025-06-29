@@ -114,40 +114,60 @@ EOF
 
 # Function to export IPA using App Store Connect API
 export_with_app_store_connect_api() {
-    log_info "Attempting export with App Store Connect API..."
+    log_info "Attempting export with App Store Connect API (using provided credentials)..."
     
     local archive_path="${OUTPUT_DIR:-output/ios}/Runner.xcarchive"
     local export_path="${OUTPUT_DIR:-output/ios}"
     local export_options_path="ios/ExportOptions.plist"
     
-    # Validate App Store Connect API credentials
-    if [ -z "${APP_STORE_CONNECT_API_KEY_PATH:-}" ] || [ -z "${APP_STORE_CONNECT_KEY_IDENTIFIER:-}" ] || [ -z "${APP_STORE_CONNECT_ISSUER_ID:-}" ]; then
-        log_warn "App Store Connect API credentials incomplete, skipping..."
-        log_info "Required variables:"
-        log_info "  - APP_STORE_CONNECT_API_KEY_PATH: ${APP_STORE_CONNECT_API_KEY_PATH:-NOT_SET}"
-        log_info "  - APP_STORE_CONNECT_KEY_IDENTIFIER: ${APP_STORE_CONNECT_KEY_IDENTIFIER:-NOT_SET}"
-        log_info "  - APP_STORE_CONNECT_ISSUER_ID: ${APP_STORE_CONNECT_ISSUER_ID:-NOT_SET}"
-        return 1
-    fi
+    # Use the specific credentials provided
+    export APP_STORE_CONNECT_KEY_IDENTIFIER="${APP_STORE_CONNECT_KEY_IDENTIFIER:-ZFD9GRMS7R}"
+    export APP_STORE_CONNECT_API_KEY_PATH="${APP_STORE_CONNECT_API_KEY_PATH:-https://raw.githubusercontent.com/prasanna91/QuikApp/main/AuthKey_ZFD9GRMS7R.p8}"
+    export APP_STORE_CONNECT_ISSUER_ID="${APP_STORE_CONNECT_ISSUER_ID:-a99a2ebd-ed3e-4117-9f97-f195823774a7}"
     
-    # Download API key
+    log_info "🔐 Using App Store Connect API credentials:"
+    log_info "  - Key ID: ${APP_STORE_CONNECT_KEY_IDENTIFIER}"
+    log_info "  - Issuer ID: ${APP_STORE_CONNECT_ISSUER_ID}"
+    log_info "  - API Key URL: ${APP_STORE_CONNECT_API_KEY_PATH}"
+    
+    # Download API key from GitHub
     local api_key_path="/tmp/AuthKey_${APP_STORE_CONNECT_KEY_IDENTIFIER}.p8"
-    log_info "Downloading API key from: ${APP_STORE_CONNECT_API_KEY_PATH}"
+    log_info "📥 Downloading p8 API key from GitHub..."
     
-    if curl -L -o "$api_key_path" "${APP_STORE_CONNECT_API_KEY_PATH}" 2>/dev/null; then
+    if curl -fsSL -o "$api_key_path" "${APP_STORE_CONNECT_API_KEY_PATH}"; then
         chmod 600 "$api_key_path"
-        log_success "API key downloaded successfully"
+        log_success "✅ API key downloaded successfully to ${api_key_path}"
+        
+        # Verify the downloaded file
+        if [[ -f "${api_key_path}" && -s "${api_key_path}" ]]; then
+            log_success "✅ API key file verified (Size: $(du -h "${api_key_path}" | cut -f1))"
+            
+            # Check if it looks like a valid p8 file
+            if head -1 "${api_key_path}" | grep -q "BEGIN PRIVATE KEY"; then
+                log_success "✅ API key format validation passed"
+            else
+                log_warn "⚠️ API key format validation warning - file may not be a valid p8 key"
+            fi
+        else
+            log_error "❌ Downloaded API key file is empty or invalid"
+            return 1
+        fi
     else
-        log_error "Failed to download API key from: ${APP_STORE_CONNECT_API_KEY_PATH}"
+        log_error "❌ Failed to download API key from GitHub"
+        log_error "   URL: ${APP_STORE_CONNECT_API_KEY_PATH}"
         log_info "Please check:"
-        log_info "  1. API key URL is accessible"
-        log_info "  2. API key has correct permissions"
+        log_info "  1. GitHub URL is accessible"
+        log_info "  2. p8 file exists at the URL"
         log_info "  3. Network connectivity"
         return 1
     fi
     
     # Try export with App Store Connect API
-    log_info "Running xcodebuild export with App Store Connect API..."
+    log_info "🚀 Running xcodebuild export with App Store Connect API..."
+    log_info "   Archive: ${archive_path}"
+    log_info "   Export Path: ${export_path}"
+    log_info "   Export Options: ${export_options_path}"
+    
     if xcodebuild -exportArchive \
         -archivePath "$archive_path" \
         -exportPath "$export_path" \
@@ -157,11 +177,28 @@ export_with_app_store_connect_api() {
         -authenticationKeyIssuerID "$APP_STORE_CONNECT_ISSUER_ID" \
         -allowProvisioningUpdates; then
         
-        log_success "App Store Connect API export successful!"
+        log_success "✅ App Store Connect API export successful!"
+        
+        # Verify IPA was created
+        local ipa_file="${export_path}/Runner.ipa"
+        if [ -f "$ipa_file" ]; then
+            local ipa_size=$(du -h "$ipa_file" | cut -f1)
+            log_success "✅ IPA file created: Runner.ipa (${ipa_size})"
+            log_info "🎯 Ready for TestFlight upload with Key ID: ${APP_STORE_CONNECT_KEY_IDENTIFIER}"
+        fi
+        
+        # Clean up API key file
         rm -f "$api_key_path"
         return 0
     else
-        log_warn "App Store Connect API export failed"
+        log_warn "⚠️ App Store Connect API export failed"
+        log_info "Possible causes:"
+        log_info "  1. Invalid or expired p8 key"
+        log_info "  2. Key ID or Issuer ID mismatch"
+        log_info "  3. Bundle ID not registered in App Store Connect"
+        log_info "  4. Provisioning profile issues"
+        
+        # Clean up API key file
         rm -f "$api_key_path"
         return 1
     fi

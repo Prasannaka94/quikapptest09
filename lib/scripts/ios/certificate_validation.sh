@@ -19,34 +19,60 @@ else
     log_error() { echo "❌ $1"; }
 fi
 
-log_info "🔒 Simple Certificate Validation (No Encoding Required)..."
+log_info "🔒 Certificate Validation with App Store Connect API..."
 
-# Check if using Codemagic's built-in code signing (simplest method)
-if [ "${CM_CODE_SIGNING:-}" = "true" ] || [ -n "${CM_CERTIFICATE:-}" ]; then
-    log_success "✅ Using Codemagic's built-in code signing (no encoding required)"
-    export EXPORT_METHOD="codemagic_builtin"
+# Download App Store Connect API Key
+log_info "📥 Setting up App Store Connect API credentials..."
+
+# Use the specific credentials provided
+export APP_STORE_CONNECT_KEY_IDENTIFIER="${APP_STORE_CONNECT_KEY_IDENTIFIER:-ZFD9GRMS7R}"
+export APP_STORE_CONNECT_API_KEY_PATH="${APP_STORE_CONNECT_API_KEY_PATH:-https://raw.githubusercontent.com/prasanna91/QuikApp/main/AuthKey_ZFD9GRMS7R.p8}"
+export APP_STORE_CONNECT_ISSUER_ID="${APP_STORE_CONNECT_ISSUER_ID:-a99a2ebd-ed3e-4117-9f97-f195823774a7}"
+
+log_info "🔐 App Store Connect API Configuration:"
+log_info "   - Key ID: ${APP_STORE_CONNECT_KEY_IDENTIFIER}"
+log_info "   - Issuer ID: ${APP_STORE_CONNECT_ISSUER_ID}"
+log_info "   - API Key URL: ${APP_STORE_CONNECT_API_KEY_PATH}"
+
+# Download the p8 file from GitHub
+log_info "📥 Downloading p8 API key from GitHub..."
+API_KEY_PATH="/tmp/AuthKey_${APP_STORE_CONNECT_KEY_IDENTIFIER}.p8"
+
+if curl -fsSL -o "${API_KEY_PATH}" "${APP_STORE_CONNECT_API_KEY_PATH}"; then
+    log_success "✅ API key downloaded successfully to ${API_KEY_PATH}"
     
-    # Codemagic handles all signing automatically
-    log_info "🔐 Codemagic will handle all certificate and profile setup automatically"
-    
-elif [ -n "${APPLE_ID:-}" ] && [ -n "${APPLE_ID_PASSWORD:-}" ]; then
-    log_success "✅ Using Apple ID authentication (simple setup)"
-    export EXPORT_METHOD="apple_id"
-    
-    log_info "🍎 Apple ID: ${APPLE_ID}"
-    log_info "🔐 App-specific password configured"
-    
-elif [ -n "${APPLE_TEAM_ID:-}" ]; then
-    log_success "✅ Using automatic signing with Team ID"
-    export EXPORT_METHOD="automatic_with_team"
-    
-    log_info "👥 Team ID: ${APPLE_TEAM_ID}"
-    log_info "🔐 iOS will attempt automatic profile selection"
-    
+    # Verify the downloaded file
+    if [[ -f "${API_KEY_PATH}" && -s "${API_KEY_PATH}" ]]; then
+        log_success "✅ API key file verified (Size: $(du -h "${API_KEY_PATH}" | cut -f1))"
+        
+        # Check if it looks like a valid p8 file
+        if head -1 "${API_KEY_PATH}" | grep -q "BEGIN PRIVATE KEY"; then
+            log_success "✅ API key format validation passed"
+        else
+            log_warn "⚠️ API key format validation warning - file may not be a valid p8 key"
+        fi
+        
+        export APP_STORE_CONNECT_API_KEY_DOWNLOADED_PATH="${API_KEY_PATH}"
+        export EXPORT_METHOD="app_store_connect_api"
+        log_success "✅ Using App Store Connect API for authentication"
+        
+    else
+        log_error "❌ Downloaded API key file is empty or invalid"
+        log_warn "⚠️ Falling back to automatic signing"
+        export EXPORT_METHOD="automatic_basic"
+    fi
 else
-    log_warn "⚠️ No signing configuration found - using basic automatic signing"
-    export EXPORT_METHOD="automatic_basic"
-    log_warn "⚠️ This may fail without proper Team ID configuration"
+    log_error "❌ Failed to download API key from GitHub"
+    log_error "   URL: ${APP_STORE_CONNECT_API_KEY_PATH}"
+    log_warn "⚠️ Falling back to automatic signing with Team ID"
+    
+    if [ -n "${APPLE_TEAM_ID:-}" ]; then
+        log_info "👥 Team ID available: ${APPLE_TEAM_ID}"
+        export EXPORT_METHOD="automatic_with_team"
+    else
+        log_warn "⚠️ No Team ID configured - using basic automatic signing"
+        export EXPORT_METHOD="automatic_basic"
+    fi
 fi
 
 # Determine export method based on profile type

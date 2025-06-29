@@ -84,10 +84,13 @@ main() {
         return 1
     fi
     
-    # Stage 2: Email Notification - Build Started
-    if [ "${ENABLE_EMAIL_NOTIFICATIONS:-false}" = "true" ]; then
+    # Stage 2: Email Notification - Build Started (only if not already sent)
+    if [ "${ENABLE_EMAIL_NOTIFICATIONS:-false}" = "true" ] && [ -z "${EMAIL_BUILD_STARTED_SENT:-}" ]; then
         log_info "--- Stage 2: Sending Build Started Email ---"
         "${SCRIPT_DIR}/email_notifications.sh" "build_started" "iOS" "${CM_BUILD_ID:-unknown}" || log_warn "Failed to send build started email."
+        export EMAIL_BUILD_STARTED_SENT="true"
+    elif [ -n "${EMAIL_BUILD_STARTED_SENT:-}" ]; then
+        log_info "--- Stage 2: Build Started Email Already Sent (Skipping) ---"
     fi
     
     # Stage 3: Handle Certificates and Provisioning Profiles
@@ -169,11 +172,10 @@ main() {
             # Skip Stage 8 since emergency script handles IPA export
             log_info "--- Stage 8: Skipped (Emergency script handled IPA export) ---"
             
-            # Stage 9: Email Notification - Build Success
-            if [ "${ENABLE_EMAIL_NOTIFICATIONS:-false}" = "true" ]; then
-                log_info "--- Stage 9: Sending Build Success Email ---"
-                "${SCRIPT_DIR}/email_notifications.sh" "build_success" "iOS" "${CM_BUILD_ID:-unknown}" || log_warn "Failed to send build success email."
-            fi
+            # Stage 9: Build Success Status Set (Email will be sent by workflow)
+            log_info "--- Stage 9: Setting Build Success Status ---"
+            export FINAL_BUILD_STATUS="success"
+            export FINAL_BUILD_MESSAGE="iOS emergency build completed successfully: ${APP_NAME:-Unknown} (${VERSION_NAME:-Unknown}) - Firebase-free recovery build"
             
             log_success "iOS workflow completed successfully with emergency Firebase removal!"
             log_info "Build Summary:"
@@ -197,11 +199,10 @@ main() {
         return 1
     fi
     
-    # Stage 9: Email Notification - Build Success
-    if [ "${ENABLE_EMAIL_NOTIFICATIONS:-false}" = "true" ]; then
-        log_info "--- Stage 9: Sending Build Success Email ---"
-        "${SCRIPT_DIR}/email_notifications.sh" "build_success" "iOS" "${CM_BUILD_ID:-unknown}" || log_warn "Failed to send build success email."
-    fi
+    # Stage 9: Build Success Status Set (Email will be sent by workflow)
+    log_info "--- Stage 9: Setting Build Success Status ---"
+    export FINAL_BUILD_STATUS="success"
+    export FINAL_BUILD_MESSAGE="iOS build completed successfully: ${APP_NAME:-Unknown} (${VERSION_NAME:-Unknown}) - Full build with IPA export"
     
     log_success "iOS workflow completed successfully!"
     log_info "Build Summary:"
