@@ -407,9 +407,12 @@ fix_transparency_issues() {
                         mv "$bg_temp" "$icon_file"
                         log_success "✅ $filename - CRITICAL: Background composition applied"
                     fi
+                    
+                    # Clean up bg_temp immediately
+                    rm -f "$bg_temp" 2>/dev/null || true
                 fi
                 
-                rm -f "$temp_jpg" "$temp_png" "$bg_temp" 2>/dev/null || true
+                rm -f "$temp_jpg" "$temp_png" 2>/dev/null || true
                 
             else
                 log_error "❌ sips not available - cannot remove transparency"
