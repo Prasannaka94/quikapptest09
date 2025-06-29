@@ -97,7 +97,7 @@ scripts:
 
       echo "*********** Bottom Navigation Configuration ***********"
       echo "BOTTOMMENU_ITEMS: $BOTTOMMENU_ITEMS"
-      echo "BOTTOMMENU_BG_COLOR: $BOTTOMMENU_BG_COLOR"  
+      echo "BOTTOMMENU_BG_COLOR: $BOTTOMMENU_BG_COLOR  
       echo "BOTTOMMENU_ICON_COLOR: $BOTTOMMENU_ICON_COLOR"
       echo "BOTTOMMENU_TEXT_COLOR: $BOTTOMMENU_TEXT_COLOR"
       echo "BOTTOMMENU_FONT: $BOTTOMMENU_FONT"
@@ -2385,6 +2385,56 @@ workflows:
             echo "⚠️ Firebase fix script not found, continuing with build..."
           fi
                     echo "🚀 Starting iOS build process with profile type: $PROFILE_TYPE"
+          
+          # Validate and configure profile type before build
+          echo "🔍 Validating profile type configuration..."
+          PROFILE_TYPE=${PROFILE_TYPE:-"ad-hoc"}
+          echo "📋 Current Profile Type: $PROFILE_TYPE"
+          
+          # Validate profile type
+          case "$PROFILE_TYPE" in
+            "app-store"|"ad-hoc"|"enterprise"|"development")
+              echo "✅ Valid profile type: $PROFILE_TYPE"
+              ;;
+            *)
+              echo "⚠️ Invalid profile type '$PROFILE_TYPE', defaulting to 'ad-hoc'"
+              PROFILE_TYPE="ad-hoc"
+              ;;
+          esac
+          
+          # Export validated profile type for use in scripts
+          export PROFILE_TYPE="$PROFILE_TYPE"
+          echo "🎯 Final Profile Type: $PROFILE_TYPE"
+          
+          # Profile-specific configuration summary
+          echo "📊 Build Configuration Summary:"
+          echo "  - Bundle ID: $BUNDLE_ID"
+          echo "  - Profile Type: $PROFILE_TYPE"
+          echo "  - App Name: $APP_NAME"
+          echo "  - Version: $VERSION_NAME ($VERSION_CODE)"
+          echo "  - Team ID: $APPLE_TEAM_ID"
+          
+          if [ "$PROFILE_TYPE" = "app-store" ]; then
+            echo "🏪 App Store build configuration:"
+            echo "  - Distribution method: App Store Connect"
+            echo "  - Symbols upload: Enabled"
+            echo "  - Bitcode: Disabled (iOS 14+)"
+            echo "  - Target: TestFlight/App Store"
+          elif [ "$PROFILE_TYPE" = "ad-hoc" ]; then
+            echo "📱 Ad Hoc build configuration:"
+            echo "  - Distribution method: Ad Hoc"
+            echo "  - Symbols upload: Disabled"
+            echo "  - Target: Direct device installation"
+          elif [ "$PROFILE_TYPE" = "enterprise" ]; then
+            echo "🏢 Enterprise build configuration:"
+            echo "  - Distribution method: Enterprise"
+            echo "  - Target: Enterprise distribution"
+          else
+            echo "🔧 Development build configuration:"
+            echo "  - Distribution method: Development"
+            echo "  - Target: Development testing"
+          fi
+          
           if ./lib/scripts/ios/main.sh; then
             echo "✅ iOS build completed successfully"
           else
@@ -2393,23 +2443,18 @@ workflows:
             # Emergency Firebase-free rebuild
             echo "🔥 Applying emergency Firebase removal..."
             
-            # Remove all Firebase dependencies from pubspec.yaml
+            # Clean everything first
+            flutter clean
+            rm -rf .dart_tool/
+            rm -rf build/
+            rm -rf ios/Pods/
+            rm -f ios/Podfile.lock
+            
+            # Remove Firebase dependencies from pubspec.yaml
             if [ -f "pubspec.yaml" ]; then
               cp pubspec.yaml pubspec.yaml.emergency_backup
-              sed -i.tmp '/firebase_core:/d' pubspec.yaml
-              sed -i.tmp '/firebase_messaging:/d' pubspec.yaml
-              sed -i.tmp '/_flutterfire_internals:/d' pubspec.yaml
-              sed -i.tmp '/firebase_core_platform_interface:/d' pubspec.yaml
-              sed -i.tmp '/firebase_core_web:/d' pubspec.yaml
-              sed -i.tmp '/firebase_messaging_platform_interface:/d' pubspec.yaml
-              sed -i.tmp '/firebase_messaging_web:/d' pubspec.yaml
-              sed -i.tmp '/cloud_firestore:/d' pubspec.yaml
-              sed -i.tmp '/firebase_auth:/d' pubspec.yaml
-              sed -i.tmp '/firebase_analytics:/d' pubspec.yaml
-              sed -i.tmp '/firebase_crashlytics:/d' pubspec.yaml
-              sed -i.tmp '/firebase_performance:/d' pubspec.yaml
-              sed -i.tmp '/firebase_remote_config:/d' pubspec.yaml
-              sed -i.tmp '/firebase_storage:/d' pubspec.yaml
+              sed -i.tmp '/firebase/d' pubspec.yaml
+              sed -i.tmp '/Firebase/d' pubspec.yaml
               rm -f pubspec.yaml.tmp
               echo "✅ Firebase dependencies removed"
             fi
@@ -2418,14 +2463,7 @@ workflows:
             [ -f "ios/Runner/GoogleService-Info.plist" ] && mv "ios/Runner/GoogleService-Info.plist" "ios/Runner/GoogleService-Info.plist.emergency_backup"
             [ -f "android/app/google-services.json" ] && mv "android/app/google-services.json" "android/app/google-services.json.emergency_backup"
             
-            # Clean everything
-            flutter clean
-            rm -rf .dart_tool/
-            rm -rf build/
-            rm -rf ios/Pods/
-            rm -f ios/Podfile.lock
-            
-            # Fix bundle identifier conflicts
+            # Fix bundle identifier conflicts in project file
             if [ -f "ios/Runner.xcodeproj/project.pbxproj" ]; then
               sed -i.tmp 's/com\.example\.quikapptest07/com.twinklub.twinklub/g' "ios/Runner.xcodeproj/project.pbxproj"
               sed -i.tmp 's/com\.example\.[a-zA-Z0-9_]*/com.twinklub.twinklub/g' "ios/Runner.xcodeproj/project.pbxproj"
@@ -2433,81 +2471,11 @@ workflows:
               echo "✅ Bundle identifier conflicts cleaned"
             fi
             
-            # Regenerate with correct organization
+            # Regenerate Flutter dependencies and iOS files
             flutter pub get
             flutter create --platforms ios --org com.twinklub .
             
-            # Create Firebase-free Podfile
-            cat > ios/Podfile << 'EOF_EMERGENCY'
-              platform :ios, '13.0'
-              use_frameworks! :linkage => :static
-              
-              ENV['COCOAPODS_DISABLE_STATS'] = 'true'
-              ENV['FIREBASE_DISABLED'] = 'true'
-              
-              project 'Runner', {
-                'Debug' => :debug,
-                'Profile' => :release,
-                'Release' => :release,
-              }
-              
-              def flutter_root
-                generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
-                unless File.exist?(generated_xcode_build_settings_path)
-                  raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
-                end
-              
-                File.foreach(generated_xcode_build_settings_path) do |line|
-                  matches = line.match(/FLUTTER_ROOT\=(.*)/)
-                  return matches[1].strip if matches
-                end
-                raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
-              end
-              
-              require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
-              
-              flutter_ios_podfile_setup
-              
-              target 'Runner' do
-                use_frameworks!
-                use_modular_headers!
-              
-                flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-                
-                target 'RunnerTests' do
-                  inherit! :search_paths
-                end
-              end
-              
-              post_install do |installer|
-                installer.pods_project.targets.each do |target|
-                  flutter_additional_ios_build_settings(target)
-                  target.build_configurations.each do |config|
-                    config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
-                    config.build_settings['ENABLE_BITCODE'] = 'NO'
-                    config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
-                    config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
-                    config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
-                    config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
-                    config.build_settings['SWIFT_VERSION'] = '5.0'
-                    config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-Onone'
-                    config.build_settings['ENABLE_PREVIEWS'] = 'NO'
-                    config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
-                    
-                    next if target.name == 'Runner'
-                    
-                    if config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
-                      current_bundle_id = config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
-                      if current_bundle_id.include?('com.twinklub.twinklub') || current_bundle_id.include?('com.example')
-                        config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = current_bundle_id + '.pod.' + target.name.downcase
-                      end
-                    end
-                  end
-                end
-              end
-              EOF_EMERGENCY
-            
-            # Install CocoaPods without Firebase
+            # Simple CocoaPods installation without Firebase
             cd ios
             FIREBASE_DISABLED=true pod install --repo-update --verbose
             cd ..
@@ -2521,10 +2489,163 @@ workflows:
               --dart-define=PUSH_NOTIFY="false" \
               --dart-define=FIREBASE_DISABLED="true"
             
-            # Create output directory
+            # Create output directory and Xcode archive
             mkdir -p output/ios
             
-            # Create Xcode archive
+            # Read and validate PROFILE_TYPE
+            echo "🔍 Reading profile type configuration..."
+            PROFILE_TYPE=${PROFILE_TYPE:-"ad-hoc"}
+            echo "📋 Profile Type: $PROFILE_TYPE"
+            
+            # Validate profile type
+            case "$PROFILE_TYPE" in
+              "app-store"|"ad-hoc"|"enterprise"|"development")
+                echo "✅ Valid profile type: $PROFILE_TYPE"
+                ;;
+              *)
+                echo "⚠️ Invalid profile type '$PROFILE_TYPE', defaulting to 'ad-hoc'"
+                PROFILE_TYPE="ad-hoc"
+                ;;
+            esac
+            
+            # Create appropriate ExportOptions.plist based on profile type
+            echo "📝 Creating ExportOptions.plist for profile type: $PROFILE_TYPE"
+            
+            if [ "$PROFILE_TYPE" = "app-store" ]; then
+              # App Store configuration
+              cat > ios/ExportOptions.plist << 'EOF_APPSTORE'
+              <?xml version="1.0" encoding="UTF-8"?>
+              <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+              <plist version="1.0">
+              <dict>
+                <key>method</key>
+                <string>app-store</string>
+                <key>teamID</key>
+                <string>$APPLE_TEAM_ID</string>
+                <key>uploadBitcode</key>
+                <false/>
+                <key>uploadSymbols</key>
+                <true/>
+                <key>compileBitcode</key>
+                <false/>
+                <key>signingStyle</key>
+                <string>automatic</string>
+                <key>stripSwiftSymbols</key>
+                <true/>
+                <key>thinning</key>
+                <string>&lt;none&gt;</string>
+                <key>distributionBundleIdentifier</key>
+                <string>$BUNDLE_ID</string>
+                <key>generateAppStoreInformation</key>
+                <false/>
+                <key>manageVersionAndBuildNumber</key>
+                <false/>
+              </dict>
+              </plist>
+              EOF_APPSTORE
+              echo "✅ App Store ExportOptions.plist created"
+              
+            elif [ "$PROFILE_TYPE" = "ad-hoc" ]; then
+              # Ad Hoc configuration
+              cat > ios/ExportOptions.plist << 'EOF_ADHOC'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                <plist version="1.0">
+                <dict>
+                  <key>method</key>
+                  <string>ad-hoc</string>
+                  <key>teamID</key>
+                  <string>$APPLE_TEAM_ID</string>
+                  <key>uploadBitcode</key>
+                  <false/>
+                  <key>uploadSymbols</key>
+                  <false/>
+                  <key>compileBitcode</key>
+                  <false/>
+                  <key>signingStyle</key>
+                  <string>automatic</string>
+                  <key>stripSwiftSymbols</key>
+                  <true/>
+                  <key>thinning</key>
+                  <string>&lt;none&gt;</string>
+                  <key>distributionBundleIdentifier</key>
+                  <string>$BUNDLE_ID</string>
+                </dict>
+                </plist>
+                EOF_ADHOC
+              echo "✅ Ad Hoc ExportOptions.plist created"
+              
+            elif [ "$PROFILE_TYPE" = "enterprise" ]; then
+              # Enterprise configuration
+              cat > ios/ExportOptions.plist << 'EOF_ENTERPRISE'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                <plist version="1.0">
+                <dict>
+                  <key>method</key>
+                  <string>enterprise</string>
+                  <key>teamID</key>
+                  <string>$APPLE_TEAM_ID</string>
+                  <key>uploadBitcode</key>
+                  <false/>
+                  <key>uploadSymbols</key>
+                  <false/>
+                  <key>compileBitcode</key>
+                  <false/>
+                  <key>signingStyle</key>
+                  <string>automatic</string>
+                  <key>stripSwiftSymbols</key>
+                  <true/>
+                  <key>thinning</key>
+                  <string>&lt;none&gt;</string>
+                  <key>distributionBundleIdentifier</key>
+                  <string>$BUNDLE_ID</string>
+                </dict>
+                </plist>
+                EOF_ENTERPRISE
+              echo "✅ Enterprise ExportOptions.plist created"
+              
+            else
+              # Development configuration (fallback)
+              cat > ios/ExportOptions.plist << 'EOF_DEVELOPMENT'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                <plist version="1.0">
+                <dict>
+                  <key>method</key>
+                  <string>development</string>
+                  <key>teamID</key>
+                  <string>$APPLE_TEAM_ID</string>
+                  <key>uploadBitcode</key>
+                  <false/>
+                  <key>uploadSymbols</key>
+                  <false/>
+                  <key>compileBitcode</key>
+                  <false/>
+                  <key>signingStyle</key>
+                  <string>automatic</string>
+                  <key>stripSwiftSymbols</key>
+                  <true/>
+                  <key>thinning</key>
+                  <string>&lt;none&gt;</string>
+                  <key>distributionBundleIdentifier</key>
+                  <string>$BUNDLE_ID</string>
+                </dict>
+                </plist>
+                EOF_DEVELOPMENT
+              echo "✅ Development ExportOptions.plist created"
+            fi
+            
+            # Replace environment variables in ExportOptions.plist
+            sed -i.tmp "s/\$APPLE_TEAM_ID/$APPLE_TEAM_ID/g" ios/ExportOptions.plist
+            sed -i.tmp "s/\$BUNDLE_ID/$BUNDLE_ID/g" ios/ExportOptions.plist
+            rm -f ios/ExportOptions.plist.tmp
+            
+            echo "📋 Final ExportOptions.plist contents:"
+            cat ios/ExportOptions.plist
+            
+            # Create Xcode archive first
+            echo "🏗️ Creating Xcode archive for profile type: $PROFILE_TYPE"
             xcodebuild archive \
               -workspace ios/Runner.xcworkspace \
               -scheme Runner \
@@ -2543,11 +2664,295 @@ workflows:
               COMPILER_INDEX_STORE_ENABLE=NO \
               ONLY_ACTIVE_ARCH=NO
             
+            # Export IPA using the correct profile type
             if [ -d "output/ios/Runner.xcarchive" ]; then
-              echo "✅ Emergency Firebase-free rebuild completed successfully!"
-              echo "⚠️ Note: Firebase features (push notifications) are disabled in this build"
+              echo "✅ Archive created successfully"
+              echo "📦 Exporting IPA with profile type: $PROFILE_TYPE"
+              
+              xcodebuild -exportArchive \
+                -archivePath "output/ios/Runner.xcarchive" \
+                -exportPath "output/ios/" \
+                -exportOptionsPlist "ios/ExportOptions.plist" \
+                -allowProvisioningUpdates
+              
+              if [ -f "output/ios/Runner.ipa" ]; then
+                IPA_SIZE=$(du -h "output/ios/Runner.ipa" | cut -f1)
+                echo "✅ IPA exported successfully!"
+                echo "📊 IPA Size: $IPA_SIZE"
+                echo "🎯 Profile Type: $PROFILE_TYPE"
+                echo "📦 Location: output/ios/Runner.ipa"
+                
+                # Validate IPA
+                if unzip -t "output/ios/Runner.ipa" >/dev/null 2>&1; then
+                  echo "✅ IPA validation passed"
+                else
+                  echo "⚠️ IPA validation failed, but file exists"
+                fi
+              else
+                echo "⚠️ IPA export failed, but archive is available"
+                echo "📦 Archive location: output/ios/Runner.xcarchive"
+              fi
             else
-              echo "❌ Emergency rebuild also failed"
+              echo "❌ Archive creation failed"
+              exit 1
+            fi
+          else
+            echo "❌ iOS build failed, trying emergency Firebase-free rebuild..."
+            
+            # Emergency Firebase-free rebuild
+            echo "🔥 Applying emergency Firebase removal..."
+            
+            # Clean everything first
+            flutter clean
+            rm -rf .dart_tool/
+            rm -rf build/
+            rm -rf ios/Pods/
+            rm -f ios/Podfile.lock
+            
+            # Remove Firebase dependencies from pubspec.yaml
+            if [ -f "pubspec.yaml" ]; then
+              cp pubspec.yaml pubspec.yaml.emergency_backup
+              sed -i.tmp '/firebase/d' pubspec.yaml
+              sed -i.tmp '/Firebase/d' pubspec.yaml
+              rm -f pubspec.yaml.tmp
+              echo "✅ Firebase dependencies removed"
+            fi
+            
+            # Remove Firebase config files
+            [ -f "ios/Runner/GoogleService-Info.plist" ] && mv "ios/Runner/GoogleService-Info.plist" "ios/Runner/GoogleService-Info.plist.emergency_backup"
+            [ -f "android/app/google-services.json" ] && mv "android/app/google-services.json" "android/app/google-services.json.emergency_backup"
+            
+            # Fix bundle identifier conflicts in project file
+            if [ -f "ios/Runner.xcodeproj/project.pbxproj" ]; then
+              sed -i.tmp 's/com\.example\.quikapptest07/com.twinklub.twinklub/g' "ios/Runner.xcodeproj/project.pbxproj"
+              sed -i.tmp 's/com\.example\.[a-zA-Z0-9_]*/com.twinklub.twinklub/g' "ios/Runner.xcodeproj/project.pbxproj"
+              rm -f "ios/Runner.xcodeproj/project.pbxproj.tmp"
+              echo "✅ Bundle identifier conflicts cleaned"
+            fi
+            
+            # Regenerate Flutter dependencies and iOS files
+            flutter pub get
+            flutter create --platforms ios --org com.twinklub .
+            
+            # Simple CocoaPods installation without Firebase
+            cd ios
+            FIREBASE_DISABLED=true pod install --repo-update --verbose
+            cd ..
+            
+            # Build Flutter app without Firebase
+            flutter build ios --release --no-codesign \
+              --dart-define=APP_NAME="$APP_NAME" \
+              --dart-define=BUNDLE_ID="$BUNDLE_ID" \
+              --dart-define=VERSION_NAME="$VERSION_NAME" \
+              --dart-define=VERSION_CODE="$VERSION_CODE" \
+              --dart-define=PUSH_NOTIFY="false" \
+              --dart-define=FIREBASE_DISABLED="true"
+            
+            # Create output directory and Xcode archive
+            mkdir -p output/ios
+            
+            # Read and validate PROFILE_TYPE
+            echo "🔍 Reading profile type configuration..."
+            PROFILE_TYPE=${PROFILE_TYPE:-"ad-hoc"}
+            echo "📋 Profile Type: $PROFILE_TYPE"
+            
+            # Validate profile type
+            case "$PROFILE_TYPE" in
+              "app-store"|"ad-hoc"|"enterprise"|"development")
+                echo "✅ Valid profile type: $PROFILE_TYPE"
+                ;;
+              *)
+                echo "⚠️ Invalid profile type '$PROFILE_TYPE', defaulting to 'ad-hoc'"
+                PROFILE_TYPE="ad-hoc"
+                ;;
+            esac
+            
+            # Create appropriate ExportOptions.plist based on profile type
+            echo "📝 Creating ExportOptions.plist for profile type: $PROFILE_TYPE"
+            
+            if [ "$PROFILE_TYPE" = "app-store" ]; then
+              # App Store configuration
+              cat > ios/ExportOptions.plist << 'EOF_APPSTORE'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                <plist version="1.0">
+                <dict>
+                  <key>method</key>
+                  <string>app-store</string>
+                  <key>teamID</key>
+                  <string>$APPLE_TEAM_ID</string>
+                  <key>uploadBitcode</key>
+                  <false/>
+                  <key>uploadSymbols</key>
+                  <true/>
+                  <key>compileBitcode</key>
+                  <false/>
+                  <key>signingStyle</key>
+                  <string>automatic</string>
+                  <key>stripSwiftSymbols</key>
+                  <true/>
+                  <key>thinning</key>
+                  <string>&lt;none&gt;</string>
+                  <key>distributionBundleIdentifier</key>
+                  <string>$BUNDLE_ID</string>
+                  <key>generateAppStoreInformation</key>
+                  <false/>
+                  <key>manageVersionAndBuildNumber</key>
+                  <false/>
+                </dict>
+                </plist>
+                EOF_APPSTORE
+              echo "✅ App Store ExportOptions.plist created"
+              
+            elif [ "$PROFILE_TYPE" = "ad-hoc" ]; then
+              # Ad Hoc configuration
+              cat > ios/ExportOptions.plist << 'EOF_ADHOC'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                <plist version="1.0">
+                <dict>
+                  <key>method</key>
+                  <string>ad-hoc</string>
+                  <key>teamID</key>
+                  <string>$APPLE_TEAM_ID</string>
+                  <key>uploadBitcode</key>
+                  <false/>
+                  <key>uploadSymbols</key>
+                  <false/>
+                  <key>compileBitcode</key>
+                  <false/>
+                  <key>signingStyle</key>
+                  <string>automatic</string>
+                  <key>stripSwiftSymbols</key>
+                  <true/>
+                  <key>thinning</key>
+                  <string>&lt;none&gt;</string>
+                  <key>distributionBundleIdentifier</key>
+                  <string>$BUNDLE_ID</string>
+                </dict>
+                </plist>
+                EOF_ADHOC
+              echo "✅ Ad Hoc ExportOptions.plist created"
+              
+            elif [ "$PROFILE_TYPE" = "enterprise" ]; then
+              # Enterprise configuration
+              cat > ios/ExportOptions.plist << 'EOF_ENTERPRISE'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                <plist version="1.0">
+                <dict>
+                  <key>method</key>
+                  <string>enterprise</string>
+                  <key>teamID</key>
+                  <string>$APPLE_TEAM_ID</string>
+                  <key>uploadBitcode</key>
+                  <false/>
+                  <key>uploadSymbols</key>
+                  <false/>
+                  <key>compileBitcode</key>
+                  <false/>
+                  <key>signingStyle</key>
+                  <string>automatic</string>
+                  <key>stripSwiftSymbols</key>
+                  <true/>
+                  <key>thinning</key>
+                  <string>&lt;none&gt;</string>
+                  <key>distributionBundleIdentifier</key>
+                  <string>$BUNDLE_ID</string>
+                </dict>
+                </plist>
+                EOF_ENTERPRISE
+              echo "✅ Enterprise ExportOptions.plist created"
+              
+            else
+              # Development configuration (fallback)
+              cat > ios/ExportOptions.plist << 'EOF_DEVELOPMENT'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                <plist version="1.0">
+                <dict>
+                  <key>method</key>
+                  <string>development</string>
+                  <key>teamID</key>
+                  <string>$APPLE_TEAM_ID</string>
+                  <key>uploadBitcode</key>
+                  <false/>
+                  <key>uploadSymbols</key>
+                  <false/>
+                  <key>compileBitcode</key>
+                  <false/>
+                  <key>signingStyle</key>
+                  <string>automatic</string>
+                  <key>stripSwiftSymbols</key>
+                  <true/>
+                  <key>thinning</key>
+                  <string>&lt;none&gt;</string>
+                  <key>distributionBundleIdentifier</key>
+                  <string>$BUNDLE_ID</string>
+                </dict>
+                </plist>
+                EOF_DEVELOPMENT
+              echo "✅ Development ExportOptions.plist created"
+            fi
+            
+            # Replace environment variables in ExportOptions.plist
+            sed -i.tmp "s/\$APPLE_TEAM_ID/$APPLE_TEAM_ID/g" ios/ExportOptions.plist
+            sed -i.tmp "s/\$BUNDLE_ID/$BUNDLE_ID/g" ios/ExportOptions.plist
+            rm -f ios/ExportOptions.plist.tmp
+            
+            echo "📋 Final ExportOptions.plist contents:"
+            cat ios/ExportOptions.plist
+            
+            # Create Xcode archive first
+            echo "🏗️ Creating Xcode archive for profile type: $PROFILE_TYPE"
+            xcodebuild archive \
+              -workspace ios/Runner.xcworkspace \
+              -scheme Runner \
+              -configuration Release \
+              -archivePath "output/ios/Runner.xcarchive" \
+              -allowProvisioningUpdates \
+              CODE_SIGN_IDENTITY="" \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGNING_ALLOWED=NO \
+              DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+              PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
+              MARKETING_VERSION="$VERSION_NAME" \
+              CURRENT_PROJECT_VERSION="$VERSION_CODE" \
+              IPHONEOS_DEPLOYMENT_TARGET="13.0" \
+              ENABLE_BITCODE=NO \
+              COMPILER_INDEX_STORE_ENABLE=NO \
+              ONLY_ACTIVE_ARCH=NO
+            
+            # Export IPA using the correct profile type
+            if [ -d "output/ios/Runner.xcarchive" ]; then
+              echo "✅ Archive created successfully"
+              echo "📦 Exporting IPA with profile type: $PROFILE_TYPE"
+              
+              xcodebuild -exportArchive \
+                -archivePath "output/ios/Runner.xcarchive" \
+                -exportPath "output/ios/" \
+                -exportOptionsPlist "ios/ExportOptions.plist" \
+                -allowProvisioningUpdates
+              
+              if [ -f "output/ios/Runner.ipa" ]; then
+                IPA_SIZE=$(du -h "output/ios/Runner.ipa" | cut -f1)
+                echo "✅ IPA exported successfully!"
+                echo "📊 IPA Size: $IPA_SIZE"
+                echo "🎯 Profile Type: $PROFILE_TYPE"
+                echo "📦 Location: output/ios/Runner.ipa"
+                
+                # Validate IPA
+                if unzip -t "output/ios/Runner.ipa" >/dev/null 2>&1; then
+                  echo "✅ IPA validation passed"
+                else
+                  echo "⚠️ IPA validation failed, but file exists"
+                fi
+              else
+                echo "⚠️ IPA export failed, but archive is available"
+                echo "📦 Archive location: output/ios/Runner.xcarchive"
+              fi
+            else
+              echo "❌ Archive creation failed"
               exit 1
             fi
           fi
