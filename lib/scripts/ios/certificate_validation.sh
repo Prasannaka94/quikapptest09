@@ -50,13 +50,37 @@ else
 fi
 
 # Determine export method based on profile type
-if [ "${PROFILE_TYPE:-app-store}" = "development" ]; then
-    export_method="development"
-    log_info "🔧 Using development export method"
-else
-    export_method="app-store"
-    log_info "🏪 Using app-store export method"
-fi
+case "${PROFILE_TYPE:-app-store}" in
+    "app-store")
+        export_method="app-store"
+        distribution_type="app_store"
+        log_info "🏪 Using app-store export method"
+        ;;
+    "ad-hoc")
+        export_method="ad-hoc"
+        distribution_type="ad_hoc"
+        log_info "📱 Using ad-hoc export method"
+        ;;
+    "enterprise")
+        export_method="enterprise"
+        distribution_type="enterprise"
+        log_info "🏢 Using enterprise export method"
+        ;;
+    "development")
+        export_method="development"
+        distribution_type="development"
+        log_info "🔧 Using development export method"
+        ;;
+    *)
+        export_method="app-store"
+        distribution_type="app_store"
+        log_warn "⚠️ Unknown profile type '${PROFILE_TYPE}', defaulting to app-store"
+        ;;
+esac
+
+log_info "📋 Profile Type: ${PROFILE_TYPE:-app-store}"
+log_info "📦 Distribution Type: ${distribution_type}"
+log_info "🎯 Export Method: ${export_method}"
 
 # Create simple export options (no encoding required)
 log_info "📝 Creating simple ExportOptions.plist..."

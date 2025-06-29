@@ -2037,11 +2037,6 @@ workflows:
       xcode: 16.0
       cocoapods: 1.16.2
 
-      # 🔐 Simple iOS Signing (No Encoding Required)
-      ios_signing:
-        distribution_type: $PROFILE_TYPE
-        bundle_identifier: $BUNDLE_ID
-
       vars:
         <<: *common_vars
         <<: *ios_build_acceleration
