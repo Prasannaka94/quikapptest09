@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Simple Certificate Validation Script
-# Purpose: Basic validation for IPA export credentials
+# Simple Certificate Validation Script (No Encoding Required)
+# Purpose: Basic validation for IPA export without complex setup
 
 set -euo pipefail
 
@@ -19,82 +19,50 @@ else
     log_error() { echo "❌ $1"; }
 fi
 
-log_info "🔒 Starting Certificate Validation..."
+log_info "🔒 Simple Certificate Validation (No Encoding Required)..."
 
-# Check App Store Connect API credentials
-if [ -n "${APP_STORE_CONNECT_ISSUER_ID:-}" ] && [ -n "${APP_STORE_CONNECT_KEY_IDENTIFIER:-}" ] && [ -n "${APP_STORE_CONNECT_PRIVATE_KEY:-}" ]; then
-    log_success "✅ App Store Connect API credentials available"
-    export EXPORT_METHOD="api"
+# Check if using Codemagic's built-in code signing (simplest method)
+if [ "${CM_CODE_SIGNING:-}" = "true" ] || [ -n "${CM_CERTIFICATE:-}" ]; then
+    log_success "✅ Using Codemagic's built-in code signing (no encoding required)"
+    export EXPORT_METHOD="codemagic_builtin"
     
-    # Create API-based export options
-    mkdir -p ios/export_options
-    cat > ios/export_options/ExportOptions.plist << 'API_EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>destination</key>
-    <string>export</string>
-    <key>method</key>
-    <string>app-store-connect</string>
-    <key>uploadBitcode</key>
-    <false/>
-    <key>uploadSymbols</key>
-    <true/>
-    <key>compileBitcode</key>
-    <false/>
-    <key>thinning</key>
-    <string>&lt;none&gt;</string>
-    <key>teamID</key>
-    <string>AUTOMATIC</string>
-    <key>signingStyle</key>
-    <string>automatic</string>
-    <key>manageAppVersionAndBuildNumber</key>
-    <true/>
-</dict>
-</plist>
-API_EOF
-    log_success "✅ API-based ExportOptions.plist created"
+    # Codemagic handles all signing automatically
+    log_info "🔐 Codemagic will handle all certificate and profile setup automatically"
     
-elif [ -n "${CERTIFICATE:-}" ] && [ -n "${PROVISIONING_PROFILE:-}" ]; then
-    log_success "✅ Manual signing credentials available"
-    export EXPORT_METHOD="manual"
+elif [ -n "${APPLE_ID:-}" ] && [ -n "${APPLE_ID_PASSWORD:-}" ]; then
+    log_success "✅ Using Apple ID authentication (simple setup)"
+    export EXPORT_METHOD="apple_id"
     
-    # Create manual signing export options
-    mkdir -p ios/export_options
-    cat > ios/export_options/ExportOptions.plist << 'MANUAL_EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>destination</key>
-    <string>export</string>
-    <key>method</key>
-    <string>app-store</string>
-    <key>uploadBitcode</key>
-    <false/>
-    <key>uploadSymbols</key>
-    <true/>
-    <key>compileBitcode</key>
-    <false/>
-    <key>thinning</key>
-    <string>&lt;none&gt;</string>
-    <key>signingStyle</key>
-    <string>manual</string>
-    <key>stripSwiftSymbols</key>
-    <true/>
-</dict>
-</plist>
-MANUAL_EOF
-    log_success "✅ Manual signing ExportOptions.plist created"
+    log_info "🍎 Apple ID: ${APPLE_ID}"
+    log_info "🔐 App-specific password configured"
+    
+elif [ -n "${APPLE_TEAM_ID:-}" ]; then
+    log_success "✅ Using automatic signing with Team ID"
+    export EXPORT_METHOD="automatic_with_team"
+    
+    log_info "👥 Team ID: ${APPLE_TEAM_ID}"
+    log_info "🔐 iOS will attempt automatic profile selection"
     
 else
-    log_warn "⚠️ No signing credentials found - using automatic signing"
-    export EXPORT_METHOD="automatic"
-    
-    # Create automatic signing export options  
-    mkdir -p ios/export_options
-    cat > ios/export_options/ExportOptions.plist << 'AUTO_EOF'
+    log_warn "⚠️ No signing configuration found - using basic automatic signing"
+    export EXPORT_METHOD="automatic_basic"
+    log_warn "⚠️ This may fail without proper Team ID configuration"
+fi
+
+# Determine export method based on profile type
+if [ "${PROFILE_TYPE:-app-store}" = "development" ]; then
+    export_method="development"
+    log_info "🔧 Using development export method"
+else
+    export_method="app-store"
+    log_info "🏪 Using app-store export method"
+fi
+
+# Create simple export options (no encoding required)
+log_info "📝 Creating simple ExportOptions.plist..."
+mkdir -p ios/export_options
+
+cat > ios/export_options/ExportOptions.plist << SIMPLE_EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -102,7 +70,11 @@ else
     <key>destination</key>
     <string>export</string>
     <key>method</key>
-    <string>development</string>
+    <string>${export_method}</string>
+    <key>teamID</key>
+    <string>${APPLE_TEAM_ID:-AUTOMATIC}</string>
+    <key>signingStyle</key>
+    <string>automatic</string>
     <key>uploadBitcode</key>
     <false/>
     <key>uploadSymbols</key>
@@ -111,13 +83,18 @@ else
     <false/>
     <key>thinning</key>
     <string>&lt;none&gt;</string>
-    <key>signingStyle</key>
-    <string>automatic</string>
+    <key>stripSwiftSymbols</key>
+    <true/>
+    <key>manageAppVersionAndBuildNumber</key>
+    <false/>
 </dict>
 </plist>
-AUTO_EOF
-    log_success "✅ Automatic signing ExportOptions.plist created"
-fi
+SIMPLE_EOF
+
+log_success "✅ Simple export configuration created"
+log_info "📋 Export Method: ${export_method}"
+log_info "👥 Team ID: ${APPLE_TEAM_ID:-AUTOMATIC}"
+log_info "🔐 Signing Style: automatic"
 
 log_success "✅ Certificate validation completed - Export Method: ${EXPORT_METHOD}"
 return 0

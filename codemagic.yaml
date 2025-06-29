@@ -2036,6 +2036,12 @@ workflows:
       java: 17
       xcode: 16.0
       cocoapods: 1.16.2
+
+      # 🔐 Simple iOS Signing (No Encoding Required)
+      ios_signing:
+        distribution_type: $PROFILE_TYPE
+        bundle_identifier: $BUNDLE_ID
+
       vars:
         <<: *common_vars
         <<: *ios_build_acceleration
@@ -2043,12 +2049,13 @@ workflows:
         WORKFLOW_ID: "ios-workflow"
         BUNDLE_ID: $BUNDLE_ID
         PROFILE_TYPE: $PROFILE_TYPE # app-store, ad-hoc, enterprise, development
-        APPLE_ID: $APPLE_ID # Your Apple Developer email
-        APPLE_ID_PASSWORD: $APPLE_ID_PASSWORD
-        APP_STORE_CONNECT_KEY_IDENTIFIER: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        APP_STORE_CONNECT_API_KEY_PATH: $APP_STORE_CONNECT_API_KEY_PATH
-        APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
-        APPLE_TEAM_ID: $APPLE_TEAM_ID
+
+        # 🔐 Simple Apple Developer Configuration (Optional)
+        APPLE_ID: $APPLE_ID # Optional: Your Apple Developer email
+        APPLE_ID_PASSWORD: $APPLE_ID_PASSWORD # Optional: App-specific password
+        APPLE_TEAM_ID: $APPLE_TEAM_ID # Optional but recommended: Your team ID
+
+        # 📱 iOS Signing Configuration
         APNS_KEY_ID: $APNS_KEY_ID
         IS_TESTFLIGHT: $IS_TESTFLIGHT
 
