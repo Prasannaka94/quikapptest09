@@ -2054,6 +2054,12 @@ workflows:
         APNS_KEY_ID: $APNS_KEY_ID
         IS_TESTFLIGHT: $IS_TESTFLIGHT
 
+        # 🔐 App Store Connect API Credentials (for TestFlight upload)
+        APP_STORE_CONNECT_KEY_IDENTIFIER: "ZFD9GRMS7R"
+        APP_STORE_CONNECT_API_KEY: "https://raw.githubusercontent.com/prasanna91/QuikApp/main/AuthKey_ZFD9GRMS7R.p8"
+        APP_STORE_CONNECT_API_KEY_PATH: "https://raw.githubusercontent.com/prasanna91/QuikApp/main/AuthKey_ZFD9GRMS7R.p8"
+        APP_STORE_CONNECT_ISSUER_ID: "a99a2ebd-ed3e-4117-9f97-f195823774a7"
+
         # 🔧 Feature Flags
         PUSH_NOTIFY: $PUSH_NOTIFY
         IS_DOMAIN_URL: $IS_DOMAIN_URL
@@ -2542,7 +2548,7 @@ workflows:
 
           # Check for IPA file
           if [ -f "output/ios/Runner.ipa" ]; then
-            local ipa_size=$(du -h output/ios/Runner.ipa | cut -f1)
+            ipa_size=$(du -h output/ios/Runner.ipa | cut -f1)
             echo "✅ IPA file found: output/ios/Runner.ipa ($ipa_size)"
             
             # Validate IPA structure
@@ -2556,7 +2562,7 @@ workflows:
             echo "📦 Distribution Status: READY"
             
           elif [ -d "output/ios/Runner.xcarchive" ]; then
-            local archive_size=$(du -h output/ios/Runner.xcarchive | cut -f1)
+            archive_size=$(du -h output/ios/Runner.xcarchive | cut -f1)
             echo "⚠️ IPA export failed, but archive is available"
             echo "📦 Archive: output/ios/Runner.xcarchive ($archive_size)"
             echo "🔧 Manual export required in Xcode"

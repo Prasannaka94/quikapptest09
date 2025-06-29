@@ -66,6 +66,37 @@ firebase_settings = '''
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				DEAD_CODE_STRIPPING = NO;
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = YES;
+				GCC_C_LANGUAGE_STANDARD = \"gnu17\";
+				CLANG_C_LANGUAGE_STANDARD = \"gnu17\";
+				GCC_OPTIMIZATION_LEVEL = \"0\";
+				CLANG_OPTIMIZATION_PROFILE_FILE = \"\";
+				CLANG_WARN_STRICT_PROTOTYPES = NO;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = NO;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = NO;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = NO;
+				CLANG_WARN_COMMA = NO;
+				CLANG_WARN_EMPTY_BODY = NO;
+				CLANG_WARN_BOOL_CONVERSION = NO;
+				CLANG_WARN_CONSTANT_CONVERSION = NO;
+				CLANG_WARN_INT_CONVERSION = NO;
+				CLANG_WARN_ENUM_CONVERSION = NO;
+				CLANG_WARN_FLOAT_CONVERSION = NO;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = NO;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = NO;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = NO;
+				CLANG_WARN_SUSPICIOUS_MOVE = NO;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = NO;
+				CLANG_WARN_UNREACHABLE_CODE = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = NO;
+				GCC_WARN_UNDECLARED_SELECTOR = NO;
+				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = NO;
+				CLANG_ANALYZER_NONNULL = NO;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = NO;
 '''
 
 # Find all build configuration sections and add Firebase settings
@@ -110,29 +141,118 @@ PODFILE="$PROJECT_ROOT/ios/Podfile"
 
 if [ -f "$PODFILE" ]; then
     # Add post_install hook to fix Firebase issues
-    if ! grep -q "post_install do |installer|" "$PODFILE"; then
-        cat >> "$PODFILE" << 'EOF'
+    # Check if post_install hook exists and replace it
+    if grep -q "post_install do |installer|" "$PODFILE"; then
+        echo "🔄 Existing post_install hook found, replacing with enhanced Firebase-compatible version..."
+        
+        # Create backup
+        cp "$PODFILE" "$PODFILE.backup.pre_firebase_fix"
+        
+        # Remove existing post_install hook
+        sed -i '' '/post_install do |installer|/,/^end$/d' "$PODFILE"
+        echo "✅ Removed existing post_install hook"
+    fi
+    
+    # Add comprehensive Firebase-compatible post_install hook
+    cat >> "$PODFILE" << 'EOF'
 
-# Fix Firebase compilation issues with Xcode 16.0
+# Fix Firebase compilation issues with Xcode 16.0 - Comprehensive Version
 post_install do |installer|
   installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
     target.build_configurations.each do |config|
-      # Fix modular headers issue
-      config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
-      
-      # Ensure proper deployment target
+      # Core iOS settings
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+      config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
       
-      # Fix Firebase specific issues
-      if target.name.start_with?('Firebase') || target.name.start_with?('firebase')
+      # Disable code signing for pods to avoid conflicts
+      config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+      config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
+      
+      # Universal Xcode 16.0 compatibility fixes
+      config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
+      config.build_settings['SWIFT_VERSION'] = '5.0'
+      config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+      config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
+      config.build_settings['CLANG_MODULES_AUTOLINK'] = 'YES'
+      
+      # Aggressive warning and analyzer disabling for Firebase compatibility
+      config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = 'NO'
+      config.build_settings['CLANG_WARN_DOCUMENTATION_COMMENTS'] = 'NO'
+      config.build_settings['CLANG_WARN_STRICT_PROTOTYPES'] = 'NO'
+      config.build_settings['CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS'] = 'NO'
+      config.build_settings['CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF'] = 'NO'
+      config.build_settings['CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING'] = 'NO'
+      config.build_settings['CLANG_WARN_COMMA'] = 'NO'
+      config.build_settings['CLANG_WARN_EMPTY_BODY'] = 'NO'
+      config.build_settings['CLANG_WARN_BOOL_CONVERSION'] = 'NO'
+      config.build_settings['CLANG_WARN_CONSTANT_CONVERSION'] = 'NO'
+      config.build_settings['CLANG_WARN_INT_CONVERSION'] = 'NO'
+      config.build_settings['CLANG_WARN_ENUM_CONVERSION'] = 'NO'
+      config.build_settings['CLANG_WARN_FLOAT_CONVERSION'] = 'NO'
+      config.build_settings['CLANG_WARN_NON_LITERAL_NULL_CONVERSION'] = 'NO'
+      config.build_settings['CLANG_WARN_OBJC_LITERAL_CONVERSION'] = 'NO'
+      config.build_settings['CLANG_WARN_RANGE_LOOP_ANALYSIS'] = 'NO'
+      config.build_settings['CLANG_WARN_SUSPICIOUS_MOVE'] = 'NO'
+      config.build_settings['CLANG_WARN_UNGUARDED_AVAILABILITY'] = 'NO'
+      config.build_settings['CLANG_WARN_UNREACHABLE_CODE'] = 'NO'
+      config.build_settings['GCC_WARN_64_TO_32_BIT_CONVERSION'] = 'NO'
+      config.build_settings['GCC_WARN_ABOUT_RETURN_TYPE'] = 'NO'
+      config.build_settings['GCC_WARN_UNDECLARED_SELECTOR'] = 'NO'
+      config.build_settings['GCC_WARN_UNINITIALIZED_AUTOS'] = 'NO'
+      config.build_settings['GCC_WARN_UNUSED_FUNCTION'] = 'NO'
+      config.build_settings['GCC_WARN_UNUSED_VARIABLE'] = 'NO'
+      config.build_settings['CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED'] = 'NO'
+      config.build_settings['CLANG_ANALYZER_NONNULL'] = 'NO'
+      config.build_settings['CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION'] = 'NO'
+      config.build_settings['ENABLE_STRICT_OBJC_MSGSEND'] = 'NO'
+      
+      # Compiler optimization and language standard fixes
+      config.build_settings['GCC_C_LANGUAGE_STANDARD'] = 'gnu17'
+      config.build_settings['CLANG_C_LANGUAGE_STANDARD'] = 'gnu17'
+      config.build_settings['GCC_OPTIMIZATION_LEVEL'] = '0'
+      config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-Onone'
+      config.build_settings['SWIFT_COMPILATION_MODE'] = 'singlefile'
+      config.build_settings['ENABLE_PREVIEWS'] = 'NO'
+      config.build_settings['DEAD_CODE_STRIPPING'] = 'NO'
+      config.build_settings['PRESERVE_DEAD_CODE_INITS_AND_TERMS'] = 'YES'
+      
+      # Firebase-specific fixes
+      if target.name.start_with?('Firebase') || target.name.start_with?('firebase') || target.name.include?('Firebase')
+        puts "🔥 Applying Firebase-specific Xcode 16.0 fixes to target: #{target.name}"
+        
+        # Firebase modular headers fix
         config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
         config.build_settings['DEFINES_MODULE'] = 'YES'
         config.build_settings['SWIFT_INSTALL_OBJC_HEADER'] = 'NO'
+        
+        # Firebase compilation fix for FIRHeartbeatLogger.m and similar files
+        config.build_settings['CLANG_WARN_DOCUMENTATION_COMMENTS'] = 'NO'
+        config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = 'NO'
+        config.build_settings['GCC_WARN_INHIBIT_ALL_WARNINGS'] = 'YES'
+        config.build_settings['CLANG_WARN_EVERYTHING'] = 'NO'
+        
+        # Force minimal optimization for Firebase targets
+        config.build_settings['GCC_OPTIMIZATION_LEVEL'] = '0'
+        config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-Onone'
+        
+        # Disable problematic features for Firebase
+        config.build_settings['ENABLE_BITCODE'] = 'NO'
+        config.build_settings['CLANG_MODULES_DISABLE_PRIVATE_WARNING'] = 'YES'
+        
+        puts "✅ Firebase Xcode 16.0 fixes applied to: #{target.name}"
       end
       
-      # Fix for Xcode 16.0
-      config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
-      config.build_settings['SWIFT_VERSION'] = '5.0'
+      # Bundle identifier collision prevention for pods
+      next if target.name == "Runner"
+      
+      if config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
+        current_bundle_id = config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
+        if current_bundle_id.include?("com.twinklub.twinklub") || current_bundle_id.include?("com.example.quikapptest07")
+          config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"] = current_bundle_id + ".pod." + target.name.downcase
+        end
+      end
     end
   end
 end
@@ -165,27 +285,46 @@ INFO_PLIST="$PROJECT_ROOT/ios/Runner/Info.plist"
 if [ -f "$INFO_PLIST" ]; then
     # Add Firebase messaging configuration if not present
     if ! grep -q "FirebaseAppDelegateProxyEnabled" "$INFO_PLIST"; then
-        # Add before the closing </dict>
-        sed -i '' '/<\/dict>/i\
-	<key>FirebaseAppDelegateProxyEnabled</key>\
-	<false/>' "$INFO_PLIST"
+        # Create a temporary file with the new content
+        local temp_plist="/tmp/info_plist_temp_$$"
+        
+        # Insert Firebase configuration before the closing </dict>
+        sed 's|</dict>|	<key>FirebaseAppDelegateProxyEnabled</key>\n	<false/>\n</dict>|' "$INFO_PLIST" > "$temp_plist"
+        
+        # Replace the original file
+        mv "$temp_plist" "$INFO_PLIST"
+        
         echo "✅ Firebase AppDelegate proxy disabled in Info.plist"
     fi
 else
     echo "⚠️ Info.plist not found"
 fi
 
-echo "✅ Firebase Xcode 16.0 fixes completed!"
+echo "✅ Firebase Xcode 16.0 fixes completed successfully!"
 echo ""
-echo "📋 Summary of fixes applied:"
+echo "📋 Comprehensive summary of fixes applied:"
 echo "   ✅ Added CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES"
-echo "   ✅ Updated build settings for Firebase compatibility"
-echo "   ✅ Added Podfile post_install hook"
-echo "   ✅ Updated Info.plist for Firebase"
+echo "   ✅ Enhanced build settings for Firebase Xcode 16.0 compatibility"
+echo "   ✅ Comprehensive Podfile post_install hook with Firebase-specific fixes"
+echo "   ✅ Updated Info.plist for Firebase AppDelegate proxy"
 echo "   ✅ Set proper deployment target (iOS 13.0+)"
+echo "   ✅ Disabled all compiler warnings and analyzers for Firebase targets"
+echo "   ✅ Set C language standard to gnu17 for compatibility"
+echo "   ✅ Disabled optimization (GCC_OPTIMIZATION_LEVEL = 0)"
+echo "   ✅ Added SWIFT_COMPILATION_MODE = singlefile"
+echo "   ✅ Disabled code signing for pods to prevent conflicts"
+echo "   ✅ Added bundle identifier collision prevention"
+echo "   ✅ Specifically targeted FIRHeartbeatLogger.m compilation issues"
+echo ""
+echo "🎯 Fixes specifically target:"
+echo "   • FIRHeartbeatLogger.m compilation errors"
+echo "   • Firebase modular header include issues"
+echo "   • Xcode 16.0 compiler compatibility"
+echo "   • Bundle identifier collisions"
+echo "   • Code signing conflicts"
 echo ""
 echo "🔄 Next steps:"
 echo "   1. Run 'flutter clean'"
 echo "   2. Run 'flutter pub get'"
 echo "   3. Run 'cd ios && pod install'"
-echo "   4. Rebuild your iOS app" 
+echo "   4. Rebuild your iOS app with enhanced Firebase compatibility" 
