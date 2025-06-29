@@ -118,15 +118,39 @@ main() {
         return 1
     fi
     
-    # Stage 6: Firebase Integration (Conditional)
+    # Stage 6: Conditional Firebase Injection
+    log_info "--- Stage 6: Conditional Firebase Injection ---"
+    
+    # Make conditional Firebase injection script executable
+    chmod +x "${SCRIPT_DIR}/conditional_firebase_injection.sh"
+    
+    # Run conditional Firebase injection based on PUSH_NOTIFY flag
+    if ! "${SCRIPT_DIR}/conditional_firebase_injection.sh"; then
+        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Conditional Firebase injection failed."
+        return 1
+    fi
+    
+    # Stage 6.5: Certificate and API Validation
+    log_info "--- Stage 6.5: Certificate and API Validation ---"
+    
+    # Make certificate validation script executable  
+    chmod +x "${SCRIPT_DIR}/certificate_validation.sh"
+    
+    # Run certificate and API validation for proper IPA export
+    if ! "${SCRIPT_DIR}/certificate_validation.sh"; then
+        log_warn "⚠️ Certificate validation failed - IPA export may not work properly"
+        # Don't fail the build here, just warn
+    fi
+    
+    # Stage 6.7: Firebase Setup (Only if PUSH_NOTIFY=true)
     if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
-        log_info "--- Stage 6: Setting up Firebase ---"
+        log_info "--- Stage 6.7: Setting up Firebase (Push notifications enabled) ---"
         if ! "${SCRIPT_DIR}/firebase_setup.sh"; then
             send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Firebase setup failed."
             return 1
         fi
     else
-        log_info "--- Stage 6: Skipping Firebase (Push notifications disabled) ---"
+        log_info "--- Stage 6.7: Firebase Setup Skipped (Push notifications disabled) ---"
     fi
     
     # Stage 7: Flutter Build Process (with emergency Firebase fallback)
