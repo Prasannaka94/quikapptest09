@@ -130,36 +130,42 @@ export_with_app_store_connect_api() {
     log_info "  - Issuer ID: ${APP_STORE_CONNECT_ISSUER_ID}"
     log_info "  - API Key URL: ${APP_STORE_CONNECT_API_KEY_PATH}"
     
-    # Download API key from GitHub
-    local api_key_path="/tmp/AuthKey_${APP_STORE_CONNECT_KEY_IDENTIFIER}.p8"
-    log_info "📥 Downloading p8 API key from GitHub..."
+    # Use the API key downloaded by certificate validation or download it if not available
+    local api_key_path="${APP_STORE_CONNECT_API_KEY_DOWNLOADED_PATH:-/tmp/AuthKey_${APP_STORE_CONNECT_KEY_IDENTIFIER}.p8}"
     
-    if curl -fsSL -o "$api_key_path" "${APP_STORE_CONNECT_API_KEY_PATH}"; then
+    if [[ -f "${api_key_path}" && -s "${api_key_path}" ]]; then
+        log_success "✅ Using previously downloaded API key: ${api_key_path}"
         chmod 600 "$api_key_path"
-        log_success "✅ API key downloaded successfully to ${api_key_path}"
+    else
+        log_info "📥 Downloading p8 API key from GitHub..."
         
-        # Verify the downloaded file
-        if [[ -f "${api_key_path}" && -s "${api_key_path}" ]]; then
-            log_success "✅ API key file verified (Size: $(du -h "${api_key_path}" | cut -f1))"
+        if curl -fsSL -o "$api_key_path" "${APP_STORE_CONNECT_API_KEY_PATH}"; then
+            chmod 600 "$api_key_path"
+            log_success "✅ API key downloaded successfully to ${api_key_path}"
             
-            # Check if it looks like a valid p8 file
-            if head -1 "${api_key_path}" | grep -q "BEGIN PRIVATE KEY"; then
-                log_success "✅ API key format validation passed"
+            # Verify the downloaded file
+            if [[ -f "${api_key_path}" && -s "${api_key_path}" ]]; then
+                log_success "✅ API key file verified (Size: $(du -h "${api_key_path}" | cut -f1))"
+                
+                # Check if it looks like a valid p8 file
+                if head -1 "${api_key_path}" | grep -q "BEGIN PRIVATE KEY"; then
+                    log_success "✅ API key format validation passed"
+                else
+                    log_warn "⚠️ API key format validation warning - file may not be a valid p8 key"
+                fi
             else
-                log_warn "⚠️ API key format validation warning - file may not be a valid p8 key"
+                log_error "❌ Downloaded API key file is empty or invalid"
+                return 1
             fi
         else
-            log_error "❌ Downloaded API key file is empty or invalid"
+            log_error "❌ Failed to download API key from GitHub"
+            log_error "   URL: ${APP_STORE_CONNECT_API_KEY_PATH}"
+            log_info "Please check:"
+            log_info "  1. GitHub URL is accessible"
+            log_info "  2. p8 file exists at the URL"
+            log_info "  3. Network connectivity"
             return 1
         fi
-    else
-        log_error "❌ Failed to download API key from GitHub"
-        log_error "   URL: ${APP_STORE_CONNECT_API_KEY_PATH}"
-        log_info "Please check:"
-        log_info "  1. GitHub URL is accessible"
-        log_info "  2. p8 file exists at the URL"
-        log_info "  3. Network connectivity"
-        return 1
     fi
     
     # Try export with App Store Connect API
