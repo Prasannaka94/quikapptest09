@@ -149,17 +149,23 @@ post_install do |installer|
         config.build_settings['SWIFT_VERSION'] = '5.0'
       end
       
-      # Bundle identifier collision prevention (v1)
-      # Skip the main app target
-      next if target.name == "Runner"
-      
-      # Make pod bundle identifiers unique
-      if config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
-        current_bundle_id = config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
-        if current_bundle_id == "com.twinklub.twinklub" || current_bundle_id == "com.example.quikapptest07"
-          config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"] = current_bundle_id + ".pod"
-        end
-      end
+             # Bundle identifier collision prevention (v1)
+       # Skip the main app target
+       next if target.name == "Runner"
+       
+       # Make pod bundle identifiers unique
+       if config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
+         current_bundle_id = config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
+         if current_bundle_id == "com.twinklub.twinklub" || current_bundle_id == "com.example.quikapptest07"
+           config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"] = current_bundle_id + ".pod"
+         end
+       end
+       
+       # Fix for Xcode 16.0 and Swift optimization warnings  
+       config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
+       config.build_settings['SWIFT_VERSION'] = '5.0'
+       config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-Onone'
+       config.build_settings['ENABLE_PREVIEWS'] = 'NO'
     end
   end
 end

@@ -86,20 +86,59 @@ handle_firebase_issues() {
     # Remove Firebase dependencies temporarily
     sed -i.tmp '/firebase_core:/d' pubspec.yaml
     sed -i.tmp '/firebase_messaging:/d' pubspec.yaml
+    sed -i.tmp '/_flutterfire_internals:/d' pubspec.yaml
+    sed -i.tmp '/firebase_core_platform_interface:/d' pubspec.yaml
+    sed -i.tmp '/firebase_core_web:/d' pubspec.yaml
+    sed -i.tmp '/firebase_messaging_platform_interface:/d' pubspec.yaml
+    sed -i.tmp '/firebase_messaging_web:/d' pubspec.yaml
     rm -f pubspec.yaml.tmp
     
     log_info "Firebase dependencies temporarily removed from pubspec.yaml"
     
-    # Clean and reinstall
+    # Clean project state
     flutter clean
+    
+    # Fix bundle identifier conflicts before regenerating iOS files
+    log_info "Fixing bundle identifier conflicts..."
+    
+    # Clean up any remaining com.example references in iOS files
+    if [ -f "ios/Runner.xcodeproj/project.pbxproj" ]; then
+        cp "ios/Runner.xcodeproj/project.pbxproj" "ios/Runner.xcodeproj/project.pbxproj.backup"
+        sed -i.tmp 's/com\.example\.quikapptest07/com.twinklub.twinklub/g' "ios/Runner.xcodeproj/project.pbxproj"
+        sed -i.tmp 's/com\.example\.[a-zA-Z0-9_]*/com.twinklub.twinklub/g' "ios/Runner.xcodeproj/project.pbxproj"
+        rm -f "ios/Runner.xcodeproj/project.pbxproj.tmp"
+        log_info "Bundle identifier conflicts cleaned up"
+    fi
+    
+    # Get dependencies
     flutter pub get
     
-    # Regenerate iOS files
-    flutter create --platforms ios .
+    # Determine organization from bundle ID
+    local ORG_NAME="com.twinklub"
+    if [ -n "${BUNDLE_ID:-}" ]; then
+        ORG_NAME=$(echo "$BUNDLE_ID" | cut -d. -f1-2)
+    fi
     
+    log_info "Using organization: $ORG_NAME"
+    
+    # Regenerate iOS files with correct organization
+    flutter create --platforms ios --org "$ORG_NAME" .
+    
+    # Clean and reinstall CocoaPods
     cd ios
     rm -rf Pods Podfile.lock
-    pod install --repo-update --verbose
+    
+    # Use the bundle identifier collision fix to ensure proper Podfile
+    if [ -f "../lib/scripts/ios/fix_bundle_identifier_collision_v2.sh" ]; then
+        log_info "Applying bundle identifier collision fixes..."
+        cd ..
+        chmod +x lib/scripts/ios/fix_bundle_identifier_collision_v2.sh
+        ./lib/scripts/ios/fix_bundle_identifier_collision_v2.sh || true
+        cd ios
+    fi
+    
+    # Install pods with Firebase disabled
+    FIREBASE_DISABLED=true pod install --repo-update --verbose
     cd ..
     
     log_warn "Firebase functionality disabled for this build"
@@ -156,8 +195,17 @@ install_dependencies() {
                 sed -i.tmp '/Firebase/d' Podfile
                 rm -f Podfile.tmp
                 
+                # Apply bundle identifier collision fixes to prevent conflicts
+                if [ -f "../lib/scripts/ios/fix_bundle_identifier_collision_v2.sh" ]; then
+                    log_info "Applying bundle identifier collision fixes..."
+                    cd ..
+                    chmod +x lib/scripts/ios/fix_bundle_identifier_collision_v2.sh
+                    ./lib/scripts/ios/fix_bundle_identifier_collision_v2.sh || true
+                    cd ios
+                fi
+                
                 # Try installation again without Firebase
-                if pod install --repo-update --verbose; then
+                if FIREBASE_DISABLED=true pod install --repo-update --verbose; then
                     log_success "CocoaPods installation completed without Firebase"
                     log_warn "Firebase functionality will be disabled for this build"
                     # Set environment variable to disable Firebase in subsequent steps

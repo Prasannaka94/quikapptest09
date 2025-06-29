@@ -186,9 +186,11 @@ post_install do |installer|
         config.build_settings['SWIFT_INSTALL_OBJC_HEADER'] = 'NO'
       end
       
-      # Fix for Xcode 16.0
+      # Fix for Xcode 16.0 and Swift optimization warnings
       config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
       config.build_settings['SWIFT_VERSION'] = '5.0'
+      config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-Onone'
+      config.build_settings['ENABLE_PREVIEWS'] = 'NO'
     end
   end
 end

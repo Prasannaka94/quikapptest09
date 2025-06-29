@@ -33,8 +33,8 @@ echo "🔧 Adding modular headers configuration..."
 sed -i '' '/CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;/a\
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;' "$IOS_PROJECT_FILE"
 
-# Fix 2: Add Firebase-specific build settings
-echo "🔧 Adding Firebase-specific build settings..."
+# Fix 2: Add Firebase-specific build settings and compilation fixes
+echo "🔧 Adding Firebase-specific build settings and compilation fixes..."
 
 # Add Firebase build settings to all configurations
 python3 -c "
@@ -44,17 +44,24 @@ import re
 with open('$IOS_PROJECT_FILE', 'r') as f:
     content = f.read()
 
-# Add Firebase-specific settings to all build configurations
+# Enhanced Firebase-specific settings for Xcode 16.0 compatibility
 firebase_settings = '''
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
-				OTHER_LDFLAGS = \"\$(inherited)\";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_MODULES_AUTOLINK = YES;
+				OTHER_LDFLAGS = \"\$(inherited) -ObjC\";
 				FRAMEWORK_SEARCH_PATHS = \"\$(inherited)\";
 				HEADER_SEARCH_PATHS = \"\$(inherited)\";
 				LIBRARY_SEARCH_PATHS = \"\$(inherited)\";
 				SWIFT_OBJC_BRIDGING_HEADER = \"Runner/Runner-Bridging-Header.h\";
 				SWIFT_VERSION = 5.0;
+				SWIFT_OPTIMIZATION_LEVEL = \"-Onone\";
+				ENABLE_PREVIEWS = NO;
 				ENABLE_BITCODE = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				GCC_PREPROCESSOR_DEFINITIONS = \"\$(inherited) COCOAPODS=1\";
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 '''
 
 # Find all build configuration sections and add Firebase settings
@@ -68,7 +75,28 @@ modified_content = re.sub(pattern, replacement, content, flags=re.DOTALL)
 with open('$IOS_PROJECT_FILE', 'w') as f:
     f.write(modified_content)
 
-print('Firebase build settings added successfully')
+print('Enhanced Firebase build settings added successfully')
+"
+
+# Fix 2.1: Clean up any conflicting bundle identifiers first
+echo "🔧 Cleaning up conflicting bundle identifiers..."
+
+python3 -c "
+import re
+
+# Read the project file
+with open('$IOS_PROJECT_FILE', 'r') as f:
+    content = f.read()
+
+# Replace any remaining com.example bundle IDs with com.twinklub
+content = re.sub(r'com\.example\.quikapptest07', 'com.twinklub.twinklub', content)
+content = re.sub(r'com\.example\.[a-zA-Z0-9_]+', 'com.twinklub.twinklub', content)
+
+# Write back to file
+with open('$IOS_PROJECT_FILE', 'w') as f:
+    f.write(content)
+
+print('Bundle identifier conflicts cleaned up')
 "
 
 # Fix 3: Update Podfile to handle Firebase properly
