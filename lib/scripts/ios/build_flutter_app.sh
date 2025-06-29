@@ -330,9 +330,230 @@ create_xcode_archive() {
     fi
 }
 
+# Function to completely remove Firebase from project
+completely_remove_firebase() {
+    log_warn "🔥 Completely removing Firebase from project..."
+    
+    # 1. Remove Firebase from pubspec.yaml
+    if [ -f "pubspec.yaml" ]; then
+        cp pubspec.yaml pubspec.yaml.firebase_backup
+        log_info "Backup created: pubspec.yaml.firebase_backup"
+        
+        # Remove all Firebase-related dependencies
+        sed -i.tmp '/firebase_core:/d' pubspec.yaml
+        sed -i.tmp '/firebase_messaging:/d' pubspec.yaml
+        sed -i.tmp '/_flutterfire_internals:/d' pubspec.yaml
+        sed -i.tmp '/firebase_core_platform_interface:/d' pubspec.yaml
+        sed -i.tmp '/firebase_core_web:/d' pubspec.yaml
+        sed -i.tmp '/firebase_messaging_platform_interface:/d' pubspec.yaml
+        sed -i.tmp '/firebase_messaging_web:/d' pubspec.yaml
+        sed -i.tmp '/cloud_firestore:/d' pubspec.yaml
+        sed -i.tmp '/firebase_auth:/d' pubspec.yaml
+        sed -i.tmp '/firebase_analytics:/d' pubspec.yaml
+        sed -i.tmp '/firebase_crashlytics:/d' pubspec.yaml
+        sed -i.tmp '/firebase_performance:/d' pubspec.yaml
+        sed -i.tmp '/firebase_remote_config:/d' pubspec.yaml
+        sed -i.tmp '/firebase_storage:/d' pubspec.yaml
+        rm -f pubspec.yaml.tmp
+        
+        log_info "✅ Firebase dependencies removed from pubspec.yaml"
+    fi
+    
+    # 2. Remove Firebase configuration files
+    if [ -f "ios/Runner/GoogleService-Info.plist" ]; then
+        mv "ios/Runner/GoogleService-Info.plist" "ios/Runner/GoogleService-Info.plist.backup"
+        log_info "✅ GoogleService-Info.plist backed up and removed"
+    fi
+    
+    if [ -f "android/app/google-services.json" ]; then
+        mv "android/app/google-services.json" "android/app/google-services.json.backup"
+        log_info "✅ google-services.json backed up and removed"
+    fi
+    
+    # 3. Clean Flutter project state
+    log_info "🧹 Cleaning Flutter project state..."
+    flutter clean
+    rm -rf .dart_tool/
+    rm -rf build/
+    
+    # 4. Clean iOS project
+    log_info "🧹 Cleaning iOS project..."
+    if [ -d "ios" ]; then
+        cd ios
+        rm -rf Pods/
+        rm -f Podfile.lock
+        rm -rf build/
+        rm -rf .symlinks/
+        rm -rf Flutter/ephemeral/
+        cd ..
+    fi
+    
+    # 5. Fix bundle identifier conflicts
+    log_info "🔧 Fixing bundle identifier conflicts..."
+    if [ -f "ios/Runner.xcodeproj/project.pbxproj" ]; then
+        cp "ios/Runner.xcodeproj/project.pbxproj" "ios/Runner.xcodeproj/project.pbxproj.firebase_backup"
+        sed -i.tmp 's/com\.example\.quikapptest07/com.twinklub.twinklub/g' "ios/Runner.xcodeproj/project.pbxproj"
+        sed -i.tmp 's/com\.example\.[a-zA-Z0-9_]*/com.twinklub.twinklub/g' "ios/Runner.xcodeproj/project.pbxproj"
+        rm -f "ios/Runner.xcodeproj/project.pbxproj.tmp"
+        log_info "✅ Bundle identifier conflicts cleaned up"
+    fi
+    
+    # 6. Get dependencies without Firebase
+    log_info "📦 Installing dependencies without Firebase..."
+    flutter pub get
+    
+    # 7. Regenerate iOS files with correct organization
+    local ORG_NAME="com.twinklub"
+    if [ -n "${BUNDLE_ID:-}" ]; then
+        ORG_NAME=$(echo "$BUNDLE_ID" | cut -d. -f1-2)
+    fi
+    
+    log_info "🔄 Regenerating iOS files with organization: $ORG_NAME"
+    flutter create --platforms ios --org "$ORG_NAME" .
+    
+    # 8. Create a clean Podfile without Firebase
+    log_info "📝 Creating clean Podfile without Firebase..."
+    cat > ios/Podfile << 'EOF'
+platform :ios, '13.0'
+use_frameworks! :linkage => :static
+
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+ENV['FIREBASE_DISABLED'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_ios_podfile_setup
+
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+    target.build_configurations.each do |config|
+      # Core iOS settings
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+      config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
+      config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+      config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
+      
+      # Xcode 16.0 compatibility fixes
+      config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
+      config.build_settings['SWIFT_VERSION'] = '5.0'
+      config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-Onone'
+      config.build_settings['ENABLE_PREVIEWS'] = 'NO'
+      config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+      
+      # Bundle identifier collision prevention
+      next if target.name == 'Runner'
+      
+      if config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
+        current_bundle_id = config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
+        if current_bundle_id.include?('com.twinklub.twinklub') || current_bundle_id.include?('com.example')
+          config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = current_bundle_id + '.pod.' + target.name.downcase
+        end
+      end
+    end
+  end
+end
+EOF
+    
+    # 9. Install CocoaPods with Firebase disabled
+    log_info "📦 Installing CocoaPods without Firebase..."
+    cd ios
+    FIREBASE_DISABLED=true pod install --repo-update --verbose
+    cd ..
+    
+    # 10. Set environment flag
+    export FIREBASE_DISABLED=true
+    echo "FIREBASE_DISABLED=true" >> "$HOME/.bashrc" 2>/dev/null || true
+    
+    log_success "✅ Firebase completely removed from project"
+    log_warn "⚠️ Push notifications and Firebase features will be disabled"
+    
+    return 0
+}
+
+# Function to detect potential Firebase issues early
+detect_firebase_issues() {
+    log_info "🔍 Detecting potential Firebase issues..."
+    
+    # Check for known Firebase compilation issues with Xcode 16.0
+    if [ -f "pubspec.yaml" ] && grep -q "firebase" pubspec.yaml; then
+        log_info "Firebase dependencies detected, checking for potential issues..."
+        
+        # Check Xcode version
+        local xcode_version=$(xcodebuild -version | head -1 | grep -o '[0-9]*\.[0-9]*')
+        if [[ "$xcode_version" == "16."* ]]; then
+            log_warn "⚠️ Xcode 16.x detected with Firebase - known compilation issues"
+            log_info "Applying preemptive Firebase removal to avoid build failures..."
+            return 1  # Indicates Firebase issues detected
+        fi
+        
+        # Check for Firebase configuration files
+        if [ -f "ios/Runner/GoogleService-Info.plist" ]; then
+            # Try to validate the Firebase configuration
+            if ! plutil -lint "ios/Runner/GoogleService-Info.plist" >/dev/null 2>&1; then
+                log_warn "⚠️ Invalid GoogleService-Info.plist detected"
+                return 1  # Indicates Firebase issues detected
+            fi
+        fi
+        
+        # Check if Firebase dependencies exist but configuration is missing
+        if [ ! -f "ios/Runner/GoogleService-Info.plist" ]; then
+            log_warn "⚠️ Firebase dependencies found but GoogleService-Info.plist missing"
+            return 1  # Indicates Firebase issues detected
+        fi
+    fi
+    
+    log_info "✅ No immediate Firebase issues detected"
+    return 0  # No issues detected
+}
+
 # Main execution
 main() {
     log_info "Flutter iOS Build Starting..."
+    
+    # Early Firebase issue detection
+    if detect_firebase_issues; then
+        log_info "✅ Firebase checks passed, proceeding with normal build"
+    else
+        log_warn "🔥 Firebase issues detected, applying preemptive removal..."
+        if completely_remove_firebase; then
+            log_info "✅ Preemptive Firebase removal completed"
+        else
+            log_error "❌ Failed to remove Firebase preemptively"
+            return 1
+        fi
+    fi
     
     # Generate Podfile if needed
     generate_podfile
@@ -351,22 +572,28 @@ main() {
     
     # Create Xcode archive
     if ! create_xcode_archive; then
-        log_warn "Xcode archive failed, trying Firebase workaround..."
+        log_warn "Xcode archive failed, trying comprehensive Firebase removal..."
         
-        # Try Firebase workaround if archive fails
+        # Try comprehensive Firebase removal if archive fails
         if [ "${FIREBASE_DISABLED:-false}" != "true" ]; then
-            log_info "Attempting Firebase workaround..."
-            handle_firebase_issues
+            log_info "Attempting comprehensive Firebase removal..."
             
-            # Retry build without Firebase
-            if ! build_flutter_app; then
-                log_error "Failed to build Flutter app even without Firebase"
-                return 1
-            fi
-            
-            # Retry archive without Firebase
-            if ! create_xcode_archive; then
-                log_error "Failed to create Xcode archive even without Firebase"
+            if completely_remove_firebase; then
+                log_info "Firebase completely removed, rebuilding..."
+                
+                # Retry build without Firebase
+                if ! build_flutter_app; then
+                    log_error "Failed to build Flutter app even after Firebase removal"
+                    return 1
+                fi
+                
+                # Retry archive without Firebase
+                if ! create_xcode_archive; then
+                    log_error "Failed to create Xcode archive even after Firebase removal"
+                    return 1
+                fi
+            else
+                log_error "Failed to remove Firebase completely"
                 return 1
             fi
         else

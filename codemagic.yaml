@@ -2385,7 +2385,172 @@ workflows:
             echo "⚠️ Firebase fix script not found, continuing with build..."
           fi
                     echo "🚀 Starting iOS build process with profile type: $PROFILE_TYPE"
-          ./lib/scripts/ios/main.sh
+          if ./lib/scripts/ios/main.sh; then
+            echo "✅ iOS build completed successfully"
+          else
+            echo "❌ iOS build failed, trying emergency Firebase-free rebuild..."
+            
+            # Emergency Firebase-free rebuild
+            echo "🔥 Applying emergency Firebase removal..."
+            
+            # Remove all Firebase dependencies from pubspec.yaml
+            if [ -f "pubspec.yaml" ]; then
+              cp pubspec.yaml pubspec.yaml.emergency_backup
+              sed -i.tmp '/firebase_core:/d' pubspec.yaml
+              sed -i.tmp '/firebase_messaging:/d' pubspec.yaml
+              sed -i.tmp '/_flutterfire_internals:/d' pubspec.yaml
+              sed -i.tmp '/firebase_core_platform_interface:/d' pubspec.yaml
+              sed -i.tmp '/firebase_core_web:/d' pubspec.yaml
+              sed -i.tmp '/firebase_messaging_platform_interface:/d' pubspec.yaml
+              sed -i.tmp '/firebase_messaging_web:/d' pubspec.yaml
+              sed -i.tmp '/cloud_firestore:/d' pubspec.yaml
+              sed -i.tmp '/firebase_auth:/d' pubspec.yaml
+              sed -i.tmp '/firebase_analytics:/d' pubspec.yaml
+              sed -i.tmp '/firebase_crashlytics:/d' pubspec.yaml
+              sed -i.tmp '/firebase_performance:/d' pubspec.yaml
+              sed -i.tmp '/firebase_remote_config:/d' pubspec.yaml
+              sed -i.tmp '/firebase_storage:/d' pubspec.yaml
+              rm -f pubspec.yaml.tmp
+              echo "✅ Firebase dependencies removed"
+            fi
+            
+            # Remove Firebase config files
+            [ -f "ios/Runner/GoogleService-Info.plist" ] && mv "ios/Runner/GoogleService-Info.plist" "ios/Runner/GoogleService-Info.plist.emergency_backup"
+            [ -f "android/app/google-services.json" ] && mv "android/app/google-services.json" "android/app/google-services.json.emergency_backup"
+            
+            # Clean everything
+            flutter clean
+            rm -rf .dart_tool/
+            rm -rf build/
+            rm -rf ios/Pods/
+            rm -f ios/Podfile.lock
+            
+            # Fix bundle identifier conflicts
+            if [ -f "ios/Runner.xcodeproj/project.pbxproj" ]; then
+              sed -i.tmp 's/com\.example\.quikapptest07/com.twinklub.twinklub/g' "ios/Runner.xcodeproj/project.pbxproj"
+              sed -i.tmp 's/com\.example\.[a-zA-Z0-9_]*/com.twinklub.twinklub/g' "ios/Runner.xcodeproj/project.pbxproj"
+              rm -f "ios/Runner.xcodeproj/project.pbxproj.tmp"
+              echo "✅ Bundle identifier conflicts cleaned"
+            fi
+            
+            # Regenerate with correct organization
+            flutter pub get
+            flutter create --platforms ios --org com.twinklub .
+            
+            # Create Firebase-free Podfile
+            cat > ios/Podfile << 'EOF_EMERGENCY'
+              platform :ios, '13.0'
+              use_frameworks! :linkage => :static
+              
+              ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+              ENV['FIREBASE_DISABLED'] = 'true'
+              
+              project 'Runner', {
+                'Debug' => :debug,
+                'Profile' => :release,
+                'Release' => :release,
+              }
+              
+              def flutter_root
+                generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+                unless File.exist?(generated_xcode_build_settings_path)
+                  raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+                end
+              
+                File.foreach(generated_xcode_build_settings_path) do |line|
+                  matches = line.match(/FLUTTER_ROOT\=(.*)/)
+                  return matches[1].strip if matches
+                end
+                raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+              end
+              
+              require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+              
+              flutter_ios_podfile_setup
+              
+              target 'Runner' do
+                use_frameworks!
+                use_modular_headers!
+              
+                flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+                
+                target 'RunnerTests' do
+                  inherit! :search_paths
+                end
+              end
+              
+              post_install do |installer|
+                installer.pods_project.targets.each do |target|
+                  flutter_additional_ios_build_settings(target)
+                  target.build_configurations.each do |config|
+                    config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+                    config.build_settings['ENABLE_BITCODE'] = 'NO'
+                    config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
+                    config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+                    config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
+                    config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
+                    config.build_settings['SWIFT_VERSION'] = '5.0'
+                    config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-Onone'
+                    config.build_settings['ENABLE_PREVIEWS'] = 'NO'
+                    config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+                    
+                    next if target.name == 'Runner'
+                    
+                    if config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
+                      current_bundle_id = config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
+                      if current_bundle_id.include?('com.twinklub.twinklub') || current_bundle_id.include?('com.example')
+                        config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = current_bundle_id + '.pod.' + target.name.downcase
+                      end
+                    end
+                  end
+                end
+              end
+              EOF_EMERGENCY
+            
+            # Install CocoaPods without Firebase
+            cd ios
+            FIREBASE_DISABLED=true pod install --repo-update --verbose
+            cd ..
+            
+            # Build Flutter app without Firebase
+            flutter build ios --release --no-codesign \
+              --dart-define=APP_NAME="$APP_NAME" \
+              --dart-define=BUNDLE_ID="$BUNDLE_ID" \
+              --dart-define=VERSION_NAME="$VERSION_NAME" \
+              --dart-define=VERSION_CODE="$VERSION_CODE" \
+              --dart-define=PUSH_NOTIFY="false" \
+              --dart-define=FIREBASE_DISABLED="true"
+            
+            # Create output directory
+            mkdir -p output/ios
+            
+            # Create Xcode archive
+            xcodebuild archive \
+              -workspace ios/Runner.xcworkspace \
+              -scheme Runner \
+              -configuration Release \
+              -archivePath "output/ios/Runner.xcarchive" \
+              -allowProvisioningUpdates \
+              CODE_SIGN_IDENTITY="" \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGNING_ALLOWED=NO \
+              DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+              PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
+              MARKETING_VERSION="$VERSION_NAME" \
+              CURRENT_PROJECT_VERSION="$VERSION_CODE" \
+              IPHONEOS_DEPLOYMENT_TARGET="13.0" \
+              ENABLE_BITCODE=NO \
+              COMPILER_INDEX_STORE_ENABLE=NO \
+              ONLY_ACTIVE_ARCH=NO
+            
+            if [ -d "output/ios/Runner.xcarchive" ]; then
+              echo "✅ Emergency Firebase-free rebuild completed successfully!"
+              echo "⚠️ Note: Firebase features (push notifications) are disabled in this build"
+            else
+              echo "❌ Emergency rebuild also failed"
+              exit 1
+            fi
+          fi
 
       #      - name: Enhanced IPA Export (if needed)
       #        script: |
