@@ -22,6 +22,14 @@ if ! grep -q "flutter_launcher_icons:" pubspec.yaml; then
     echo "  flutter_launcher_icons: ^0.13.1" >> pubspec.yaml
 fi
 
+# Update pubspec.yaml configuration to use correct path
+if grep -q "image_path: \"assets/images/logo.png\"" pubspec.yaml; then
+    echo "🔧 Updating image_path to use assets/icons/app_icon.png..."
+    sed -i.bak 's|image_path: "assets/images/logo.png"|image_path: "assets/icons/app_icon.png"|' pubspec.yaml
+    sed -i.bak 's|adaptive_icon_foreground: "assets/images/logo.png"|adaptive_icon_foreground: "assets/icons/app_icon.png"|' pubspec.yaml
+    rm -f pubspec.yaml.bak
+fi
+
 # Install dependencies
 echo "📥 Installing dependencies..."
 flutter pub get
@@ -48,10 +56,28 @@ if [ ! -f "assets/images/logo.png" ]; then
 fi
 
 # Fix path issue - ensure logo is available at both paths
-if [ -f "assets/images/logo.png" ] && [ ! -f "assets/icons/app_icon.png" ]; then
-    echo "📋 Creating assets/icons/app_icon.png from assets/images/logo.png"
+echo "📋 Copying logo from assets/images/logo.png to assets/icons/app_icon.png..."
+if [ -f "assets/images/logo.png" ]; then
     mkdir -p assets/icons
-    cp "assets/images/logo.png" "assets/icons/app_icon.png"
+    if cp "assets/images/logo.png" "assets/icons/app_icon.png"; then
+        echo "✅ Logo successfully copied to: assets/icons/app_icon.png"
+        
+        # Verify the copy
+        source_size=$(stat -f%z "assets/images/logo.png" 2>/dev/null || stat -c%s "assets/images/logo.png" 2>/dev/null)
+        target_size=$(stat -f%z "assets/icons/app_icon.png" 2>/dev/null || stat -c%s "assets/icons/app_icon.png" 2>/dev/null)
+        
+        if [ "$source_size" = "$target_size" ]; then
+            echo "✅ Copy verified - file sizes match ($source_size bytes)"
+        else
+            echo "⚠️ File sizes don't match - Source: $source_size, Target: $target_size"
+        fi
+    else
+        echo "❌ Failed to copy logo"
+        exit 1
+    fi
+else
+    echo "❌ Source logo not found: assets/images/logo.png"
+    exit 1
 fi
 
 # Check if logo is AVIF format and convert

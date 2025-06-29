@@ -87,6 +87,59 @@ validate_logo_file() {
     return 0
 }
 
+# Function to copy logo from branding_assets to flutter_launcher_icons expected path
+copy_logo_to_app_icon() {
+    log_info "📋 Ensuring logo is available at expected path for flutter_launcher_icons..."
+    
+    local source_logo="assets/images/logo.png"
+    local target_icon="assets/icons/app_icon.png"
+    
+    # Ensure target directory exists
+    ensure_directory "assets/icons"
+    
+    # Check if source logo exists (from branding_assets.sh)
+    if [ ! -f "$source_logo" ]; then
+        log_error "❌ Source logo not found: $source_logo"
+        log_error "❌ Expected logo to be downloaded by branding_assets.sh in Stage 4"
+        return 1
+    fi
+    
+    # Always copy the logo to ensure we have the latest version from branding_assets.sh
+    log_info "📸 Copying logo from branding_assets.sh to flutter_launcher_icons path..."
+    log_info "   Source: $source_logo"
+    log_info "   Target: $target_icon"
+    
+    if cp "$source_logo" "$target_icon"; then
+        log_success "✅ Logo successfully copied to: $target_icon"
+        
+        # Verify the copy
+        if [ -f "$target_icon" ]; then
+            local source_size=$(stat -f%z "$source_logo" 2>/dev/null || stat -c%s "$source_logo" 2>/dev/null)
+            local target_size=$(stat -f%z "$target_icon" 2>/dev/null || stat -c%s "$target_icon" 2>/dev/null)
+            
+            if [ "$source_size" = "$target_size" ]; then
+                log_success "✅ Copy verified - file sizes match ($source_size bytes)"
+            else
+                log_warn "⚠️ File sizes don't match - Source: $source_size, Target: $target_size"
+            fi
+            
+            # Show file properties
+            if command -v file &> /dev/null; then
+                local target_info=$(file "$target_icon")
+                log_info "📋 Copied app_icon.png properties: $target_info"
+            fi
+        else
+            log_error "❌ Copy verification failed - target file not found"
+            return 1
+        fi
+    else
+        log_error "❌ Failed to copy logo from $source_logo to $target_icon"
+        return 1
+    fi
+    
+    return 0
+}
+
 # Function to backup existing icons
 backup_existing_icons() {
     local backup_dir="ios/Runner/Assets.xcassets/AppIcon.appiconset.backup.$(date +%Y%m%d_%H%M%S)"
@@ -119,14 +172,6 @@ check_flutter_launcher_icons() {
     # Run pub get to ensure dependency is installed
     log_info "📥 Installing dependencies..."
     flutter pub get
-    
-    # Fix path issue - ensure logo is also available at expected path
-    if [ -f "assets/images/logo.png" ] && [ ! -f "assets/icons/app_icon.png" ]; then
-        log_info "📋 Creating assets/icons/app_icon.png from assets/images/logo.png"
-        ensure_directory "assets/icons"
-        cp "assets/images/logo.png" "assets/icons/app_icon.png"
-        log_success "✅ Logo copied to expected path"
-    fi
 }
 
 # Function to validate flutter_launcher_icons configuration
@@ -146,21 +191,14 @@ validate_launcher_icons_config() {
     fi
     
     # Check for remove_alpha_ios setting
-    if ! grep -A 20 "^flutter_launcher_icons:" pubspec.yaml | grep -q "remove_alpha_ios: true"; then
+    if grep -A 20 "^flutter_launcher_icons:" pubspec.yaml | grep -q "remove_alpha_ios: true"; then
+        log_success "✅ remove_alpha_ios: true is already configured"
+    else
         log_warn "⚠️ remove_alpha_ios not set to true - may cause App Store validation issues"
+        log_info "💡 The configuration will be checked again after any manual fixes"
         
-        # Fix the configuration automatically
-        log_info "🔧 Fixing remove_alpha_ios configuration..."
-        if grep -A 20 "^flutter_launcher_icons:" pubspec.yaml | grep -q "remove_alpha_ios:"; then
-            # Update existing setting
-            sed -i.bak 's/remove_alpha_ios: false/remove_alpha_ios: true/' pubspec.yaml
-        else
-            # Add missing setting
-            sed -i.bak '/ios: true/a\
-  remove_alpha_ios: true' pubspec.yaml
-        fi
-        rm -f pubspec.yaml.bak
-        log_success "✅ Added remove_alpha_ios: true to configuration"
+        # Only warn, don't auto-fix to avoid YAML syntax issues
+        # The pubspec.yaml should be properly configured in the repository
     fi
     
     # Debug: Show current configuration
@@ -178,13 +216,18 @@ validate_launcher_icons_config() {
         else
             log_error "❌ Configured image path does not exist: $configured_path"
             
-            # Try to find the actual logo and update configuration
-            if [ -f "assets/images/logo.png" ]; then
-                log_info "🔧 Updating image_path to use existing logo..."
-                sed -i.bak "s|image_path: .*|image_path: \"assets/images/logo.png\"|" pubspec.yaml
-                rm -f pubspec.yaml.bak
-                log_success "✅ Updated image_path to: assets/images/logo.png"
-            fi
+                         # Try to find the actual logo and update configuration
+             if [ -f "assets/icons/app_icon.png" ]; then
+                 log_info "🔧 Updating image_path to use existing logo..."
+                 sed -i.bak "s|image_path: .*|image_path: \"assets/icons/app_icon.png\"|" pubspec.yaml
+                 rm -f pubspec.yaml.bak
+                 log_success "✅ Updated image_path to: assets/icons/app_icon.png"
+             elif [ -f "assets/images/logo.png" ]; then
+                 log_info "🔧 Updating image_path to use logo from branding_assets..."
+                 sed -i.bak "s|image_path: .*|image_path: \"assets/images/logo.png\"|" pubspec.yaml
+                 rm -f pubspec.yaml.bak
+                 log_success "✅ Updated image_path to: assets/images/logo.png"
+             fi
         fi
     else
         log_warn "⚠️ No image_path found in configuration"
@@ -394,6 +437,12 @@ main() {
     # Step 1: Validate logo file
     if ! validate_logo_file; then
         log_error "❌ Logo file validation failed"
+        return 1
+    fi
+    
+    # Step 1.5: Copy logo from branding_assets to expected path
+    if ! copy_logo_to_app_icon; then
+        log_error "❌ Failed to copy logo to flutter_launcher_icons expected path"
         return 1
     fi
     

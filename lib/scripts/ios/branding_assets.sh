@@ -244,10 +244,23 @@ main() {
     # Step 3: Download logo
     log_info "--- Step 3: Setting up Logo Assets ---"
     if [ -n "${LOGO_URL:-}" ]; then
-        log_info "Downloading logo from $LOGO_URL"
+        log_info "📥 Downloading logo from $LOGO_URL"
+        log_info "📍 Target location: assets/images/logo.png (for Stage 4.5 app icon generation)"
         download_asset_with_fallbacks "$LOGO_URL" "assets/images/logo.png" "logo"
+        
+        # Verify logo was downloaded successfully
+        if [ -f "assets/images/logo.png" ]; then
+            log_success "✅ Logo downloaded successfully to: assets/images/logo.png"
+            if command -v file &> /dev/null; then
+                local logo_info=$(file "assets/images/logo.png")
+                log_info "📋 Downloaded logo properties: $logo_info"
+            fi
+        else
+            log_error "❌ Logo download failed - file not found at assets/images/logo.png"
+        fi
     else
         log_warn "LOGO_URL is empty, creating default logo"
+        log_info "📍 Creating fallback logo at: assets/images/logo.png"
         create_fallback_asset "assets/images/logo.png" "logo"
     fi
     
