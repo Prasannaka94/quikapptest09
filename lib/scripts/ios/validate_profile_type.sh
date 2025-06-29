@@ -129,7 +129,7 @@ create_app_store_export_options() {
 <plist version="1.0">
 <dict>
   <key>method</key>
-  <string>app-store</string>
+  <string>app-store-connect</string>
   <key>teamID</key>
   <string>$APPLE_TEAM_ID</string>
   <key>uploadBitcode</key>
@@ -150,6 +150,38 @@ create_app_store_export_options() {
   <false/>
   <key>manageVersionAndBuildNumber</key>
   <false/>
+</dict>
+</plist>
+EOF
+}
+
+# Fallback Development ExportOptions.plist (when App Store export fails)
+create_fallback_development_export_options() {
+    cat > "$1" << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>method</key>
+  <string>development</string>
+  <key>teamID</key>
+  <string>$APPLE_TEAM_ID</string>
+  <key>uploadBitcode</key>
+  <false/>
+  <key>uploadSymbols</key>
+  <false/>
+  <key>compileBitcode</key>
+  <false/>
+  <key>signingStyle</key>
+  <string>automatic</string>
+  <key>stripSwiftSymbols</key>
+  <true/>
+  <key>thinning</key>
+  <string>&lt;none&gt;</string>
+  <key>distributionBundleIdentifier</key>
+  <string>$BUNDLE_ID</string>
+  <key>iCloudContainerEnvironment</key>
+  <string>Development</string>
 </dict>
 </plist>
 EOF
