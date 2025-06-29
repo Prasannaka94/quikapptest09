@@ -100,15 +100,20 @@ main() {
         return 1
     fi
     
-    # Stage 4: Branding Assets Setup
+    # Stage 4: Branding Assets Setup (Downloads logo and sets up assets)
     log_info "--- Stage 4: Setting up Branding Assets ---"
+    log_info "📥 Downloading logo from LOGO_URL (if provided) to assets/images/logo.png"
+    log_info "📱 Updating Bundle ID: ${BUNDLE_ID:-<not set>}"
+    log_info "🏷️ Updating App Name: ${APP_NAME:-<not set>}"
     if ! "${SCRIPT_DIR}/branding_assets.sh"; then
         send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Branding assets setup failed."
         return 1
     fi
     
-    # Stage 4.5: Generate Flutter Launcher Icons (iOS-specific)
+    # Stage 4.5: Generate Flutter Launcher Icons (Uses logo from Stage 4 as app icons)
     log_info "--- Stage 4.5: Generating Flutter Launcher Icons ---"
+    log_info "🎨 Using logo from assets/images/logo.png (created by branding_assets.sh)"
+    log_info "✨ Generating App Store compliant iOS icons (removing transparency)"
     if ! "${SCRIPT_DIR}/generate_launcher_icons.sh"; then
         send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Flutter Launcher Icons generation failed."
         return 1

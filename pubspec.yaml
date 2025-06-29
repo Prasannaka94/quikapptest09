@@ -52,9 +52,9 @@ flutter_launcher_icons:
     generate: false
   macos:
     generate: false
-  # iOS specific configuration
-  ios_content_mode: scaleAspectFit
+  # iOS specific configuration to fix App Store validation
   remove_alpha_ios: true
-  # Ensure 1024x1024 icon is generated
+  background_color_ios: "#FFFFFF"
+  # Adaptive icon for Android
   adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/images/logo.png"
