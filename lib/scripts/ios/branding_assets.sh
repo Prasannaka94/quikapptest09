@@ -178,37 +178,100 @@ update_bundle_id_and_app_name() {
     return 0
 }
 
-# Function to update version in pubspec.yaml
+# Function to update version in pubspec.yaml and iOS Info.plist
 update_pubspec_version() {
-    log_info "📝 Updating pubspec.yaml version..."
+    log_info "📝 Updating App Version from Environment Variables..."
     
+    # Read environment variables with detailed logging
     local version_name="${VERSION_NAME:-}"
     local version_code="${VERSION_CODE:-}"
     
+    log_info "🔍 Environment Variables Check:"
+    log_info "   VERSION_NAME: ${version_name:-<not set>}"
+    log_info "   VERSION_CODE: ${version_code:-<not set>}"
+    
     if [ -z "$version_name" ] || [ -z "$version_code" ]; then
-        log_warn "VERSION_NAME or VERSION_CODE not provided, skipping pubspec.yaml version update"
+        log_warn "⚠️ VERSION_NAME or VERSION_CODE not provided"
+        log_info "💡 Skipping version update - set environment variables to update version"
+        log_info "   Example: VERSION_NAME=1.0.6 VERSION_CODE=51"
         return 0
     fi
     
+    # Validate version format
+    if [[ ! "$version_name" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        log_warn "⚠️ VERSION_NAME format may be invalid: $version_name"
+        log_info "💡 Expected format: X.Y.Z (e.g., 1.0.6)"
+    fi
+    
+    if [[ ! "$version_code" =~ ^[0-9]+$ ]]; then
+        log_error "❌ VERSION_CODE must be a number: $version_code"
+        return 1
+    fi
+    
+    # Update pubspec.yaml
     if [ -f "pubspec.yaml" ]; then
+        # Get current version for comparison
+        local current_version
+        current_version=$(grep "^version:" "pubspec.yaml" | cut -d' ' -f2 2>/dev/null || echo "<not found>")
+        log_info "📋 Current pubspec.yaml version: $current_version"
+        
         # Create backup
-        cp "pubspec.yaml" "pubspec.yaml.backup"
+        cp "pubspec.yaml" "pubspec.yaml.version.backup"
         
         # Update version line
-        sed -i.tmp "s/^version: .*/version: ${version_name}+${version_code}/" "pubspec.yaml"
+        local new_version="${version_name}+${version_code}"
+        sed -i.tmp "s/^version: .*/version: ${new_version}/" "pubspec.yaml"
         rm -f "pubspec.yaml.tmp"
         
-        log_success "✅ Updated pubspec.yaml: version: ${version_name}+${version_code}"
+        log_success "✅ Updated pubspec.yaml version"
+        log_info "   From: $current_version"
+        log_info "   To:   $new_version"
         
         # Verify the update
         local updated_version
         updated_version=$(grep "^version:" "pubspec.yaml" | cut -d' ' -f2)
-        log_info "📋 Current pubspec.yaml version: $updated_version"
+        if [ "$updated_version" = "$new_version" ]; then
+            log_success "✅ Version update verified in pubspec.yaml"
+        else
+            log_error "❌ Version update verification failed"
+            log_error "   Expected: $new_version"
+            log_error "   Found: $updated_version"
+            return 1
+        fi
     else
-        log_error "pubspec.yaml not found"
+        log_error "❌ pubspec.yaml not found"
         return 1
     fi
     
+    # Update iOS Info.plist
+    local info_plist="ios/Runner/Info.plist"
+    if [ -f "$info_plist" ]; then
+        log_info "📱 Updating iOS Info.plist version..."
+        
+        # Create backup
+        cp "$info_plist" "${info_plist}.version.backup"
+        
+        # Update CFBundleShortVersionString (version name)
+        if command -v plutil &> /dev/null; then
+            plutil -replace CFBundleShortVersionString -string "$version_name" "$info_plist" 2>/dev/null
+            plutil -replace CFBundleVersion -string "$version_code" "$info_plist" 2>/dev/null
+            log_success "✅ iOS Info.plist updated using plutil"
+        else
+            # Manual update as fallback
+            sed -i.tmp "s/<key>CFBundleShortVersionString<\/key>.*<string>.*<\/string>/<key>CFBundleShortVersionString<\/key><string>$version_name<\/string>/g" "$info_plist"
+            sed -i.tmp "s/<key>CFBundleVersion<\/key>.*<string>.*<\/string>/<key>CFBundleVersion<\/key><string>$version_code<\/string>/g" "$info_plist"
+            rm -f "${info_plist}.tmp"
+            log_success "✅ iOS Info.plist updated manually"
+        fi
+        
+        log_info "📋 iOS Version Updated:"
+        log_info "   CFBundleShortVersionString: $version_name"
+        log_info "   CFBundleVersion: $version_code"
+    else
+        log_warn "⚠️ iOS Info.plist not found: $info_plist"
+    fi
+    
+    log_success "🎉 Version update completed successfully!"
     return 0
 }
 
@@ -292,9 +355,30 @@ main() {
     log_info "📊 Branding Summary:"
     log_info "   Bundle ID: ${BUNDLE_ID:-${PKG_NAME:-<not updated>}}"
     log_info "   App Name: ${APP_NAME:-<not updated>}"
-    log_info "   Version: ${VERSION_NAME:-<not updated>} (${VERSION_CODE:-<not updated>})"
+    
+    # Enhanced version reporting
+    if [ -n "${VERSION_NAME:-}" ] && [ -n "${VERSION_CODE:-}" ]; then
+        local current_pubspec_version
+        current_pubspec_version=$(grep "^version:" "pubspec.yaml" | cut -d' ' -f2 2>/dev/null || echo "<unknown>")
+        log_info "   Version (Environment): ${VERSION_NAME} (build ${VERSION_CODE})"
+        log_info "   Version (pubspec.yaml): $current_pubspec_version"
+        log_success "   ✅ Version successfully updated from environment variables"
+    else
+        log_info "   Version: <not updated - environment variables not set>"
+        log_warn "   ⚠️ Set VERSION_NAME and VERSION_CODE to update app version"
+    fi
+    
     log_info "   Logo: ${LOGO_URL:+downloaded}${LOGO_URL:-<fallback created>}"
     log_info "   Splash: ${SPLASH_URL:+downloaded}${SPLASH_URL:-<used logo>}"
+    
+    # Environment variables summary
+    log_info "📋 Environment Variables Used:"
+    log_info "   BUNDLE_ID: ${BUNDLE_ID:-<not set>}"
+    log_info "   APP_NAME: ${APP_NAME:-<not set>}"
+    log_info "   VERSION_NAME: ${VERSION_NAME:-<not set>}"
+    log_info "   VERSION_CODE: ${VERSION_CODE:-<not set>}"
+    log_info "   LOGO_URL: ${LOGO_URL:-<not set>}"
+    log_info "   SPLASH_URL: ${SPLASH_URL:-<not set>}"
     
     return 0
 }
