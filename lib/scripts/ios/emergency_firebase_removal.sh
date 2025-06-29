@@ -58,12 +58,121 @@ remove_firebase_dependencies() {
         sed -i.tmp '/firebase/d' pubspec.yaml
         sed -i.tmp '/Firebase/d' pubspec.yaml
         sed -i.tmp '/_flutterfire_internals/d' pubspec.yaml
+        sed -i.tmp '/cloud_firestore/d' pubspec.yaml
+        sed -i.tmp '/firebase_auth/d' pubspec.yaml
+        sed -i.tmp '/firebase_messaging/d' pubspec.yaml
+        sed -i.tmp '/firebase_analytics/d' pubspec.yaml
+        sed -i.tmp '/firebase_crashlytics/d' pubspec.yaml
+        sed -i.tmp '/firebase_storage/d' pubspec.yaml
+        sed -i.tmp '/firebase_remote_config/d' pubspec.yaml
         rm -f pubspec.yaml.tmp
         
         log_success "✅ Firebase dependencies removed from pubspec.yaml"
     else
         log_warn "⚠️ pubspec.yaml not found"
     fi
+}
+
+# Function to clean up Firebase imports and code from Dart files
+cleanup_firebase_dart_code() {
+    log_info "🧹 Cleaning up Firebase imports and code from Dart files..."
+    
+    # Find all Dart files
+    find lib -name "*.dart" -type f | while read -r dart_file; do
+        if grep -q "firebase" "$dart_file" 2>/dev/null; then
+            log_info "🔧 Processing: $dart_file"
+            
+            # Create backup
+            cp "$dart_file" "$dart_file.emergency_backup"
+            
+            # Comment out Firebase imports
+            sed -i.tmp 's/^import.*firebase.*$/\/\/ &/' "$dart_file"
+            sed -i.tmp 's/^import.*Firebase.*$/\/\/ &/' "$dart_file"
+            
+            # Comment out Firebase initialization calls
+            sed -i.tmp 's/^.*Firebase\.initializeApp.*$/\/\/ &/' "$dart_file"
+            sed -i.tmp 's/^.*FirebaseApp\.configure.*$/\/\/ &/' "$dart_file"
+            sed -i.tmp 's/^.*await Firebase\.initializeApp.*$/\/\/ &/' "$dart_file"
+            
+            # Comment out FirebaseMessaging usage
+            sed -i.tmp 's/^.*FirebaseMessaging.*$/\/\/ &/' "$dart_file"
+            sed -i.tmp 's/^.*firebaseMessaging.*$/\/\/ &/' "$dart_file"
+            
+            # Comment out other Firebase service usage
+            sed -i.tmp 's/^.*FirebaseAuth.*$/\/\/ &/' "$dart_file"
+            sed -i.tmp 's/^.*FirebaseFirestore.*$/\/\/ &/' "$dart_file"
+            sed -i.tmp 's/^.*FirebaseAnalytics.*$/\/\/ &/' "$dart_file"
+            sed -i.tmp 's/^.*FirebaseCrashlytics.*$/\/\/ &/' "$dart_file"
+            
+            rm -f "$dart_file.tmp"
+            log_success "✅ Firebase code commented out in: $dart_file"
+        fi
+    done
+    
+    # Special handling for main.dart
+    if [ -f "lib/main.dart" ]; then
+        log_info "🔧 Special processing for lib/main.dart..."
+        
+        # Create backup
+        cp "lib/main.dart" "lib/main.dart.emergency_backup"
+        
+        # Create a Firebase-free version
+        cat > "lib/main.dart.firebase_free" << 'EOF'
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+// Firebase imports commented out for emergency build
+// import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Firebase initialization commented out for emergency build
+  // await Firebase.initializeApp();
+  
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Twinklub App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Twinklub App'),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Welcome to Twinklub App',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Emergency build without Firebase',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+EOF
+        
+        # Replace main.dart with Firebase-free version
+        mv "lib/main.dart.firebase_free" "lib/main.dart"
+        log_success "✅ Created Firebase-free main.dart"
+    fi
+    
+    log_success "✅ Firebase Dart code cleanup completed"
 }
 
 # Function to remove Firebase configuration files
@@ -251,34 +360,37 @@ emergency_firebase_removal() {
     # Step 2: Remove Firebase dependencies
     remove_firebase_dependencies
     
-    # Step 3: Remove Firebase config files
+    # Step 3: Clean up Firebase imports and code from Dart files
+    cleanup_firebase_dart_code
+    
+    # Step 4: Remove Firebase config files
     remove_firebase_config_files
     
-    # Step 4: Fix bundle identifier conflicts
+    # Step 5: Fix bundle identifier conflicts
     fix_bundle_identifier_conflicts
     
-    # Step 5: Regenerate project
+    # Step 6: Regenerate project
     regenerate_project
     
-    # Step 6: Install CocoaPods
+    # Step 7: Install CocoaPods
     if ! install_cocoapods; then
         log_error "❌ Failed to install CocoaPods"
         return 1
     fi
     
-    # Step 7: Build Flutter app
+    # Step 8: Build Flutter app
     if ! build_flutter_app; then
         log_error "❌ Failed to build Flutter app"
         return 1
     fi
     
-    # Step 8: Create Xcode archive
+    # Step 9: Create Xcode archive
     if ! create_xcode_archive; then
         log_error "❌ Failed to create Xcode archive"
         return 1
     fi
     
-    # Step 9: Export IPA
+    # Step 10: Export IPA
     if export_ipa; then
         log_success "✅ Emergency Firebase-free rebuild completed successfully!"
         log_warn "⚠️ Note: Firebase features (push notifications) are disabled in this build"

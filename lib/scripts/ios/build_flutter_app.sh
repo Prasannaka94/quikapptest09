@@ -11,6 +11,64 @@ source "${SCRIPT_DIR}/utils.sh"
 
 log_info "Starting Flutter iOS Build..."
 
+# Function to check Firebase requirement
+check_firebase_requirement() {
+    log_info "🔍 Checking Firebase requirement based on PUSH_NOTIFY flag..."
+    
+    if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
+        log_info "🔔 Push notifications ENABLED - Firebase required"
+        export FIREBASE_REQUIRED=true
+        export FIREBASE_DISABLED=false
+        return 0
+    else
+        log_info "🔕 Push notifications DISABLED - Firebase NOT required"
+        export FIREBASE_REQUIRED=false
+        export FIREBASE_DISABLED=true
+        
+        # Proactively remove Firebase to prevent conflicts
+        log_info "🧹 Proactively removing Firebase dependencies..."
+        remove_firebase_dependencies_proactive
+        return 0
+    fi
+}
+
+# Function to proactively remove Firebase dependencies when not needed
+remove_firebase_dependencies_proactive() {
+    if [ "${FIREBASE_DISABLED:-false}" = "true" ] || [ "${PUSH_NOTIFY:-false}" = "false" ]; then
+        log_info "🔥 Removing Firebase dependencies (not required for this build)..."
+        
+        if [ -f "pubspec.yaml" ]; then
+            # Create backup
+            cp pubspec.yaml pubspec.yaml.no_firebase_backup
+            
+            # Remove Firebase dependencies
+            sed -i.tmp '/firebase_core:/d' pubspec.yaml
+            sed -i.tmp '/firebase_messaging:/d' pubspec.yaml
+            sed -i.tmp '/_flutterfire_internals:/d' pubspec.yaml
+            sed -i.tmp '/cloud_firestore:/d' pubspec.yaml
+            sed -i.tmp '/firebase_auth:/d' pubspec.yaml
+            sed -i.tmp '/firebase_analytics:/d' pubspec.yaml
+            sed -i.tmp '/firebase_crashlytics:/d' pubspec.yaml
+            sed -i.tmp '/firebase_storage:/d' pubspec.yaml
+            sed -i.tmp '/firebase_remote_config:/d' pubspec.yaml
+            rm -f pubspec.yaml.tmp
+            
+            log_success "✅ Firebase dependencies removed from pubspec.yaml"
+        fi
+        
+        # Remove Firebase config files
+        if [ -f "ios/Runner/GoogleService-Info.plist" ]; then
+            mv "ios/Runner/GoogleService-Info.plist" "ios/Runner/GoogleService-Info.plist.disabled"
+            log_info "✅ GoogleService-Info.plist disabled"
+        fi
+        
+        if [ -f "android/app/google-services.json" ]; then
+            mv "android/app/google-services.json" "android/app/google-services.json.disabled"
+            log_info "✅ google-services.json disabled"
+        fi
+    fi
+}
+
 # Function to generate Podfile
 generate_podfile() {
     log_info "Generating Podfile for iOS..."
@@ -266,7 +324,8 @@ build_flutter_app() {
         --dart-define=IS_SPLASH="${IS_SPLASH:-false}" \
         --dart-define=IS_PULLDOWN="${IS_PULLDOWN:-false}" \
         --dart-define=IS_BOTTOMMENU="${IS_BOTTOMMENU:-false}" \
-        --dart-define=IS_LOAD_IND="${IS_LOAD_IND:-false}"
+        --dart-define=IS_LOAD_IND="${IS_LOAD_IND:-false}" \
+        --dart-define=FIREBASE_DISABLED="${FIREBASE_DISABLED:-false}"
     
     log_success "Flutter iOS app built successfully"
 }
@@ -498,127 +557,48 @@ EOF
     
     log_success "✅ Firebase completely removed from project"
     log_warn "⚠️ Push notifications and Firebase features will be disabled"
-    
-    return 0
 }
 
-# Function to detect potential Firebase issues early
-detect_firebase_issues() {
-    log_info "🔍 Detecting potential Firebase issues..."
-    
-    # Check for known Firebase compilation issues with Xcode 16.0
-    if [ -f "pubspec.yaml" ] && grep -q "firebase" pubspec.yaml; then
-        log_info "Firebase dependencies detected, checking for potential issues..."
-        
-        # Check Xcode version
-        local xcode_version=$(xcodebuild -version | head -1 | grep -o '[0-9]*\.[0-9]*')
-        if [[ "$xcode_version" == "16."* ]]; then
-            log_warn "⚠️ Xcode 16.x detected with Firebase - known compilation issues"
-            log_info "Applying preemptive Firebase removal to avoid build failures..."
-            return 1  # Indicates Firebase issues detected
-        fi
-        
-        # Check for Firebase configuration files
-        if [ -f "ios/Runner/GoogleService-Info.plist" ]; then
-            # Try to validate the Firebase configuration
-            if ! plutil -lint "ios/Runner/GoogleService-Info.plist" >/dev/null 2>&1; then
-                log_warn "⚠️ Invalid GoogleService-Info.plist detected"
-                return 1  # Indicates Firebase issues detected
-            fi
-        fi
-        
-        # Check if Firebase dependencies exist but configuration is missing
-        if [ ! -f "ios/Runner/GoogleService-Info.plist" ]; then
-            log_warn "⚠️ Firebase dependencies found but GoogleService-Info.plist missing"
-            return 1  # Indicates Firebase issues detected
-        fi
-    fi
-    
-    log_info "✅ No immediate Firebase issues detected"
-    return 0  # No issues detected
-}
-
-# Main execution
+# Main execution function
 main() {
-    log_info "Flutter iOS Build Starting..."
+    log_info "Starting Flutter iOS Build Process..."
     
-    # Early Firebase issue detection
-    if detect_firebase_issues; then
-        log_info "✅ Firebase checks passed, proceeding with normal build"
-    else
-        log_warn "🔥 Firebase issues detected, applying preemptive removal..."
-        if completely_remove_firebase; then
-            log_info "✅ Preemptive Firebase removal completed"
-        else
-            log_error "❌ Failed to remove Firebase preemptively"
-            return 1
-        fi
-    fi
+    # Step 1: Check Firebase requirement based on PUSH_NOTIFY flag
+    check_firebase_requirement
     
-    # Generate Podfile if needed
+    # Step 2: Generate Podfile (if needed)
     generate_podfile
     
-    # Install dependencies
+    # Step 3: Install dependencies
     if ! install_dependencies; then
         log_error "Failed to install dependencies"
         return 1
     fi
     
-    # Build Flutter app
+    # Step 4: Build Flutter app
     if ! build_flutter_app; then
         log_error "Failed to build Flutter app"
         return 1
     fi
     
-    # Create Xcode archive
+    # Step 5: Create Xcode archive
     if ! create_xcode_archive; then
-        log_warn "Xcode archive failed, trying comprehensive Firebase removal..."
-        
-        # Try comprehensive Firebase removal if archive fails
-        if [ "${FIREBASE_DISABLED:-false}" != "true" ]; then
-            log_info "Attempting comprehensive Firebase removal..."
-            
-            if completely_remove_firebase; then
-                log_info "Firebase completely removed, rebuilding..."
-                
-                # Retry build without Firebase
-                if ! build_flutter_app; then
-                    log_error "Failed to build Flutter app even after Firebase removal"
-                    return 1
-                fi
-                
-                # Retry archive without Firebase
-                if ! create_xcode_archive; then
-                    log_error "Failed to create Xcode archive even after Firebase removal"
-                    return 1
-                fi
-            else
-                log_error "Failed to remove Firebase completely"
-                return 1
-            fi
-        else
-            log_error "Failed to create Xcode archive"
-            return 1
-        fi
+        log_error "Failed to create Xcode archive"
+        return 1
     fi
     
-    log_success "Flutter iOS Build completed successfully!"
-    
-    # Summary
+    log_success "Flutter iOS build completed successfully!"
     log_info "Build Summary:"
-    log_info "  - App: ${APP_NAME:-Unknown}"
+    log_info "  - App: ${APP_NAME:-Unknown} v${VERSION_NAME:-Unknown}"
     log_info "  - Bundle ID: ${BUNDLE_ID:-Unknown}"
-    log_info "  - Version: ${VERSION_NAME:-Unknown} (${VERSION_CODE:-Unknown})"
     log_info "  - Profile Type: ${PROFILE_TYPE:-Unknown}"
-    log_info "  - Archive: ${OUTPUT_DIR:-output/ios}/Runner.xcarchive"
-    if [ "${FIREBASE_DISABLED:-false}" = "true" ]; then
-        log_warn "  - Firebase: DISABLED (due to compilation issues)"
-    else
-        log_info "  - Firebase: ENABLED"
-    fi
+    log_info "  - Firebase: $([ "${FIREBASE_DISABLED:-false}" = "true" ] && echo "DISABLED" || echo "ENABLED")"
+    log_info "  - Push Notifications: ${PUSH_NOTIFY:-false}"
     
     return 0
 }
 
-# Run main function
-main "$@"
+# Run main function if script is executed directly
+if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
+    main "$@"
+fi

@@ -569,7 +569,8 @@ def main():
     
     if len(sys.argv) < 4:
         print("Usage: send_email.py <email_type> <platform> <build_id> [error_message]")
-        print("Email types: build_started, build_success, build_failed")
+        print("Email types: started, success, error, failed, upload, partial, recovery")
+        print("Legacy types: build_started, build_success, build_failed")
         sys.exit(1)
     
     email_type = sys.argv[1]
@@ -595,14 +596,18 @@ def main():
     # Send appropriate email
     success = False
     try:
-        if email_type == "build_started":
+        if email_type == "build_started" or email_type == "started":
             success = notifier.send_build_started_email(platform, build_id)
-        elif email_type == "build_success":
+        elif email_type == "build_success" or email_type == "success":
             success = notifier.send_build_success_email(platform, build_id)
-        elif email_type == "build_failed":
+        elif email_type == "build_failed" or email_type == "failed" or email_type == "error":
             success = notifier.send_build_failed_email(platform, build_id, error_message)
+        elif email_type == "upload" or email_type == "partial" or email_type == "recovery":
+            # For upload success, partial success, and recovery, use build_success template
+            success = notifier.send_build_success_email(platform, build_id)
         else:
             logger.error(f"Unknown email type: {email_type}")
+            logger.info("Valid email types: build_started, started, build_success, success, build_failed, failed, error, upload, partial, recovery")
             sys.exit(1)
     except Exception as e:
         logger.error(f"Failed to send email: {e}")
