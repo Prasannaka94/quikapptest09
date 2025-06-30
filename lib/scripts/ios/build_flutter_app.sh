@@ -298,28 +298,47 @@ install_dependencies() {
         log_warn "Build will continue - archive creation may have integration issues"
     fi
     
-         # BUNDLE IDENTIFIER COLLISION FINAL FIX: Address CFBundleIdentifier validation issues
-     log_info "🔧 BUNDLE IDENTIFIER COLLISION FINAL FIX: Applying collision prevention..."
-     
-     if [ -f "lib/scripts/ios/bundle_identifier_collision_final_fix.sh" ]; then
-         chmod +x lib/scripts/ios/bundle_identifier_collision_final_fix.sh
-         if lib/scripts/ios/bundle_identifier_collision_final_fix.sh; then
-             log_success "✅ BUNDLE IDENTIFIER COLLISION FINAL FIX: Collision prevention applied successfully"
-             log_info "🎯 All pod targets now have unique bundle identifiers"
-             log_info "🔧 App Store validation should now succeed"
-         else
-             log_warn "⚠️ Bundle identifier collision fix failed"
-             log_warn "Build will continue - manual IPA export may be required"
-         fi
-     else
-         log_warn "⚠️ Bundle identifier collision fix script not found"
-         log_warn "Build will continue - validation issues may occur"
-     fi
-     
-     log_success "CocoaPods dependencies installed with Firebase, integration, and collision fixes"
- }
- 
- # Function to build Flutter app
+    # WORKFLOW-INTEGRATED BUNDLE IDENTIFIER COLLISION FIX: Address App Store Connect validation error 73b7b133-169a-41ec-a1aa-78eba00d4bb7
+    log_info "🚨 WORKFLOW-INTEGRATED BUNDLE IDENTIFIER COLLISION FIX: Preventing App Store Connect validation errors..."
+    
+    if [ -f "lib/scripts/ios/workflow_bundle_collision_fix.sh" ]; then
+        chmod +x lib/scripts/ios/workflow_bundle_collision_fix.sh
+        if lib/scripts/ios/workflow_bundle_collision_fix.sh; then
+            log_success "✅ WORKFLOW COLLISION FIX: App Store Connect validation error prevention applied successfully"
+            log_info "🎯 CFBundleIdentifier collision Error ID 73b7b133-169a-41ec-a1aa-78eba00d4bb7 should be resolved"
+            log_info "🔧 Project file and Podfile collision prevention active"
+            log_info "🚀 App Store validation should now succeed"
+        else
+            log_warn "⚠️ Workflow collision fix failed, trying fallback..."
+            # Fallback to the original collision fix
+            if [ -f "lib/scripts/ios/bundle_identifier_collision_final_fix.sh" ]; then
+                chmod +x lib/scripts/ios/bundle_identifier_collision_final_fix.sh
+                if lib/scripts/ios/bundle_identifier_collision_final_fix.sh; then
+                    log_success "✅ FALLBACK COLLISION FIX: Applied successfully"
+                else
+                    log_warn "⚠️ All bundle identifier collision fixes failed"
+                fi
+            fi
+        fi
+    else
+        log_warn "⚠️ Workflow collision fix script not found, trying fallback..."
+        # Fallback to the original collision fix
+        if [ -f "lib/scripts/ios/bundle_identifier_collision_final_fix.sh" ]; then
+            chmod +x lib/scripts/ios/bundle_identifier_collision_final_fix.sh
+            if lib/scripts/ios/bundle_identifier_collision_final_fix.sh; then
+                log_success "✅ FALLBACK COLLISION FIX: Applied successfully"
+            else
+                log_warn "⚠️ Bundle identifier collision fixes failed"
+            fi
+        else
+            log_warn "⚠️ No bundle identifier collision fix scripts found"
+        fi
+    fi
+    
+    log_success "CocoaPods dependencies installed with Firebase, integration, and collision fixes"
+}
+
+# Function to build Flutter app
 build_flutter_app() {
     log_info "Building Flutter iOS app..."
     
