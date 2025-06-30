@@ -332,6 +332,31 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
         return 1
     fi
     
+    # Stage 7.5: IPA Bundle Collision Fix (Error ID: 16fe2c8f-330a-451b-90c5-7c218848c196)
+    log_info "--- Stage 7.5: IPA Bundle Collision Fix ---"
+    log_info "🔧 FIXING IPA BUNDLE COLLISIONS - Error ID: 16fe2c8f-330a-451b-90c5-7c218848c196"
+    log_info "🎯 Target Error: CFBundleIdentifier collision within Runner.app bundle"
+    log_info "📱 Bundle ID: ${BUNDLE_ID:-com.example.app}"
+    
+    # Apply comprehensive IPA-level collision fix before export
+    if [ -f "${SCRIPT_DIR}/ipa_bundle_collision_fix.sh" ]; then
+        chmod +x "${SCRIPT_DIR}/ipa_bundle_collision_fix.sh"
+        
+        # Run IPA bundle collision fix on the archive
+        log_info "🔍 Analyzing archive for internal bundle identifier collisions..."
+        
+        if source "${SCRIPT_DIR}/ipa_bundle_collision_fix.sh" "${BUNDLE_ID:-com.example.app}" "${CM_BUILD_DIR}/Runner.xcarchive" "${CM_BUILD_DIR}/ios_output"; then
+            log_success "✅ Stage 7.5 completed: IPA bundle collision fix applied successfully"
+            log_info "💥 Error ID 16fe2c8f-330a-451b-90c5-7c218848c196 collision prevention applied"
+        else
+            log_warn "⚠️ Stage 7.5 partial: IPA bundle collision fix had issues, but continuing"
+            log_warn "🔧 Manual bundle identifier checks may be needed during export"
+        fi
+    else
+        log_warn "⚠️ Stage 7.5 skipped: IPA bundle collision fix script not found"
+        log_info "📝 Expected: ${SCRIPT_DIR}/ipa_bundle_collision_fix.sh"
+    fi
+    
     # Stage 8: IPA Export (only if primary build succeeded)
     log_info "--- Stage 8: Exporting IPA ---"
     if ! "${SCRIPT_DIR}/export_ipa.sh"; then
