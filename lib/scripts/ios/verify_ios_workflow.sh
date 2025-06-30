@@ -174,6 +174,7 @@ test_project_structure() {
         "lib/scripts/ios/conditional_firebase_injection.sh"
         "lib/scripts/ios/fix_firebase_xcode16.sh"
         "lib/scripts/ios/fix_firebase_source_files.sh"
+        "lib/scripts/ios/final_firebase_solution.sh"
     )
     
     for script in "${essential_scripts[@]}"; do
