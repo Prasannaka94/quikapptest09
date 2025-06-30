@@ -76,6 +76,20 @@ create_export_options() {
             ;;
     esac
     
+    # -----------------------------------------------
+    #  🔐  MANUAL SIGNING SUPPORT (new)
+    # -----------------------------------------------
+    # If a Code-signing identity has been exported by
+    # enhanced_certificate_setup.sh we switch the
+    # ExportOptions.plist to manual signing and embed
+    # the certificate + provisioning-profile UUID so
+    # xcodebuild does not fall back to automatic.
+    # -----------------------------------------------
+    if [[ -n "${CODE_SIGN_IDENTITY:-}" ]]; then
+        signing_style="manual"
+        log_info "✅ CODE_SIGN_IDENTITY detected – using MANUAL signing"
+    fi
+    
     log_info "Export configuration:"
     log_info "  - Method: $method"
     log_info "  - Profile Type: $PROFILE_TYPE"
@@ -108,6 +122,25 @@ create_export_options() {
     <key>generateAppStoreInformation</key>
     <true/>
 EOF
+
+    # When manual signing is active, inject certificate & profile
+    if [[ "$signing_style" == "manual" ]]; then
+        if [[ -n "${CODE_SIGN_IDENTITY:-}" ]]; then
+            cat >> "$export_options_path" << EOF
+    <key>signingCertificate</key>
+    <string>${CODE_SIGN_IDENTITY}</string>
+EOF
+        fi
+        if [[ -n "${PROVISIONING_PROFILE_UUID:-}" ]]; then
+            cat >> "$export_options_path" << EOF
+    <key>provisioningProfiles</key>
+    <dict>
+        <key>${BUNDLE_ID:-com.example.app}</key>
+        <string>${PROVISIONING_PROFILE_UUID}</string>
+    </dict>
+EOF
+        fi
+    fi
 
     # Add profile-specific configurations
     if [ "$method" = "app-store" ]; then
