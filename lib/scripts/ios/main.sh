@@ -158,7 +158,32 @@ main() {
             return 1
         fi
         
-        # Apply bundle identifier collision fixes after Firebase setup
+        # Stage 6.8: Critical Firebase Xcode 16.0 Compatibility Fixes
+        log_info "--- Stage 6.8: Applying Firebase Xcode 16.0 Compatibility Fixes ---"
+        log_info "🔥 Applying ULTRA AGGRESSIVE Firebase Xcode 16.0 fixes..."
+        log_info "🎯 Targeting FIRHeartbeatLogger.m compilation issues"
+        
+        if [ -f "${SCRIPT_DIR}/fix_firebase_xcode16.sh" ]; then
+            chmod +x "${SCRIPT_DIR}/fix_firebase_xcode16.sh"
+            if ! "${SCRIPT_DIR}/fix_firebase_xcode16.sh"; then
+                log_error "❌ Firebase Xcode 16.0 fixes failed - this is critical for compilation"
+                log_error "FIRHeartbeatLogger.m and other Firebase files will fail to compile"
+                send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Firebase Xcode 16.0 compatibility fixes failed."
+                return 1
+            else
+                log_success "✅ Firebase Xcode 16.0 fixes applied successfully"
+                log_info "🎯 FIRHeartbeatLogger.m compilation issues should be resolved"
+                log_info "📋 Ultra-aggressive warning suppression activated"
+                log_info "🔧 Xcode 16.0 compatibility mode enabled"
+            fi
+        else
+            log_error "❌ Firebase Xcode 16.0 fix script not found: ${SCRIPT_DIR}/fix_firebase_xcode16.sh"
+            log_error "This is critical - Firebase will fail to compile with Xcode 16.0"
+            send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Firebase Xcode 16.0 fix script not found."
+            return 1
+        fi
+        
+        # Apply bundle identifier collision fixes after Firebase setup and Xcode fixes
         log_info "🔧 Applying Bundle Identifier Collision fixes after Firebase setup..."
         if [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh" ]; then
             chmod +x "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh"
@@ -175,6 +200,7 @@ main() {
         fi
     else
         log_info "--- Stage 6.7: Firebase Setup Skipped (Push notifications disabled) ---"
+        log_info "--- Stage 6.8: Firebase Xcode 16.0 Fixes Skipped (Firebase disabled) ---"
     fi
     
     # Stage 6.9: Critical Bundle Identifier Collision Prevention
