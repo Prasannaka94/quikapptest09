@@ -332,29 +332,41 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
         return 1
     fi
     
-    # Stage 7.5: IPA Bundle Collision Fix (Error ID: 16fe2c8f-330a-451b-90c5-7c218848c196)
-    log_info "--- Stage 7.5: IPA Bundle Collision Fix ---"
-    log_info "🔧 FIXING IPA BUNDLE COLLISIONS - Error ID: 16fe2c8f-330a-451b-90c5-7c218848c196"
-    log_info "🎯 Target Error: CFBundleIdentifier collision within Runner.app bundle"
+    # Stage 7.5: ULTIMATE Bundle Collision Prevention (ALL Error IDs)
+    log_info "--- Stage 7.5: ULTIMATE Bundle Collision Prevention ---"
+    log_info "🚀 ULTIMATE COLLISION PREVENTION - ALL ERROR IDS"
+    log_info "🎯 Error IDs: 73b7b133, 66775b51, 16fe2c8f, b4b31bab + ALL future variations"
     log_info "📱 Bundle ID: ${BUNDLE_ID:-com.example.app}"
     
-    # Apply comprehensive IPA-level collision fix before export
-    if [ -f "${SCRIPT_DIR}/ipa_bundle_collision_fix.sh" ]; then
-        chmod +x "${SCRIPT_DIR}/ipa_bundle_collision_fix.sh"
+    # Apply ULTIMATE collision prevention system
+    if [ -f "${SCRIPT_DIR}/ultimate_bundle_collision_prevention.sh" ]; then
+        chmod +x "${SCRIPT_DIR}/ultimate_bundle_collision_prevention.sh"
         
-        # Run IPA bundle collision fix on the archive
-        log_info "🔍 Analyzing archive for internal bundle identifier collisions..."
+        # Run ULTIMATE collision prevention
+        log_info "🔍 Running comprehensive collision prevention across ALL levels..."
         
-        if source "${SCRIPT_DIR}/ipa_bundle_collision_fix.sh" "${BUNDLE_ID:-com.example.app}" "${CM_BUILD_DIR}/Runner.xcarchive" "${CM_BUILD_DIR}/ios_output"; then
-            log_success "✅ Stage 7.5 completed: IPA bundle collision fix applied successfully"
-            log_info "💥 Error ID 16fe2c8f-330a-451b-90c5-7c218848c196 collision prevention applied"
+        if source "${SCRIPT_DIR}/ultimate_bundle_collision_prevention.sh" "${BUNDLE_ID:-com.example.app}" "ios/Runner.xcodeproj/project.pbxproj" "${CM_BUILD_DIR}/Runner.xcarchive"; then
+            log_success "✅ Stage 7.5 completed: ULTIMATE collision prevention applied successfully"
+            log_info "🛡️ ALL known error IDs prevented: 73b7b133, 66775b51, 16fe2c8f, b4b31bab"
+            log_info "🎯 Ready for App Store Connect upload without collisions"
         else
-            log_warn "⚠️ Stage 7.5 partial: IPA bundle collision fix had issues, but continuing"
-            log_warn "🔧 Manual bundle identifier checks may be needed during export"
+            log_warn "⚠️ Stage 7.5 partial: Ultimate collision prevention had issues, but continuing"
+            log_warn "🔧 Manual collision checks may be needed during export"
         fi
     else
-        log_warn "⚠️ Stage 7.5 skipped: IPA bundle collision fix script not found"
-        log_info "📝 Expected: ${SCRIPT_DIR}/ipa_bundle_collision_fix.sh"
+        log_warn "⚠️ Stage 7.5 skipped: Ultimate collision prevention script not found"
+        log_info "📝 Expected: ${SCRIPT_DIR}/ultimate_bundle_collision_prevention.sh"
+        
+        # Fallback to previous IPA collision fix
+        if [ -f "${SCRIPT_DIR}/ipa_bundle_collision_fix.sh" ]; then
+            log_info "🔄 Falling back to IPA bundle collision fix..."
+            chmod +x "${SCRIPT_DIR}/ipa_bundle_collision_fix.sh"
+            if source "${SCRIPT_DIR}/ipa_bundle_collision_fix.sh" "${BUNDLE_ID:-com.example.app}" "${CM_BUILD_DIR}/Runner.xcarchive" "${CM_BUILD_DIR}/ios_output"; then
+                log_success "✅ Fallback collision fix applied"
+            else
+                log_warn "⚠️ Fallback collision fix also had issues"
+            fi
+        fi
     fi
     
     # Stage 8: IPA Export (only if primary build succeeded)
