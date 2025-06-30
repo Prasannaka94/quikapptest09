@@ -360,6 +360,113 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
         return 1
     fi
     
+    # Stage 7.4: Enhanced Certificate Setup (CRITICAL FOR IPA EXPORT)
+    log_info "--- Stage 7.4: Enhanced Certificate Setup with P12 Generation ---"
+    log_info "🔐 CERTIFICATE VALIDATION AND AUTO-GENERATION FOR IPA EXPORT"
+    log_info "🎯 Purpose: Fix 'No signing certificate iOS Distribution found' error"
+    log_info "✨ Features: Auto P12 generation from CER/KEY files"
+    
+    # Check certificate configuration methods
+    local cert_method_available=false
+    
+    # Method 1: Direct P12 URL
+    if [[ -n "${CERT_P12_URL:-}" ]]; then
+        if [[ "${CERT_P12_URL}" =~ ^https?:// ]]; then
+            log_success "✅ Method 1: Direct P12 certificate URL available"
+            log_info "   CERT_P12_URL: ${CERT_P12_URL}"
+            cert_method_available=true
+        else
+            log_warn "⚠️ CERT_P12_URL set but invalid URL format: ${CERT_P12_URL}"
+        fi
+    fi
+    
+    # Method 2: CER + KEY files for P12 generation
+    if [[ -n "${CERT_CER_URL:-}" && -n "${CERT_KEY_URL:-}" ]]; then
+        if [[ "${CERT_CER_URL}" =~ ^https?:// && "${CERT_KEY_URL}" =~ ^https?:// ]]; then
+            log_success "✅ Method 2: CER + KEY files available for P12 generation"
+            log_info "   CERT_CER_URL: ${CERT_CER_URL}"
+            log_info "   CERT_KEY_URL: ${CERT_KEY_URL}"
+            log_info "   CERT_PASSWORD: ${CERT_PASSWORD:+Custom (${#CERT_PASSWORD} chars)}${CERT_PASSWORD:-Default (Password@1234)}"
+            cert_method_available=true
+        else
+            log_warn "⚠️ CER/KEY URLs set but invalid format"
+            log_info "   CERT_CER_URL: ${CERT_CER_URL:-NOT_SET}"
+            log_info "   CERT_KEY_URL: ${CERT_KEY_URL:-NOT_SET}"
+        fi
+    fi
+    
+    # Validate certificate setup
+    if [[ "$cert_method_available" = "false" ]]; then
+        log_error "❌ CRITICAL: No valid certificate method configured"
+        log_error "   This is the PRIMARY cause of IPA export failure"
+        log_info ""
+        log_info "💡 SOLUTION OPTIONS:"
+        log_info ""
+        log_info "Option A - Direct P12 Certificate:"
+        log_info "   Variable Name: CERT_P12_URL"
+        log_info "   Variable Value: https://raw.githubusercontent.com/prasanna91/QuikApp/main/ios_distribution_certificate.p12"
+        log_info ""
+        log_info "Option B - Auto-Generate P12 from CER + KEY:"
+        log_info "   Variable Name: CERT_CER_URL"
+        log_info "   Variable Value: https://raw.githubusercontent.com/prasanna91/QuikApp/main/certificate.cer"
+        log_info "   Variable Name: CERT_KEY_URL"  
+        log_info "   Variable Value: https://raw.githubusercontent.com/prasanna91/QuikApp/main/private_key.key"
+        log_info "   Variable Name: CERT_PASSWORD (optional)"
+        log_info "   Variable Value: YourCustomPassword (default: Password@1234)"
+        log_info ""
+        log_warn "⚠️ IPA export will fail without certificate configuration"
+        log_info "🎯 Add one of the certificate methods above and re-run ios-workflow"
+    else
+        log_success "✅ Certificate method configured correctly"
+        
+        # Run enhanced certificate setup
+        if [[ -f "${SCRIPT_DIR}/enhanced_certificate_setup.sh" ]]; then
+            chmod +x "${SCRIPT_DIR}/enhanced_certificate_setup.sh"
+            log_info "🔧 Running enhanced certificate setup with P12 generation..."
+            
+            if "${SCRIPT_DIR}/enhanced_certificate_setup.sh"; then
+                log_success "✅ Enhanced certificate setup completed successfully"
+                log_info "🎯 Certificates configured for IPA export"
+                
+                # Check if P12 was generated from CER/KEY
+                if [[ "${GENERATED_P12:-}" = "true" ]]; then
+                    log_success "🔧 P12 certificate auto-generated from CER/KEY files"
+                    log_info "📋 Generated P12 ready for code signing"
+                fi
+                
+                # Check if code signing identity was extracted
+                if [[ -n "${CODE_SIGN_IDENTITY:-}" ]]; then
+                    log_success "🎯 Code signing identity extracted: ${CODE_SIGN_IDENTITY}"
+                fi
+            else
+                log_warn "⚠️ Enhanced certificate setup had issues"
+                log_warn "🔧 IPA export may fail due to certificate problems"
+            fi
+        else
+            log_warn "⚠️ Enhanced certificate setup script not found"
+            log_info "📝 Expected: ${SCRIPT_DIR}/enhanced_certificate_setup.sh"
+        fi
+    fi
+    
+    # Validate other certificate-related environment variables
+    local cert_issues=0
+    
+    if [[ -z "${PROFILE_URL:-}" ]]; then
+        log_warn "⚠️ PROFILE_URL not set"
+        ((cert_issues++))
+    fi
+    
+    if [[ -z "${APPLE_TEAM_ID:-}" ]]; then
+        log_warn "⚠️ APPLE_TEAM_ID not set"
+        ((cert_issues++))
+    fi
+    
+    if [[ $cert_issues -eq 0 ]]; then
+        log_success "✅ All certificate-related variables validated"
+    else
+        log_warn "⚠️ $cert_issues certificate-related variables have issues"
+    fi
+    
     # Stage 7.5: ULTIMATE Bundle Collision Prevention (ALL Error IDs)
     log_info "--- Stage 7.5: ULTIMATE Bundle Collision Prevention ---"
     log_info "🚀 ULTIMATE COLLISION PREVENTION - ALL ERROR IDS"
