@@ -2726,7 +2726,7 @@ workflows:
 
       - name: Final Validation and Summary
         script: |
-          echo "🔍 Final build validation..."
+          echo "🔍 Final build validation and IPA export recovery..."
 
           # Check for IPA file
           if [ -f "output/ios/Runner.ipa" ]; then
@@ -2745,10 +2745,94 @@ workflows:
             
           elif [ -d "output/ios/Runner.xcarchive" ]; then
             archive_size=$(du -h output/ios/Runner.xcarchive | cut -f1)
-            echo "⚠️ IPA export failed, but archive is available"
-            echo "📦 Archive: output/ios/Runner.xcarchive ($archive_size)"
-            echo "🔧 Manual export required in Xcode"
-            echo "📋 Check ARTIFACTS_SUMMARY.txt for manual export instructions"
+            echo "⚠️ IPA export failed, but archive is available ($archive_size)"
+            echo "🔍 Analyzing why IPA export failed..."
+            
+            # Diagnose certificate configuration
+            echo ""
+            echo "🔐 CERTIFICATE CONFIGURATION ANALYSIS:"
+            echo "   CERT_P12_URL: ${CERT_P12_URL:-❌ NOT_SET}"
+            echo "   CERT_CER_URL: ${CERT_CER_URL:-❌ NOT_SET}"
+            echo "   CERT_KEY_URL: ${CERT_KEY_URL:-❌ NOT_SET}"
+            echo "   CERT_PASSWORD: ${CERT_PASSWORD:+✅ SET (${#CERT_PASSWORD} chars)}${CERT_PASSWORD:-❌ NOT_SET}"
+            echo "   APP_STORE_CONNECT_KEY_IDENTIFIER: ${APP_STORE_CONNECT_KEY_IDENTIFIER:+✅ SET}${APP_STORE_CONNECT_KEY_IDENTIFIER:-❌ NOT_SET}"
+            echo "   APP_STORE_CONNECT_ISSUER_ID: ${APP_STORE_CONNECT_ISSUER_ID:+✅ SET}${APP_STORE_CONNECT_ISSUER_ID:-❌ NOT_SET}"
+            
+            # Determine the root cause
+            echo ""
+            if [ -z "${CERT_P12_URL:-}" ] && [ -z "${CERT_CER_URL:-}" ]; then
+              echo "🎯 ROOT CAUSE: Missing iOS Distribution Certificate"
+              echo ""
+              echo "💡 IMMEDIATE SOLUTION - Add one of these certificate configurations:"
+              echo ""
+              echo "🔧 Option A - Direct P12 Certificate (Recommended):"
+              echo "   Variable: CERT_P12_URL"
+              echo "   Example: https://raw.githubusercontent.com/yourrepo/ios_distribution_certificate.p12"
+              echo "   Variable: CERT_PASSWORD"
+              echo "   Example: YourP12Password"
+              echo ""
+              echo "🔧 Option B - Auto-Generate P12 from CER + KEY:"
+              echo "   Variable: CERT_CER_URL"
+              echo "   Example: https://raw.githubusercontent.com/yourrepo/certificate.cer"
+              echo "   Variable: CERT_KEY_URL"
+              echo "   Example: https://raw.githubusercontent.com/yourrepo/private_key.key"
+              echo "   Variable: CERT_PASSWORD (optional)"
+              echo "   Example: Password@1234 (default if not set)"
+              echo ""
+            elif [ -n "${CERT_P12_URL:-}" ] || [ -n "${CERT_CER_URL:-}" ]; then
+              echo "🔍 Certificate URLs configured, attempting recovery export..."
+              
+              # Attempt enhanced certificate setup and export
+              if [ -f "lib/scripts/ios/enhanced_certificate_setup.sh" ]; then
+                echo "🔧 Running enhanced certificate setup for recovery..."
+                chmod +x lib/scripts/ios/enhanced_certificate_setup.sh
+                
+                if lib/scripts/ios/enhanced_certificate_setup.sh; then
+                  echo "✅ Enhanced certificate setup completed"
+                  
+                  # Attempt IPA export with certificates
+                  if [ -f "lib/scripts/ios/export_ipa.sh" ] && [ -f "ios/ExportOptions.plist" ]; then
+                    echo "🚀 Attempting recovery IPA export..."
+                    chmod +x lib/scripts/ios/export_ipa.sh
+                    
+                    if lib/scripts/ios/export_ipa.sh; then
+                      echo "🎉 RECOVERY SUCCESS: IPA export completed!"
+                      if [ -f "output/ios/Runner.ipa" ]; then
+                        ipa_size=$(du -h output/ios/Runner.ipa | cut -f1)
+                        echo "✅ IPA file recovered: output/ios/Runner.ipa ($ipa_size)"
+                        echo "🎯 Profile Type: $PROFILE_TYPE"
+                        echo "📦 Distribution Status: READY"
+                      fi
+                    else
+                      echo "❌ Recovery IPA export failed"
+                      echo "🔧 Manual export still required"
+                    fi
+                  else
+                    echo "⚠️ Export script or options not found for recovery"
+                  fi
+                else
+                  echo "❌ Enhanced certificate setup failed during recovery"
+                fi
+              else
+                echo "⚠️ Enhanced certificate setup script not found"
+              fi
+            fi
+            
+            # If still no IPA, provide manual instructions
+            if [ ! -f "output/ios/Runner.ipa" ]; then
+              echo ""
+              echo "📋 MANUAL EXPORT INSTRUCTIONS:"
+              echo "1. Download Runner.xcarchive from this build"
+              echo "2. Open Xcode on a Mac with Apple Developer account"
+              echo "3. Go to Window > Organizer"
+              echo "4. Click '+' and select 'Import'"
+              echo "5. Select Runner.xcarchive"
+              echo "6. Click 'Distribute App'"
+              echo "7. Choose: $PROFILE_TYPE"
+              echo "8. Follow the signing wizard"
+              echo ""
+              echo "📦 Archive: output/ios/Runner.xcarchive ($archive_size)"
+            fi
             
           else
             echo "❌ No build artifacts found"
