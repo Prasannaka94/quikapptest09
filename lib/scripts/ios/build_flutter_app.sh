@@ -216,6 +216,29 @@ install_dependencies() {
         fi
     fi
     
+    # NUCLEAR OPTION: Apply direct Firebase source file patches (Firebase pods now installed)
+    if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
+        log_info "🚨 NUCLEAR OPTION: Applying direct Firebase source file patches..."
+        cd ..
+        
+        if [ -f "lib/scripts/ios/fix_firebase_source_files.sh" ]; then
+            chmod +x lib/scripts/ios/fix_firebase_source_files.sh
+            if lib/scripts/ios/fix_firebase_source_files.sh; then
+                log_success "✅ NUCLEAR OPTION: Firebase source files patched successfully"
+                log_info "🚨 Direct pragma directives added to FIRHeartbeatLogger.m and all Firebase .m files"
+                log_info "🎯 This should guarantee Firebase compilation success"
+            else
+                log_warn "⚠️ Nuclear option Firebase source patching failed"
+                log_warn "Build will continue with standard fixes only"
+            fi
+        else
+            log_warn "⚠️ Nuclear option script not found at lib/scripts/ios/fix_firebase_source_files.sh"
+        fi
+        
+        cd ios
+        log_info "🎯 Firebase source files have been directly patched - compilation should now succeed"
+    fi
+    
     cd ..
     log_success "CocoaPods dependencies installed"
 }

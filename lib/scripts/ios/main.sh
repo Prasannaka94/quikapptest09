@@ -183,6 +183,8 @@ main() {
             return 1
         fi
         
+
+        
         # Apply bundle identifier collision fixes after Firebase setup and Xcode fixes
         log_info "🔧 Applying Bundle Identifier Collision fixes after Firebase setup..."
         if [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh" ]; then
