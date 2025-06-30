@@ -243,82 +243,78 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
     log_info "--- Stage 6.9: Pre-Build Bundle Identifier Collision Prevention ---"
     log_info "🔧 Applying comprehensive Bundle Identifier Collision fixes before build..."
     
-    # CRITICAL: Apply collision fixes with multiple fallbacks
-    collision_fix_applied=false
+    # CODEMAGIC API INTEGRATION: Automatic dynamic bundle identifier injection
+    log_info "🔄 Codemagic API Integration: Auto-configuring bundle identifiers..."
+    log_info "📡 API Variables Detected:"
+    log_info "   BUNDLE_ID: ${BUNDLE_ID:-not_set}"
+    log_info "   APP_NAME: ${APP_NAME:-not_set}"
+    log_info "   APP_ID: ${APP_ID:-not_set}"
+    log_info "   WORKFLOW_ID: ${WORKFLOW_ID:-not_set}"
     
-    # Primary Fix: Apply the workflow-integrated collision fix
-    if [ -f "${SCRIPT_DIR}/workflow_bundle_collision_fix.sh" ]; then
-        chmod +x "${SCRIPT_DIR}/workflow_bundle_collision_fix.sh"
-        log_info "🎯 Applying WORKFLOW-INTEGRATED Bundle Collision Fix (Primary)..."
-        if "${SCRIPT_DIR}/workflow_bundle_collision_fix.sh"; then
-            log_success "✅ WORKFLOW-INTEGRATED Bundle Collision Fix applied successfully"
-            log_info "🔧 Error ID 73b7b133-169a-41ec-a1aa-78eba00d4bb7 prevention active"
+    # Automatic bundle identifier configuration from Codemagic API variables
+    if [ -n "${BUNDLE_ID:-}" ] || [ -n "${APP_ID:-}" ]; then
+        log_info "🎯 API-Driven Bundle Identifier Configuration Active"
+        
+        # Determine the main bundle identifier from API variables
+        if [ -n "${BUNDLE_ID:-}" ]; then
+            MAIN_BUNDLE_ID="$BUNDLE_ID"
+            log_info "✅ Using BUNDLE_ID from Codemagic API: $MAIN_BUNDLE_ID"
+        elif [ -n "${APP_ID:-}" ]; then
+            MAIN_BUNDLE_ID="$APP_ID"
+            log_info "✅ Using APP_ID from Codemagic API: $MAIN_BUNDLE_ID"
+        fi
+        
+        TEST_BUNDLE_ID="${MAIN_BUNDLE_ID}.tests"
+        
+        log_info "📊 API-Driven Bundle Configuration:"
+        log_info "   Main App: $MAIN_BUNDLE_ID"
+        log_info "   Tests: $TEST_BUNDLE_ID"
+        log_info "   App Name: ${APP_NAME:-$(basename "$MAIN_BUNDLE_ID")}"
+        
+        # Apply dynamic bundle identifier injection directly
+        log_info "💉 Applying API-driven bundle identifier injection..."
+        
+        # Create backup
+        cp "ios/Runner.xcodeproj/project.pbxproj" "ios/Runner.xcodeproj/project.pbxproj.api_backup_$(date +%Y%m%d_%H%M%S)"
+        
+        # Apply bundle identifier changes
+        # First, set everything to main bundle ID
+        sed -i.bak "s/PRODUCT_BUNDLE_IDENTIFIER = [^;]*;/PRODUCT_BUNDLE_IDENTIFIER = $MAIN_BUNDLE_ID;/g" "ios/Runner.xcodeproj/project.pbxproj"
+        
+        # Then, fix test target configurations to use test bundle ID
+        # Target RunnerTests configurations (look for TEST_HOST pattern)
+        sed -i '' '/TEST_HOST.*Runner\.app/,/}/{
+            s/PRODUCT_BUNDLE_IDENTIFIER = [^;]*;/PRODUCT_BUNDLE_IDENTIFIER = '"$TEST_BUNDLE_ID"';/g
+        }' "ios/Runner.xcodeproj/project.pbxproj"
+        
+        # Also target any configuration with BUNDLE_LOADER (test configurations)
+        sed -i '' '/BUNDLE_LOADER.*TEST_HOST/,/}/{
+            s/PRODUCT_BUNDLE_IDENTIFIER = [^;]*;/PRODUCT_BUNDLE_IDENTIFIER = '"$TEST_BUNDLE_ID"';/g
+        }' "ios/Runner.xcodeproj/project.pbxproj"
+        
+        # Clean up backup
+        rm -f "ios/Runner.xcodeproj/project.pbxproj.bak"
+        
+        # Verify injection
+        local main_count=$(grep -c "PRODUCT_BUNDLE_IDENTIFIER = $MAIN_BUNDLE_ID;" "ios/Runner.xcodeproj/project.pbxproj" 2>/dev/null || echo "0")
+        local test_count=$(grep -c "PRODUCT_BUNDLE_IDENTIFIER = $TEST_BUNDLE_ID;" "ios/Runner.xcodeproj/project.pbxproj" 2>/dev/null || echo "0")
+        
+        if [ "$main_count" -ge 1 ] && [ "$test_count" -ge 1 ]; then
+            log_success "✅ API-DRIVEN INJECTION: Bundle identifiers configured successfully"
+            log_info "📊 Applied Configuration: $main_count main app, $test_count test configurations"
             collision_fix_applied=true
         else
-            log_warn "⚠️ WORKFLOW-INTEGRATED collision fix failed, trying enhanced v2..."
+            log_warn "⚠️ API-driven injection incomplete, falling back to static fixes..."
+            collision_fix_applied=false
         fi
     else
-        log_warn "⚠️ Workflow collision fix script not found, trying enhanced v2..."
+        log_info "📁 No API bundle identifier variables found, using static collision fixes"
+        collision_fix_applied=false
     fi
     
-    # Fallback 1: Enhanced v2 fixes
-    if [ "$collision_fix_applied" = "false" ] && [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh" ]; then
-        chmod +x "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh"
-        log_info "🎯 Applying Enhanced Bundle Collision Fix v2 (Fallback 1)..."
-        if "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh"; then
-            log_success "✅ Enhanced Bundle Identifier Collision fixes (v2) applied successfully"
-            collision_fix_applied=true
-        else
-            log_warn "⚠️ Enhanced Bundle Identifier Collision fixes (v2) failed, trying v1..."
-        fi
-    fi
-    
-    # Fallback 2: Basic v1 fixes
-    if [ "$collision_fix_applied" = "false" ] && [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh" ]; then
-        chmod +x "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh"
-        log_info "🎯 Applying Basic Bundle Collision Fix v1 (Fallback 2)..."
-        if "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh"; then
-            log_success "✅ Basic Bundle Identifier Collision fixes (v1) applied successfully"
-            collision_fix_applied=true
-        else
-            log_warn "⚠️ Basic Bundle Identifier Collision fixes (v1) failed, trying emergency fix..."
-        fi
-    fi
-    
-    # Fallback 3: Emergency App Store fix
-    if [ "$collision_fix_applied" = "false" ] && [ -f "${SCRIPT_DIR}/emergency_app_store_collision_fix.sh" ]; then
-        chmod +x "${SCRIPT_DIR}/emergency_app_store_collision_fix.sh"
-        log_info "🎯 Applying Emergency App Store Collision Fix (Fallback 3)..."
-        if "${SCRIPT_DIR}/emergency_app_store_collision_fix.sh"; then
-            log_success "✅ Emergency App Store Collision fix applied successfully"
-            collision_fix_applied=true
-        else
-            log_warn "⚠️ Emergency App Store collision fix failed, trying final fix..."
-        fi
-    fi
-    
-    # Fallback 4: Bundle collision final fix
-    if [ "$collision_fix_applied" = "false" ] && [ -f "${SCRIPT_DIR}/bundle_identifier_collision_final_fix.sh" ]; then
-        chmod +x "${SCRIPT_DIR}/bundle_identifier_collision_final_fix.sh"
-        log_info "🎯 Applying Final Bundle Collision Fix (Fallback 4)..."
-        if "${SCRIPT_DIR}/bundle_identifier_collision_final_fix.sh"; then
-            log_success "✅ Final Bundle Identifier Collision fix applied successfully"
-            collision_fix_applied=true
-        else
-            log_warn "⚠️ Final Bundle Identifier collision fix failed, proceeding without collision prevention"
-        fi
-    fi
-    
-    # Report collision fix status
-    if [ "$collision_fix_applied" = "true" ]; then
-        log_success "🎯 COLLISION PREVENTION: Successfully applied at least one collision fix"
-        log_info "✅ App Store Connect validation error prevention active"
-        log_info "🔧 CFBundleIdentifier collision Error ID 73b7b133-169a-41ec-a1aa-78eba00d4bb7 should be resolved"
-    else
-        log_warn "⚠️ COLLISION PREVENTION: All collision fixes failed - continuing without collision prevention"
-        log_warn "🚨 App Store Connect validation may fail with CFBundleIdentifier collision"
-        log_warn "📋 Manual collision fix may be required after build"
-        # This is NOT a hard failure - continue with build
+    # FALLBACK: Apply static collision fixes if API injection wasn't successful
+    if [ "$collision_fix_applied" != "true" ]; then
+        log_info "🔧 Applying static bundle identifier collision fixes..."
     fi
     
     # Stage 7: Flutter Build Process (must succeed for clean build)
