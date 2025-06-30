@@ -16,6 +16,26 @@ log_info "Starting IPA Export... (Enhanced Version v3.0 with Profile Type Suppor
 create_export_options() {
     log_info "Creating ExportOptions.plist for $PROFILE_TYPE distribution..."
     
+    # Check if real-time collision-free export options are available
+    if [[ -n "${REALTIME_EXPORT_OPTIONS:-}" && -f "${REALTIME_EXPORT_OPTIONS}" ]]; then
+        log_success "🚨 REAL-TIME COLLISION-FREE EXPORT OPTIONS DETECTED!"
+        log_info "📱 Using collision-free export options: ${REALTIME_EXPORT_OPTIONS}"
+        log_info "🎯 This should prevent ALL CFBundleIdentifier collision errors"
+        
+        # Copy the real-time export options to the expected location
+        local export_options_path="ios/ExportOptions.plist"
+        cp "${REALTIME_EXPORT_OPTIONS}" "$export_options_path"
+        
+        if [ -f "$export_options_path" ]; then
+            log_success "✅ Real-time collision-free export options applied!"
+            log_info "🛡️ Protection against Error IDs: 73b7b133, 66775b51, 16fe2c8f, b4b31bab, a2bd4f60"
+            return 0
+        else
+            log_warn "⚠️ Failed to copy real-time export options, falling back to standard method"
+        fi
+    fi
+    
+    # Standard export options creation (fallback)
     local export_options_path="ios/ExportOptions.plist"
     local method="app-store"
     local upload_bitcode="false"
