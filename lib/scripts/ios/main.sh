@@ -517,68 +517,112 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
     
     # Stage 8: IPA Export (only if primary build succeeded)
     log_info "--- Stage 8: Exporting IPA ---"
-    if ! "${SCRIPT_DIR}/export_ipa.sh"; then
-        log_warn "⚠️ IPA export failed, but build was successful"
-        log_info "📦 Archive should be available for manual export"
+    
+    # Verify certificate setup before export
+    log_info "🔐 Verifying certificate setup..."
+    
+    # Create and configure keychain
+    local keychain_password="temp_password"
+    security create-keychain -p "$keychain_password" ios-build.keychain
+    security default-keychain -s ios-build.keychain
+    security unlock-keychain -p "$keychain_password" ios-build.keychain
+    security set-keychain-settings -t 3600 -l ios-build.keychain
+    
+    # Download and install certificate
+    log_info "📥 Downloading P12 certificate..."
+    local cert_file="/tmp/certificate.p12"
+    if curl -fsSL -o "$cert_file" "${CERT_P12_URL}"; then
+        log_success "✅ Certificate downloaded"
         
-        # Check if archive exists (successful build outcome)
-        if [ -d "${OUTPUT_DIR:-output/ios}/Runner.xcarchive" ]; then
-            log_success "✅ Archive found - this is a successful build outcome"
-            log_info "📋 Manual export instructions will be provided"
-            log_info "🎯 This is NOT a Firebase issue - just missing Apple Developer credentials"
-            
-            # Set build status as partial success (archive created, no IPA)
-            export FINAL_BUILD_STATUS="partial"
-            export FINAL_BUILD_MESSAGE="iOS build completed with archive only: ${APP_NAME:-Unknown} (${VERSION_NAME:-Unknown}) - Manual IPA export required due to missing Apple Developer credentials"
-            
-            # Continue to success email - this is a successful build
-            log_info "--- Stage 9: Setting Build Success Status ---"
-            log_success "iOS workflow completed successfully with archive creation!"
-            log_info "Build Summary:"
-            log_info "   App: ${APP_NAME:-Unknown} v${VERSION_NAME:-Unknown}"
-            log_info "   Bundle ID: ${BUNDLE_ID:-Unknown}"
-            log_info "   Profile Type: ${PROFILE_TYPE:-Unknown}"
-            log_info "   Output: ${OUTPUT_DIR:-Unknown}"
-            log_info "   Result: Archive created, manual IPA export required"
-            log_info "   Issue: Missing Apple Developer account configuration (not Firebase related)"
-            
-            return 0  # This is a successful outcome
+        # Install certificate
+        if security import "$cert_file" -k ios-build.keychain -P "${CERT_PASSWORD}" -A; then
+            log_success "✅ Certificate installed"
+            security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$keychain_password" ios-build.keychain
         else
-            log_error "❌ No archive found - build may have failed"
-            send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "IPA export and archive creation failed."
+            log_error "❌ Certificate installation failed"
+            return 1
+        fi
+    else
+        log_error "❌ Certificate download failed"
         return 1
     fi
+    
+    # Download and install provisioning profile
+    log_info "📥 Downloading provisioning profile..."
+    local profile_file="/tmp/profile.mobileprovision"
+    if curl -fsSL -o "$profile_file" "${PROFILE_URL}"; then
+        log_success "✅ Profile downloaded"
+        
+        # Install profile
+        mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+        cp "$profile_file" "$HOME/Library/MobileDevice/Provisioning Profiles/"
+        log_success "✅ Profile installed"
+    else
+        log_error "❌ Profile download failed"
+        return 1
     fi
     
-    # Stage 9: Build Success Status Set (Email will be sent by workflow)
-    log_info "--- Stage 9: Setting Build Success Status ---"
-    export FINAL_BUILD_STATUS="success"
-    export FINAL_BUILD_MESSAGE="iOS build completed successfully: ${APP_NAME:-Unknown} (${VERSION_NAME:-Unknown}) - Full build with IPA export"
+    # Verify certificate is available
+    if ! security find-identity -v -p codesigning ios-build.keychain | grep "Apple Distribution"; then
+        log_error "❌ Certificate verification failed"
+        return 1
+    fi
     
-    log_success "🎉 iOS WORKFLOW COMPLETED SUCCESSFULLY!"
-    log_success "========================================"
-    log_info ""
-    log_info "📋 BUILD SUMMARY:"
-    log_info "   ✅ App: ${APP_NAME:-Unknown} v${VERSION_NAME:-Unknown}"
-    log_info "   ✅ Bundle ID: ${BUNDLE_ID:-Unknown}"
-    log_info "   ✅ Profile Type: ${PROFILE_TYPE:-Unknown}"
-    log_info "   ✅ Output: ${OUTPUT_DIR:-Unknown}"
-    log_info "   ✅ Firebase: $([ "${PUSH_NOTIFY:-false}" = "true" ] && echo "ENABLED with compilation fixes" || echo "DISABLED")"
-    log_info "   ✅ Collision Prevention: $([ "${collision_fix_applied:-false}" = "true" ] && echo "ACTIVE" || echo "ATTEMPTED")"
-    log_info "   ✅ Project Corruption: PROTECTED"
-    log_info "   ✅ Xcode Compatibility: 16.0+ READY"
-    log_info ""
-    log_info "🔧 SCRIPTS EXECUTED SUCCESSFULLY:"
-    log_info "   ✅ All iOS workflow scripts read and processed"
-    log_info "   ✅ Firebase compilation fixes applied (if needed)"
-    log_info "   ✅ Bundle identifier collision prevention attempted"
-    log_info "   ✅ Project corruption protection active"
-    log_info "   ✅ Workflow resilience mechanisms engaged"
-    log_info ""
-    log_info "🚀 RESULT: iOS workflow completed till SUCCESS!"
-    log_info "========================================"
+    # Create enhanced export options
+    log_info "📝 Creating enhanced export options..."
+    cat > "ios/ExportOptions.plist" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>method</key>
+    <string>app-store</string>
+    <key>teamID</key>
+    <string>${APPLE_TEAM_ID}</string>
+    <key>signingStyle</key>
+    <string>manual</string>
+    <key>stripSwiftSymbols</key>
+    <true/>
+    <key>uploadBitcode</key>
+    <false/>
+    <key>compileBitcode</key>
+    <false/>
+    <key>signingCertificate</key>
+    <string>Apple Distribution</string>
+    <key>provisioningProfiles</key>
+    <dict>
+        <key>${BUNDLE_ID}</key>
+        <string>comtwinklubtwinklub__IOS_APP_STORE</string>
+    </dict>
+</dict>
+</plist>
+EOF
     
-    return 0
+    # Export IPA with enhanced settings
+    log_info "📦 Exporting IPA with enhanced settings..."
+    if ! xcodebuild -exportArchive \
+        -archivePath "${OUTPUT_DIR:-output/ios}/Runner.xcarchive" \
+        -exportPath "${OUTPUT_DIR:-output/ios}" \
+        -exportOptionsPlist "ios/ExportOptions.plist" \
+        -allowProvisioningUpdates \
+        DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
+        CODE_SIGN_IDENTITY="Apple Distribution" \
+        PROVISIONING_PROFILE_SPECIFIER="comtwinklubtwinklub__IOS_APP_STORE" 2>&1 | tee export.log; then
+        
+        log_error "❌ IPA export failed"
+        cat export.log
+        return 1
+    fi
+    
+    # Verify IPA was created
+    if [ -f "${OUTPUT_DIR:-output/ios}/Runner.ipa" ]; then
+        local ipa_size=$(du -h "${OUTPUT_DIR:-output/ios}/Runner.ipa" | cut -f1)
+        log_success "✅ IPA created successfully: $ipa_size"
+        return 0
+    else
+        log_error "❌ IPA file not found after export"
+        return 1
+    fi
 }
 
 # Run main function

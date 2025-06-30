@@ -12,152 +12,45 @@ source "${SCRIPT_DIR}/utils.sh"
 
 log_info "Starting IPA Export... (Enhanced Version v3.0 with Profile Type Support)"
 
-# Function to create ExportOptions.plist based on profile type
+# Function to create ExportOptions.plist
 create_export_options() {
     log_info "Creating ExportOptions.plist for $PROFILE_TYPE distribution..."
     
-    # Check if real-time collision-free export options are available
-    if [[ -n "${REALTIME_EXPORT_OPTIONS:-}" && -f "${REALTIME_EXPORT_OPTIONS}" ]]; then
-        log_success "🚨 REAL-TIME COLLISION-FREE EXPORT OPTIONS DETECTED!"
-        log_info "📱 Using collision-free export options: ${REALTIME_EXPORT_OPTIONS}"
-        log_info "🎯 This should prevent ALL CFBundleIdentifier collision errors"
-        
-        # Copy the real-time export options to the expected location
-        local export_options_path="ios/ExportOptions.plist"
-        cp "${REALTIME_EXPORT_OPTIONS}" "$export_options_path"
-        
-        if [ -f "$export_options_path" ]; then
-            log_success "✅ Real-time collision-free export options applied!"
-            log_info "🛡️ Protection against Error IDs: 73b7b133, 66775b51, 16fe2c8f, b4b31bab, a2bd4f60"
-            return 0
-        else
-            log_warn "⚠️ Failed to copy real-time export options, falling back to standard method"
-        fi
-    fi
-    
-    # Standard export options creation (fallback)
     local export_options_path="ios/ExportOptions.plist"
-    local method="app-store"
-    local upload_bitcode="false"
-    local upload_symbols="true"
-    local compile_bitcode="false"
-    local signing_style="automatic"
     
-    # Determine export method and settings based on profile type
-    case "${PROFILE_TYPE:-app-store}" in
-        "app-store")
-            method="app-store"
-            upload_bitcode="false"
-            upload_symbols="true"
-            signing_style="automatic"
-            ;;
-        "ad-hoc")
-            method="ad-hoc"
-            upload_bitcode="false"
-            upload_symbols="false"
-            signing_style="automatic"
-            ;;
-        "enterprise")
-            method="enterprise"
-            upload_bitcode="false"
-            upload_symbols="false"
-            signing_style="automatic"
-            ;;
-        "development")
-            method="development"
-            upload_bitcode="false"
-            upload_symbols="false"
-            signing_style="automatic"
-            ;;
-        *)
-            log_error "Invalid profile type: $PROFILE_TYPE"
-            log_info "Supported types: app-store, ad-hoc, enterprise, development"
-            return 1
-            ;;
-    esac
+    # Force manual signing for reliability
+    log_info "🔐 Using manual signing for reliable IPA export..."
     
-    # -----------------------------------------------
-    #  🔐  MANUAL SIGNING SUPPORT (new)
-    # -----------------------------------------------
-    # If a Code-signing identity has been exported by
-    # enhanced_certificate_setup.sh we switch the
-    # ExportOptions.plist to manual signing and embed
-    # the certificate + provisioning-profile UUID so
-    # xcodebuild does not fall back to automatic.
-    # -----------------------------------------------
-    if [[ -n "${CODE_SIGN_IDENTITY:-}" ]]; then
-        signing_style="manual"
-        log_info "✅ CODE_SIGN_IDENTITY detected – using MANUAL signing"
-    fi
-    
-    log_info "Export configuration:"
-    log_info "  - Method: $method"
-    log_info "  - Profile Type: $PROFILE_TYPE"
-    log_info "  - Signing Style: $signing_style"
-    log_info "  - Upload Bitcode: $upload_bitcode"
-    log_info "  - Upload Symbols: $upload_symbols"
-    
-    # Create ExportOptions.plist
     cat > "$export_options_path" << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
     <key>method</key>
-    <string>$method</string>
+    <string>app-store</string>
     <key>teamID</key>
-    <string>${APPLE_TEAM_ID:-}</string>
-    <key>uploadBitcode</key>
-    <$upload_bitcode/>
-    <key>uploadSymbols</key>
-    <$upload_symbols/>
-    <key>compileBitcode</key>
-    <$compile_bitcode/>
+    <string>${APPLE_TEAM_ID}</string>
     <key>signingStyle</key>
-    <string>$signing_style</string>
+    <string>manual</string>
     <key>stripSwiftSymbols</key>
     <true/>
-    <key>thinning</key>
-    <string>&lt;none&gt;</string>
-    <key>generateAppStoreInformation</key>
-    <true/>
-EOF
-
-    # When manual signing is active, inject certificate & profile
-    if [[ "$signing_style" == "manual" ]]; then
-        if [[ -n "${CODE_SIGN_IDENTITY:-}" ]]; then
-            cat >> "$export_options_path" << EOF
+    <key>uploadBitcode</key>
+    <false/>
+    <key>compileBitcode</key>
+    <false/>
     <key>signingCertificate</key>
-    <string>${CODE_SIGN_IDENTITY}</string>
-EOF
-        fi
-        if [[ -n "${PROVISIONING_PROFILE_UUID:-}" ]]; then
-            cat >> "$export_options_path" << EOF
+    <string>Apple Distribution</string>
     <key>provisioningProfiles</key>
     <dict>
-        <key>${BUNDLE_ID:-com.example.app}</key>
-        <string>${PROVISIONING_PROFILE_UUID}</string>
+        <key>${BUNDLE_ID}</key>
+        <string>comtwinklubtwinklub__IOS_APP_STORE</string>
     </dict>
-EOF
-        fi
-    fi
-
-    # Add profile-specific configurations
-    if [ "$method" = "app-store" ]; then
-        cat >> "$export_options_path" << EOF
-    <key>uploadToAppStore</key>
-    <false/>
-EOF
-    fi
-
-    cat >> "$export_options_path" << EOF
 </dict>
 </plist>
 EOF
-    
+
     if [ -f "$export_options_path" ]; then
-        log_success "ExportOptions.plist created successfully"
-        log_info "Export options saved to: $export_options_path"
+        log_success "✅ Enhanced ExportOptions.plist created with manual signing"
         return 0
     else
         log_error "Failed to create ExportOptions.plist"
@@ -386,17 +279,6 @@ export_with_manual_certificates() {
     local export_path="${OUTPUT_DIR:-output/ios}"
     local export_options_path="ios/ExportOptions.plist"
     
-    # Validate manual certificate credentials
-    if [ -z "${CERT_P12_URL:-}" ] || [ -z "${PROFILE_URL:-}" ] || [ -z "${CERT_PASSWORD:-}" ]; then
-        log_warn "Manual certificate credentials incomplete, skipping..."
-        log_info "Required variables:"
-        log_info "  - CERT_P12_URL: ${CERT_P12_URL:-NOT_SET}"
-        log_info "  - PROFILE_URL: ${PROFILE_URL:-NOT_SET}"
-        log_info "  - CERT_PASSWORD: ${CERT_PASSWORD:+SET}"
-        log_info "For manual certificate export, please provide all three variables"
-        return 1
-    fi
-    
     # Download and install certificates
     local cert_dir="/tmp/certs_manual"
     mkdir -p "$cert_dir"
@@ -421,21 +303,25 @@ export_with_manual_certificates() {
         return 1
     fi
     
-    # Install certificate in keychain
+    # Create and configure keychain
     local keychain_path="/Users/builder/Library/Keychains/ios-build.keychain-db"
-    if [ ! -f "$keychain_path" ]; then
-        keychain_path="/Users/builder/Library/Keychains/ios-build.keychain"
-    fi
+    local keychain_password="temp_password"
     
-    log_info "Installing certificate in keychain: $keychain_path"
-    if security import "$cert_dir/certificate.p12" -k "$keychain_path" -P "${CERT_PASSWORD}" -T /usr/bin/codesign 2>/dev/null; then
+    # Create new keychain
+    security create-keychain -p "$keychain_password" ios-build.keychain
+    security default-keychain -s ios-build.keychain
+    security unlock-keychain -p "$keychain_password" ios-build.keychain
+    security set-keychain-settings -t 3600 -l ios-build.keychain
+    
+    # Install certificate in keychain
+    log_info "Installing certificate in keychain..."
+    if security import "$cert_dir/certificate.p12" -k ios-build.keychain -P "${CERT_PASSWORD}" -A; then
         log_success "Certificate installed successfully"
+        
+        # Set key partition list
+        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$keychain_password" ios-build.keychain
     else
         log_error "Failed to install certificate in keychain"
-        log_info "Please check:"
-        log_info "  1. Certificate password is correct"
-        log_info "  2. Certificate file is valid"
-        log_info "  3. Keychain permissions"
         rm -rf "$cert_dir"
         return 1
     fi
@@ -446,23 +332,45 @@ export_with_manual_certificates() {
     cp "$cert_dir/profile.mobileprovision" "$profile_dir/"
     log_success "Provisioning profile installed"
     
+    # Verify certificate installation
+    log_info "Verifying certificate installation..."
+    if security find-identity -v -p codesigning ios-build.keychain | grep "Apple Distribution"; then
+        log_success "✅ Certificate verification successful"
+    else
+        log_error "❌ Certificate verification failed"
+        return 1
+    fi
+    
+    # Create enhanced export options
+    create_export_options
+    
     # Try export with manual certificates
     log_info "Running xcodebuild export with manual certificates..."
     if xcodebuild -exportArchive \
         -archivePath "$archive_path" \
         -exportPath "$export_path" \
         -exportOptionsPlist "$export_options_path" \
-        -allowProvisioningUpdates; then
+        -allowProvisioningUpdates \
+        DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
+        CODE_SIGN_IDENTITY="Apple Distribution" \
+        PROVISIONING_PROFILE_SPECIFIER="comtwinklubtwinklub__IOS_APP_STORE" 2>&1 | tee export.log; then
         
         log_success "Manual certificate export successful!"
-        rm -rf "$cert_dir"
-        return 0
+        
+        # Verify IPA exists
+        if [ -f "${export_path}/Runner.ipa" ]; then
+            local ipa_size=$(du -h "${export_path}/Runner.ipa" | cut -f1)
+            log_success "✅ IPA file created successfully: ${ipa_size}"
+            rm -rf "$cert_dir"
+            return 0
+        else
+            log_error "❌ IPA file not found after successful export"
+            rm -rf "$cert_dir"
+            return 1
+        fi
     else
-        log_warn "Manual certificate export failed"
-        log_info "Please check:"
-        log_info "  1. Certificate matches provisioning profile"
-        log_info "  2. Bundle ID matches provisioning profile"
-        log_info "  3. Certificate is valid and not expired"
+        log_error "Manual certificate export failed"
+        cat export.log
         rm -rf "$cert_dir"
         return 1
     fi
