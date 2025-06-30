@@ -148,3 +148,4 @@ log_info "🔐 Signing Style: automatic"
 
 log_success "✅ Certificate validation completed - Export Method: ${EXPORT_METHOD}"
 return 0
+ 

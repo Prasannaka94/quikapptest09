@@ -160,11 +160,11 @@ export_with_app_store_connect_api() {
         else
             log_error "❌ Failed to download API key from GitHub"
             log_error "   URL: ${APP_STORE_CONNECT_API_KEY_PATH}"
-            log_info "Please check:"
+        log_info "Please check:"
             log_info "  1. GitHub URL is accessible"
             log_info "  2. p8 file exists at the URL"
-            log_info "  3. Network connectivity"
-            return 1
+        log_info "  3. Network connectivity"
+        return 1
         fi
     fi
     

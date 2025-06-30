@@ -35,9 +35,9 @@ load_environment_variables() {
     fi
     
     # Set default values
-    export OUTPUT_DIR="${OUTPUT_DIR:-output/ios}"
-    export PROJECT_ROOT="${PROJECT_ROOT:-$(pwd)}"
-    export CM_BUILD_DIR="${CM_BUILD_DIR:-$(pwd)}"
+export OUTPUT_DIR="${OUTPUT_DIR:-output/ios}"
+export PROJECT_ROOT="${PROJECT_ROOT:-$(pwd)}"
+export CM_BUILD_DIR="${CM_BUILD_DIR:-$(pwd)}"
     export PROFILE_TYPE="${PROFILE_TYPE:-ad-hoc}"
     
     log_success "Environment variables loaded successfully"
@@ -151,7 +151,7 @@ main() {
     fi
     
     # Stage 6.7: Firebase Setup (Only if PUSH_NOTIFY=true)
-    if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
+if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
         log_info "--- Stage 6.7: Setting up Firebase (Push notifications enabled) ---"
         if ! "${SCRIPT_DIR}/firebase_setup.sh"; then
             send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Firebase setup failed."
@@ -248,7 +248,7 @@ main() {
             return 1
         fi
     fi
-
+    
     # Stage 7: Flutter Build Process (must succeed for clean build)
     log_info "--- Stage 7: Building Flutter iOS App ---"
     if ! "${SCRIPT_DIR}/build_flutter_app.sh"; then
@@ -295,8 +295,8 @@ main() {
         else
             log_error "❌ No archive found - build may have failed"
             send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "IPA export and archive creation failed."
-            return 1
-        fi
+        return 1
+    fi
     fi
     
     # Stage 9: Build Success Status Set (Email will be sent by workflow)

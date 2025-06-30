@@ -2043,20 +2043,20 @@ workflows:
         WORKFLOW_ID: "ios-verification"
         BUNDLE_ID: $BUNDLE_ID
         PROFILE_TYPE: "app-store" # Will test both app-store and ad-hoc
-        
+
         # 🔧 Feature Flags (for testing)
         PUSH_NOTIFY: $PUSH_NOTIFY
         IS_DOMAIN_URL: $IS_DOMAIN_URL
         <<: *feature_flags
         <<: *permissions
         <<: *ui_config
-        
+
         # 🔥 Firebase Configuration (for testing)
         FIREBASE_CONFIG_IOS: $FIREBASE_CONFIG_IOS
-        
+
         # 📧 Email Configuration (optional for verification)
         ENABLE_EMAIL_NOTIFICATIONS: false # Disabled for verification
-        
+
     scripts:
       - name: Environment Setup and Validation
         script: |
@@ -2065,11 +2065,11 @@ workflows:
           echo "🎯 Tests both app-store and ad-hoc profiles"
           echo "🔥 Validates Firebase integration (when enabled)"
           echo ""
-          
+
           # Set verification environment
           export VERIFICATION_MODE="true"
           export PROJECT_ROOT="$(pwd)"
-          
+
           echo "📊 Verification Configuration:"
           echo "  - Bundle ID: $BUNDLE_ID"  
           echo "  - App Name: $APP_NAME"
@@ -2081,11 +2081,11 @@ workflows:
       - name: Run Comprehensive iOS Workflow Verification
         script: |
           echo "🚀 Running Comprehensive iOS Workflow Verification..."
-          
+
           # Make verification scripts executable
           chmod +x lib/scripts/ios/*.sh
           chmod +x lib/scripts/utils/*.sh
-          
+
           echo "🔧 Running verification with app-store profile and Firebase enabled..."
           if lib/scripts/ios/run_verification.sh app-store true; then
             echo "✅ App Store + Firebase verification PASSED"
@@ -2093,7 +2093,7 @@ workflows:
             echo "❌ App Store + Firebase verification FAILED"
             exit 1
           fi
-          
+
           echo ""
           echo "🔧 Running verification with ad-hoc profile and Firebase enabled..."
           if lib/scripts/ios/run_verification.sh ad-hoc true; then
@@ -2102,7 +2102,7 @@ workflows:
             echo "❌ Ad Hoc + Firebase verification FAILED" 
             exit 1
           fi
-          
+
           echo ""
           echo "🔧 Running verification with app-store profile and Firebase disabled..."
           if lib/scripts/ios/run_verification.sh app-store false; then
@@ -2111,7 +2111,7 @@ workflows:
             echo "❌ App Store + No Firebase verification FAILED"
             exit 1
           fi
-          
+
           echo ""
           echo "🔧 Running verification with ad-hoc profile and Firebase disabled..."
           if lib/scripts/ios/run_verification.sh ad-hoc false; then
@@ -2124,11 +2124,11 @@ workflows:
       - name: Generate Verification Summary Report
         script: |
           echo "📊 Generating Verification Summary Report..."
-          
+
           # Create summary report
           SUMMARY_FILE="output/verification/iOS_WORKFLOW_VERIFICATION_SUMMARY.txt"
           mkdir -p output/verification
-          
+
           cat > "$SUMMARY_FILE" << SUMMARY_EOF
             ===============================================================================
                                    iOS WORKFLOW VERIFICATION SUMMARY

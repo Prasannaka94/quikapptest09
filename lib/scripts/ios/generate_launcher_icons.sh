@@ -20,7 +20,7 @@ validate_logo_file() {
         log_error "❌ Logo file not found: $logo_path"
         log_warn "⚠️ Expected logo to be created by branding_assets.sh in Stage 4"
         log_info "Creating a default logo as fallback..."
-        
+
         # Ensure directory exists
         mkdir -p assets/images
         
@@ -157,8 +157,8 @@ copy_logo_to_app_icon() {
                     log_success "✅ app_icon.png alpha channel removed via JPEG conversion"
                 fi
                 rm -f "$temp_jpg"
-            fi
-            
+    fi
+    
             # Method 2: Force RGB format
             sips -s format png -s formatOptions RGB "$target_icon" >/dev/null 2>&1
             
@@ -241,8 +241,8 @@ validate_launcher_icons_config() {
     # Check if flutter_launcher_icons configuration exists
     if ! grep -q "^flutter_launcher_icons:" pubspec.yaml; then
         log_error "❌ flutter_launcher_icons configuration not found in pubspec.yaml"
-        return 1
-    fi
+            return 1
+        fi
     
     # Check for iOS-specific settings
     if ! grep -A 20 "^flutter_launcher_icons:" pubspec.yaml | grep -q "ios: true"; then
@@ -287,8 +287,8 @@ validate_launcher_icons_config() {
                  sed -i.bak "s|image_path: .*|image_path: \"assets/images/logo.png\"|" pubspec.yaml
                  rm -f pubspec.yaml.bak
                  log_success "✅ Updated image_path to: assets/images/logo.png"
-             fi
         fi
+    fi
     else
         log_warn "⚠️ No image_path found in configuration"
     fi
@@ -375,7 +375,7 @@ fix_transparency_issues() {
             # ALWAYS remove alpha channel using multiple methods for bulletproof removal
             if command -v sips &> /dev/null; then
                 log_info "🔧 Method 1: Converting $filename to remove alpha channel..."
-                
+    
                 # Method 1: PNG → JPEG → PNG (removes alpha)
                 local temp_jpg="${icon_file%.png}_temp.jpg"
                 local temp_png="${icon_file%.png}_temp.png"
@@ -406,8 +406,8 @@ fix_transparency_issues() {
                     if [ -f "$bg_temp" ]; then
                         mv "$bg_temp" "$icon_file"
                         log_success "✅ $filename - CRITICAL: Background composition applied"
-                    fi
-                    
+    fi
+    
                     # Clean up bg_temp immediately
                     rm -f "$bg_temp" 2>/dev/null || true
                 fi
@@ -476,7 +476,7 @@ validate_generated_icons() {
         if echo "$file_info" | grep -q "with alpha"; then
             log_error "❌ CRITICAL: 1024x1024 icon still has alpha channel - App Store will reject this"
             return 1
-        else
+            else
             log_success "✅ CRITICAL: 1024x1024 icon is App Store compliant (no alpha)"
         fi
     else
@@ -676,5 +676,5 @@ main() {
 
 # Run main function if script is executed directly
 if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
-    main "$@"
+main "$@" 
 fi 
