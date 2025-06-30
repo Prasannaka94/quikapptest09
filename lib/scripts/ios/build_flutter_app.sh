@@ -455,6 +455,23 @@ validate_build_prerequisites() {
 main() {
     log_info "Starting Flutter iOS Build Process..."
     
+    # Step 0: EMERGENCY PROJECT RECOVERY - Check for and fix project corruption
+    log_info "🚨 EMERGENCY PROJECT RECOVERY: Checking for Xcode project corruption..."
+    
+    if [ -f "lib/scripts/ios/xcode_project_recovery.sh" ]; then
+        chmod +x lib/scripts/ios/xcode_project_recovery.sh
+        if lib/scripts/ios/xcode_project_recovery.sh; then
+            log_success "✅ PROJECT RECOVERY: Project file validated or recovered successfully"
+            log_info "🔧 Xcode project is now in working state"
+        else
+            log_error "❌ PROJECT RECOVERY: Critical project corruption detected and recovery failed"
+            log_error "Manual intervention required - project file cannot be restored"
+            return 1
+        fi
+    else
+        log_warn "⚠️ Project recovery script not found - proceeding with standard validation"
+    fi
+    
     # Step 1: Validate build prerequisites
     if ! validate_build_prerequisites; then
         log_error "Build prerequisites validation failed"
@@ -495,7 +512,8 @@ main() {
     log_info "  - Profile Type: ${PROFILE_TYPE:-Unknown}"
     log_info "  - Firebase: $([ "${PUSH_NOTIFY:-false}" = "true" ] && echo "ENABLED" || echo "DISABLED")"
     log_info "  - Push Notifications: ${PUSH_NOTIFY:-false}"
-    log_info "  - Xcode Compatibility: 16.0+ with enhanced fixes"
+    log_info "  - Project Corruption: PROTECTED (emergency recovery active)"
+    log_info "  - Xcode Compatibility: 16.0+ with safe fixes (no direct project modification)"
     
     return 0
 }

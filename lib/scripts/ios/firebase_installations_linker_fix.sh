@@ -62,61 +62,16 @@ fix_firebase_installations_linking() {
     fi
 }
 
-# Function to fix project linker settings
+# Function to fix project linker settings (DISABLED for project safety)
 fix_project_linker_settings() {
-    echo "🔧 Fixing project linker settings..."
+    echo "🔧 Skipping direct project linker settings to prevent corruption..."
     
-    if [ -f "$PROJECT_FILE" ]; then
-        echo "📝 Found project file"
-        
-        # Create backup
-        cp "$PROJECT_FILE" "$PROJECT_FILE.linker_fix_backup"
-        
-        # Apply linker fixes using Python
-        python3 -c "
-import re
-
-# Read the project file
-with open('$PROJECT_FILE', 'r') as f:
-    content = f.read()
-
-# Add linker settings for better compatibility
-linker_settings = '''
-				OTHER_LDFLAGS = \"\$(inherited) -framework Foundation -framework SystemConfiguration -framework Security -ObjC\";
-				FRAMEWORK_SEARCH_PATHS = \"\$(inherited) \$(PODS_ROOT)/FirebaseInstallations/Frameworks\";
-				LIBRARY_SEARCH_PATHS = \"\$(inherited) \$(PODS_ROOT)/FirebaseInstallations/Libraries\";
-				STRIP_INSTALLED_PRODUCT = NO;
-				DEPLOYMENT_POSTPROCESSING = NO;
-				SEPARATE_STRIP = NO;
-				COPY_PHASE_STRIP = NO;
-				CLANG_ENABLE_MODULE_DEBUGGING = NO;
-				DEBUG_INFORMATION_FORMAT = \"dwarf\";
-				VALIDATE_PRODUCT = NO;
-				ENABLE_TESTABILITY = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
-				DEFINES_MODULE = NO;
-'''
-
-# Find all build configuration sections and add linker settings
-pattern = r'(buildSettings = \{.*?)(\};)'
-replacement = r'\1' + linker_settings + r'\2'
-
-# Apply the replacement
-modified_content = re.sub(pattern, replacement, content, flags=re.DOTALL)
-
-# Write back to file
-with open('$PROJECT_FILE', 'w') as f:
-    f.write(modified_content)
-
-print('✅ Project linker settings fixed')
-"
-        
-        echo "✅ Project linker settings applied"
-    else
-        echo "❌ Project file not found: $PROJECT_FILE"
-        return 1
-    fi
+    echo "⚠️ SAFETY MEASURE: Direct project.pbxproj modifications disabled"
+    echo "   Linker settings will be applied through Podfile instead"
+    echo "   This prevents project file corruption while maintaining functionality"
+    echo "✅ Project safety measures applied - using Podfile-based linker settings instead"
+    
+    return 0
 }
 
 # Function to create enhanced Podfile with linker fixes

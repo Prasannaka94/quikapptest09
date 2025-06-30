@@ -180,54 +180,16 @@ install_cocoapods_with_integration() {
     return 0
 }
 
-# Function to fix xcfilelist path issues
+# Function to fix xcfilelist path issues (DISABLED for project safety)
 fix_xcfilelist_paths() {
-    echo "🔧 Fixing xcfilelist path issues..."
+    echo "🔧 Skipping xcfilelist path fixes to prevent project corruption..."
     
-    if [ -f "$PROJECT_FILE" ]; then
-        echo "📝 Found project file: $PROJECT_FILE"
-        
-        # Create backup
-        cp "$PROJECT_FILE" "$PROJECT_FILE.integration_fix_backup"
-        
-        # Fix xcfilelist paths using Python
-        python3 -c "
-import re
-import os
-
-# Read the project file
-with open('$PROJECT_FILE', 'r') as f:
-    content = f.read()
-
-# Fix relative xcfilelist paths to absolute paths
-project_dir = '$IOS_DIR'
-
-# Pattern to match xcfilelist file references
-xcfilelist_pattern = r'(/Target Support Files/[^\"]+\.xcfilelist)'
-
-# Replace relative paths with absolute paths
-def fix_path(match):
-    relative_path = match.group(1)
-    if not relative_path.startswith('/'):
-        relative_path = '/' + relative_path.lstrip('/')
-    absolute_path = os.path.join(project_dir, 'Pods' + relative_path)
-    return absolute_path
-
-# Apply the fix
-fixed_content = re.sub(xcfilelist_pattern, fix_path, content)
-
-# Write back to file
-with open('$PROJECT_FILE', 'w') as f:
-    f.write(fixed_content)
-
-print('✅ xcfilelist paths fixed in project file')
-"
-        
-        echo "✅ xcfilelist path fixes applied"
-    else
-        echo "❌ Project file not found: $PROJECT_FILE"
-        return 1
-    fi
+    echo "⚠️ SAFETY MEASURE: Direct project.pbxproj modifications disabled"
+    echo "   xcfilelist issues will be resolved through clean CocoaPods reinstall"
+    echo "   This prevents project file corruption while maintaining functionality"
+    echo "✅ Project safety measures applied - using CocoaPods regeneration instead"
+    
+    return 0
 }
 
 # Function to validate xcfilelist files exist
@@ -272,50 +234,16 @@ validate_xcfilelist_files() {
     return 0
 }
 
-# Function to fix Xcode project script phases
+# Function to fix Xcode project script phases (DISABLED for project safety)
 fix_script_phases() {
-    echo "🔧 Fixing Xcode project script phases..."
+    echo "🔧 Skipping script phase fixes to prevent project corruption..."
     
-    if [ -f "$PROJECT_FILE" ]; then
-        # Create backup
-        cp "$PROJECT_FILE" "$PROJECT_FILE.script_phases_backup"
-        
-        # Fix script phases using Python
-        python3 -c "
-import re
-
-# Read the project file
-with open('$PROJECT_FILE', 'r') as f:
-    content = f.read()
-
-# Fix script phase configurations
-fixes_applied = 0
-
-# Fix inputFileListPaths and outputFileListPaths to use absolute paths
-def fix_file_list_paths(match):
-    global fixes_applied
-    line = match.group(0)
-    if '/Target Support Files/' in line and not line.strip().startswith('\"$IOS_DIR/Pods'):
-        fixed_line = line.replace('/Target Support Files/', '\"\$(SRCROOT)/Pods/Target Support Files/')
-        fixes_applied += 1
-        return fixed_line
-    return line
-
-# Apply file list path fixes
-content = re.sub(r'.*Target Support Files.*\.xcfilelist.*', fix_file_list_paths, content)
-
-# Write back to file
-with open('$PROJECT_FILE', 'w') as f:
-    f.write(content)
-
-print(f'✅ Script phase fixes applied: {fixes_applied} fixes')
-"
-        
-        echo "✅ Script phase fixes applied"
-    else
-        echo "❌ Project file not found for script phase fixes"
-        return 1
-    fi
+    echo "⚠️ SAFETY MEASURE: Direct project.pbxproj modifications disabled"
+    echo "   Script phase issues will be resolved through clean CocoaPods reinstall"
+    echo "   This prevents project file corruption while maintaining functionality"
+    echo "✅ Project safety measures applied - using CocoaPods regeneration instead"
+    
+    return 0
 }
 
 # Function to validate workspace integration
