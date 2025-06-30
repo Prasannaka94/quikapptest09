@@ -518,15 +518,18 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
     # Stage 8: IPA Export (only if primary build succeeded)
     log_info "--- Stage 8: Exporting IPA ---"
     
-    # Verify certificate setup before export
-    log_info "🔐 Verifying certificate setup..."
+    # Clean up any existing keychain
+    log_info "🔐 Setting up fresh keychain..."
+    security delete-keychain ios-build.keychain || true
+    rm -f ~/Library/Keychains/ios-build.keychain*
     
-    # Create and configure keychain
+    # Create new keychain
     local keychain_password="temp_password"
     security create-keychain -p "$keychain_password" ios-build.keychain
+    security list-keychains -d user -s ios-build.keychain $(security list-keychains -d user | xargs)
     security default-keychain -s ios-build.keychain
     security unlock-keychain -p "$keychain_password" ios-build.keychain
-    security set-keychain-settings -t 3600 -l ios-build.keychain
+    security set-keychain-settings -t 3600 -u ios-build.keychain
     
     # Download and install certificate
     log_info "📥 Downloading P12 certificate..."
@@ -534,10 +537,18 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
     if curl -fsSL -o "$cert_file" "${CERT_P12_URL}"; then
         log_success "✅ Certificate downloaded"
         
-        # Install certificate
-        if security import "$cert_file" -k ios-build.keychain -P "${CERT_PASSWORD}" -A; then
+        # Install certificate with all permissions
+        if security import "$cert_file" -k ios-build.keychain -P "${CERT_PASSWORD}" -T /usr/bin/codesign -T /usr/bin/security -A; then
             log_success "✅ Certificate installed"
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$keychain_password" ios-build.keychain
+            
+            # Verify certificate installation
+            if security find-identity -v -p codesigning ios-build.keychain | grep "Apple Distribution"; then
+                log_success "✅ Certificate verified in keychain"
+            else
+                log_error "❌ Certificate not found in keychain after installation"
+                return 1
+            fi
         else
             log_error "❌ Certificate installation failed"
             return 1
@@ -559,12 +570,6 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
         log_success "✅ Profile installed"
     else
         log_error "❌ Profile download failed"
-        return 1
-    fi
-    
-    # Verify certificate is available
-    if ! security find-identity -v -p codesigning ios-build.keychain | grep "Apple Distribution"; then
-        log_error "❌ Certificate verification failed"
         return 1
     fi
     
@@ -607,7 +612,8 @@ EOF
         -allowProvisioningUpdates \
         DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
         CODE_SIGN_IDENTITY="Apple Distribution" \
-        PROVISIONING_PROFILE_SPECIFIER="comtwinklubtwinklub__IOS_APP_STORE" 2>&1 | tee export.log; then
+        PROVISIONING_PROFILE_SPECIFIER="comtwinklubtwinklub__IOS_APP_STORE" \
+        OTHER_CODE_SIGN_FLAGS="--keychain ios-build.keychain" 2>&1 | tee export.log; then
         
         log_error "❌ IPA export failed"
         cat export.log
