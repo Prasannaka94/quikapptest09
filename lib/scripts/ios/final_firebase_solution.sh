@@ -261,7 +261,7 @@ create_ultimate_podfile() {
         echo "✅ Backup created: $podfile.final_solution_backup"
         
         # Remove existing post_install hooks and create the ultimate one
-        sed -i '/post_install do |installer|/,$d' "$podfile"
+        sed -i '' '/post_install do |installer|/,$d' "$podfile"
         
         # Add the ultimate post_install hook
         cat >> "$podfile" << 'ULTIMATE_PODFILE_EOF'
