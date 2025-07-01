@@ -444,60 +444,107 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
     # Stage 8: IPA Export (only if primary build succeeded)
     log_info "--- Stage 8: Exporting IPA ---"
     
-    # Clean up any existing keychain
-    log_info "🔐 Setting up fresh keychain..."
-    security delete-keychain ios-build.keychain || true
-    rm -f ~/Library/Keychains/ios-build.keychain*
+    # Use certificates and keychain from comprehensive validation (Stage 3)
+    log_info "🔐 Using certificates from comprehensive validation..."
     
-    # Create new keychain
-    local keychain_password="temp_password"
-    security create-keychain -p "$keychain_password" ios-build.keychain
-    security list-keychains -d user -s ios-build.keychain $(security list-keychains -d user | xargs)
-    security default-keychain -s ios-build.keychain
-    security unlock-keychain -p "$keychain_password" ios-build.keychain
-    security set-keychain-settings -t 3600 -u ios-build.keychain
-    
-    # Download and install certificate
-    log_info "📥 Downloading P12 certificate..."
-    local cert_file="/tmp/certificate.p12"
-    if curl -fsSL -o "$cert_file" "${CERT_P12_URL}"; then
-        log_success "✅ Certificate downloaded"
-        
-        # Install certificate with all permissions
-        if security import "$cert_file" -k ios-build.keychain -P "${CERT_PASSWORD}" -T /usr/bin/codesign -T /usr/bin/security -A; then
-            log_success "✅ Certificate installed"
-            security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$keychain_password" ios-build.keychain
-            
-            # Verify certificate installation
-            if security find-identity -v -p codesigning ios-build.keychain | grep "Apple Distribution"; then
-                log_success "✅ Certificate verified in keychain"
-            else
-                log_error "❌ Certificate not found in keychain after installation"
-                return 1
-            fi
-        else
-            log_error "❌ Certificate installation failed"
-            return 1
-        fi
-    else
-        log_error "❌ Certificate download failed"
-        return 1
-    fi
-    
-    # Use provisioning profile UUID from comprehensive validation
-    log_info "📱 Using provisioning profile UUID from comprehensive validation..."
-    if [ -n "${MOBILEPROVISION_UUID:-}" ]; then
-        local profile_uuid="${MOBILEPROVISION_UUID}"
-        log_success "✅ Using extracted UUID: $profile_uuid"
-        log_info "📋 Profile already installed by comprehensive validation"
-    else
+    # Check if comprehensive validation was completed successfully
+    if [ -z "${MOBILEPROVISION_UUID:-}" ]; then
         log_error "❌ No provisioning profile UUID available"
         log_error "🔧 Comprehensive certificate validation should have extracted UUID"
         return 1
     fi
     
-    # Create enhanced export options
+    # Verify keychain and certificates are still available
+    local keychain_name="ios-build.keychain"
+    log_info "🔍 Verifying certificate installation in keychain: $keychain_name"
+    
+    # Check if keychain exists and has certificates
+    if ! security list-keychains | grep -q "$keychain_name"; then
+        log_warn "⚠️ Keychain $keychain_name not found, recreating from comprehensive validation"
+        
+        # Recreate keychain using comprehensive validation method
+        if [ -f "${SCRIPT_DIR}/comprehensive_certificate_validation.sh" ]; then
+            log_info "🔄 Re-running certificate validation for IPA export..."
+            if ! "${SCRIPT_DIR}/comprehensive_certificate_validation.sh"; then
+                log_error "❌ Failed to recreate certificates for IPA export"
+                return 1
+            fi
+        else
+            log_error "❌ Comprehensive certificate validation script not found"
+            return 1
+        fi
+    fi
+    
+    # Verify code signing identities
+    log_info "🔍 Verifying code signing identities..."
+    local identities
+    identities=$(security find-identity -v -p codesigning "$keychain_name" 2>/dev/null)
+    
+    if [ -n "$identities" ]; then
+        log_success "✅ Found code signing identities in keychain:"
+        echo "$identities" | while read line; do
+            log_info "   $line"
+        done
+        
+        # Check for iOS distribution certificates specifically
+        local ios_certs
+        ios_certs=$(echo "$identities" | grep -E "iPhone Distribution|iOS Distribution|Apple Distribution")
+        
+        if [ -n "$ios_certs" ]; then
+            log_success "✅ Found iOS distribution certificates!"
+            echo "$ios_certs" | while read line; do
+                log_success "   $line"
+            done
+        else
+            log_warn "⚠️ No iOS distribution certificates found in keychain"
+            log_info "🔧 Attempting to reinstall certificates..."
+            
+            # Try to reinstall certificates
+            if [ -f "${SCRIPT_DIR}/comprehensive_certificate_validation.sh" ]; then
+                if ! "${SCRIPT_DIR}/comprehensive_certificate_validation.sh"; then
+                    log_error "❌ Failed to reinstall certificates"
+                    return 1
+                fi
+            else
+                log_error "❌ Cannot reinstall certificates - script not found"
+                return 1
+            fi
+        fi
+    else
+        log_error "❌ No code signing identities found in keychain"
+        log_error "🔧 Certificate installation may have failed"
+        return 1
+    fi
+    
+    # Use provisioning profile UUID from comprehensive validation
+    log_info "📱 Using provisioning profile UUID from comprehensive validation..."
+    local profile_uuid="${MOBILEPROVISION_UUID}"
+    log_success "✅ Using extracted UUID: $profile_uuid"
+    log_info "📋 Profile already installed by comprehensive validation"
+    
+    # Get the actual certificate identity from keychain
+    log_info "🔍 Extracting certificate identity for export..."
+    local cert_identity
+    cert_identity=$(security find-identity -v -p codesigning "$keychain_name" | grep -E "iPhone Distribution|iOS Distribution|Apple Distribution" | head -1 | sed 's/^[[:space:]]*[0-9]*[[:space:]]*"\([^"]*\)".*/\1/')
+    
+    if [ -z "$cert_identity" ]; then
+        log_error "❌ Could not extract certificate identity from keychain"
+        return 1
+    fi
+    
+    log_success "✅ Using certificate identity: $cert_identity"
+    
+    # Create enhanced export options with proper keychain path
     log_info "📝 Creating enhanced export options..."
+    local keychain_path
+    keychain_path=$(security list-keychains | grep "$keychain_name" | head -1 | sed 's/^[[:space:]]*"\([^"]*\)".*/\1/')
+    
+    if [ -z "$keychain_path" ]; then
+        keychain_path="$HOME/Library/Keychains/$keychain_name-db"
+    fi
+    
+    log_info "🔐 Using keychain path: $keychain_path"
+    
     cat > "ios/ExportOptions.plist" << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -516,7 +563,7 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
     <key>compileBitcode</key>
     <false/>
     <key>signingCertificate</key>
-    <string>Apple Distribution</string>
+    <string>${cert_identity}</string>
     <key>provisioningProfiles</key>
     <dict>
         <key>${BUNDLE_ID}</key>
@@ -526,17 +573,25 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
 </plist>
 EOF
     
-    # Export IPA with enhanced settings
+    # Export IPA with enhanced settings and proper keychain
     log_info "📦 Exporting IPA with enhanced settings..."
+    log_info "🔐 Using keychain: $keychain_path"
+    log_info "🎯 Using certificate: $cert_identity"
+    log_info "📱 Using profile UUID: $profile_uuid"
+    
+    # Set keychain as default for the export
+    security list-keychains -d user -s "$keychain_path" $(security list-keychains -d user | xargs)
+    security default-keychain -s "$keychain_path"
+    
     if ! xcodebuild -exportArchive \
         -archivePath "${OUTPUT_DIR:-output/ios}/Runner.xcarchive" \
         -exportPath "${OUTPUT_DIR:-output/ios}" \
         -exportOptionsPlist "ios/ExportOptions.plist" \
         -allowProvisioningUpdates \
         DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
-        CODE_SIGN_IDENTITY="Apple Distribution" \
+        CODE_SIGN_IDENTITY="${cert_identity}" \
         PROVISIONING_PROFILE="${profile_uuid}" \
-        OTHER_CODE_SIGN_FLAGS="--keychain ios-build.keychain" 2>&1 | tee export.log; then
+        OTHER_CODE_SIGN_FLAGS="--keychain $keychain_path" 2>&1 | tee export.log; then
         
         log_error "❌ IPA export failed"
         cat export.log
