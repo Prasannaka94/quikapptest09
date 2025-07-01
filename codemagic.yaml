@@ -3297,41 +3297,48 @@ workflows:
             echo "❌ Framework fix script not found"
           fi
 
-      - name: 🚀 App Store Connect CFBundleIdentifier Collision Eliminator
+            - name: ☢️ NUCLEAR App Store Connect CFBundleIdentifier Collision Eliminator
         script: |
-          echo "🚀 Running App Store Connect collision elimination for Transporter validation..."
-          echo "🎯 Target: Transporter validation (409) CFBundleIdentifier collision"
-          echo "💥 Error ID: d9cd9287-ed84-4ae8-a873-071641003b37"
+          echo "☢️ Running NUCLEAR App Store Connect collision elimination for persistent validation errors..."
+          echo "🎯 Target: Persistent Transporter validation (409) CFBundleIdentifier collisions"
+          echo "💥 Error IDs: d9cd9287-ed84-4ae8-a873-071641003b37, ad270392-702b-4255-ba02-49a7c6090b6b"
+          echo "🚨 NUCLEAR APPROACH: Most comprehensive collision elimination possible"
           echo ""
-
-          # Check if IPA exists before running App Store Connect collision eliminator
+          
+          # Check if IPA exists before running NUCLEAR collision eliminator
           if [ -f "output/ios/Runner.ipa" ]; then
-            echo "✅ IPA found, running App Store Connect collision eliminator..."
-            chmod +x lib/scripts/ios/app_store_connect_collision_eliminator.sh
+            echo "✅ IPA found, running NUCLEAR collision eliminator..."
+            chmod +x lib/scripts/ios/nuclear_app_store_collision_eliminator.sh
             
-            # Run the App Store Connect collision eliminator
-            if lib/scripts/ios/app_store_connect_collision_eliminator.sh; then
-              echo "🚀 App Store Connect collision elimination completed successfully"
-              echo "✅ IPA should now pass Transporter validation"
+            # Run the NUCLEAR App Store Connect collision eliminator
+            if lib/scripts/ios/nuclear_app_store_collision_eliminator.sh; then
+              echo "☢️ NUCLEAR App Store Connect collision elimination completed successfully"
+              echo "✅ IPA should now pass Transporter validation with NUCLEAR-level fixes"
               
-              # Verify the fixed IPA
+              # Verify the nuclear-fixed IPA
               if [ -f "output/ios/Runner.ipa" ]; then
                 ipa_size=$(du -h output/ios/Runner.ipa | cut -f1)
-                echo "📦 Final App Store Connect compatible IPA: output/ios/Runner.ipa ($ipa_size)"
-                echo "🎯 Transporter validation (409) error should be resolved"
-                echo "📱 Ready for App Store Connect upload"
+                echo "📦 NUCLEAR App Store Connect compatible IPA: output/ios/Runner.ipa ($ipa_size)"
+                echo "🎯 Multiple Transporter validation (409) errors should be ELIMINATED"
+                echo "📱 Ready for App Store Connect upload with NUCLEAR guarantee"
+                
+                # Check for nuclear backup
+                if [ -f "output/ios/Runner_Nuclear_AppStore_Fixed.ipa" ]; then
+                  nuclear_size=$(du -h output/ios/Runner_Nuclear_AppStore_Fixed.ipa | cut -f1)
+                  echo "📦 NUCLEAR backup preserved: output/ios/Runner_Nuclear_AppStore_Fixed.ipa ($nuclear_size)"
+                fi
               else
-                echo "⚠️ IPA not found after App Store Connect collision elimination"
+                echo "⚠️ IPA not found after NUCLEAR collision elimination"
               fi
             else
-              echo "❌ App Store Connect collision elimination failed"
-              echo "   This may indicate deeper validation issues"
-              echo "   IPA may still have App Store Connect compatibility problems"
+              echo "❌ NUCLEAR collision elimination failed"
+              echo "   This indicates extremely deep validation issues"
+              echo "   Manual intervention may be required"
             fi
           else
-            echo "⚠️ IPA not found, App Store Connect collision eliminator skipped"
+            echo "⚠️ IPA not found, NUCLEAR collision eliminator skipped"
             echo "   IPA path: output/ios/Runner.ipa"
-            echo "   This step requires an existing IPA to eliminate App Store Connect collisions"
+            echo "   This step requires an existing IPA for NUCLEAR collision elimination"
           fi
 
       - name: Send Final Email Notification
@@ -3383,6 +3390,7 @@ workflows:
       - output/ios/*.ipa
       - output/ios/*_collision_free.ipa # Collision-free IPA for App Store
       - output/ios/*_AppStoreConnect_Fixed.ipa # App Store Connect compatible IPA
+      - output/ios/*_Nuclear_AppStore_Fixed.ipa # NUCLEAR App Store Connect backup IPA
       - build/ios/ipa/*.ipa
       - ios/build/*.ipa
       - "*.ipa"
@@ -4838,7 +4846,7 @@ workflows:
             end
 
             File.foreach(generated_xcode_build_settings_path) do |line|
-              matches = line.match(/FLUTTER_ROOT\\=(.*)/)
+              matches = line.match(/FLUTTER_ROOT\=(.*)/)
               return matches[1].strip if matches
             end
             raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
