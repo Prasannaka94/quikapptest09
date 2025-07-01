@@ -13,7 +13,7 @@ MAIN_BUNDLE_ID="${1:-com.insurancegroupmo.insurancegroupmo}"
 PROJECT_FILE="${2:-ios/Runner.xcodeproj/project.pbxproj}"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 MICROSECONDS=$(date +%s%N | cut -b16-19)
-ERROR_ID="${3:-d969fe7f}"  # New error ID parameter
+ERROR_ID="${3:-1964e61a}"  # New error ID parameter
 
 # Source utilities if available
 if [ -f "$SCRIPT_DIR/utils.sh" ]; then

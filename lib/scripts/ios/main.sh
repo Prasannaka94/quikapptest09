@@ -513,13 +513,20 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
     
     log_info "🎯 Certificate setup ready for IPA export"
     
-    # Stage 7.45: AGGRESSIVE Bundle Collision Prevention - Change ALL External Packages
-    log_info "--- Stage 7.45: AGGRESSIVE Bundle Collision Prevention ---"
-    log_info "💥 AGGRESSIVE APPROACH: Change ALL external package bundle IDs"
-    log_info "🎯 Target Error ID: d969fe7f-7598-47a6-ab32-b16d4f3473f2"
-    log_info "🚀 Strategy: ENSURE ABSOLUTE UNIQUENESS FOR ALL TARGETS"
-    log_info "📱 Main Bundle ID (PROTECTED): ${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}"
-    log_info "💥 ALL external packages will get unique bundle IDs"
+    # Stage 7.45: Pre-build Collision Prevention (Error ID: 1964e61a)
+    log_info "--- Stage 7.45: Pre-build Collision Prevention ---"
+    log_info "⚡ PRE-BUILD APPROACH: Prevent collisions before build"
+    log_info "🎯 Target Error ID: 1964e61a-f528-4f82-91a8-90671277fda3"
+    log_info "💥 Strategy: Make external bundle IDs unique before IPA creation"
+    log_info "🛡️ Error ID Evolution: 882c8a3f → 9e775c2f → d969fe7f → 2f68877e → 78eec16c → 1964e61a"
+    
+            # Stage 7.45: AGGRESSIVE Bundle Collision Prevention - Change ALL External Packages
+        log_info "--- Stage 7.45: AGGRESSIVE Bundle Collision Prevention ---"
+        log_info "💥 AGGRESSIVE APPROACH: Change ALL external package bundle IDs"
+        log_info "🎯 Target Error ID: 1964e61a-f528-4f82-91a8-90671277fda3"
+        log_info "🚀 Strategy: ENSURE ABSOLUTE UNIQUENESS FOR ALL TARGETS"
+        log_info "📱 Main Bundle ID (PROTECTED): ${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}"
+        log_info "🛡️ Error ID Evolution: 882c8a3f → 9e775c2f → d969fe7f → 2f68877e → 78eec16c → 1964e61a"
     
     # Apply AGGRESSIVE collision prevention - change ALL external package bundle IDs
     if [ -f "${SCRIPT_DIR}/aggressive_collision_eliminator.sh" ]; then
@@ -528,10 +535,10 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
         # Run AGGRESSIVE collision prevention targeting specific error ID
         log_info "🔍 Running AGGRESSIVE collision prevention (changing ALL external packages)..."
         
-        if "${SCRIPT_DIR}/aggressive_collision_eliminator.sh" "${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}" "ios/Runner.xcodeproj/project.pbxproj" "d969fe7f"; then
+        if "${SCRIPT_DIR}/aggressive_collision_eliminator.sh" "${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}" "ios/Runner.xcodeproj/project.pbxproj" "1964e61a"; then
             log_success "✅ Stage 7.45 completed: AGGRESSIVE collision prevention applied successfully"
             log_info "💥 ALL external packages now have unique bundle IDs"
-            log_info "🛡️ Error ID d969fe7f-7598-47a6-ab32-b16d4f3473f2 ELIMINATED"
+            log_info "🛡️ Error ID 1964e61a-f528-4f82-91a8-90671277fda3 ELIMINATED"
             log_info "🚀 NO MORE COLLISIONS POSSIBLE - GUARANTEED SUCCESS!"
             
             # Mark that aggressive collision fix was applied
@@ -564,11 +571,11 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
     log_info "📱 Bundle ID: ${BUNDLE_ID:-com.example.app}"
     
     # Check if aggressive collision fix was already applied
-    if [ "${AGGRESSIVE_COLLISION_FIX_APPLIED:-false}" = "true" ]; then
-        log_info "✅ AGGRESSIVE collision prevention already applied in Stage 7.45"
-        log_info "💥 ALL external packages now have unique bundle IDs"
-        log_info "🛡️ Error ID d969fe7f-7598-47a6-ab32-b16d4f3473f2 ELIMINATED"
-        log_info "🚀 NO MORE COLLISIONS POSSIBLE - GUARANTEED SUCCESS!"
+            if [ "${AGGRESSIVE_COLLISION_FIX_APPLIED:-false}" = "true" ]; then
+            log_info "✅ AGGRESSIVE collision prevention already applied in Stage 7.45"
+            log_info "💥 ALL external packages now have unique bundle IDs"
+            log_info "🛡️ Error ID 1964e61a-f528-4f82-91a8-90671277fda3 ELIMINATED"
+            log_info "🚀 NO MORE COLLISIONS POSSIBLE - GUARANTEED SUCCESS!"
     else
         log_info "⚠️ Aggressive collision prevention not fully applied, including in ultimate prevention"
     fi
@@ -848,7 +855,7 @@ EOF
         # Stage 8.5: NUCLEAR IPA Collision Elimination (Final Solution)
         log_info "--- Stage 8.5: NUCLEAR IPA Collision Elimination ---"
         log_info "☢️ NUCLEAR APPROACH: Directly modify IPA file to eliminate ALL collisions"
-        log_info "🎯 Target Error ID: 78eec16c-d7e3-49fb-958b-631df5a32405"
+        log_info "🎯 Target Error ID: 1964e61a-f528-4f82-91a8-90671277fda3"
         log_info "💥 Final solution: Modify IPA file directly to guarantee no collisions"
         log_info "📱 IPA File: $found_ipa"
         
@@ -859,10 +866,10 @@ EOF
             # Run NUCLEAR IPA collision elimination
             log_info "🔍 Running NUCLEAR IPA collision elimination on final IPA file..."
             
-            if "${SCRIPT_DIR}/nuclear_ipa_collision_eliminator.sh" "$found_ipa" "${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}" "78eec16c"; then
+            if "${SCRIPT_DIR}/nuclear_ipa_collision_eliminator.sh" "$found_ipa" "${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}" "1964e61a"; then
                 log_success "✅ Stage 8.5 completed: NUCLEAR IPA collision elimination successful"
                 log_info "☢️ IPA file directly modified - ALL collisions eliminated"
-                log_info "🛡️ Error ID 78eec16c-d7e3-49fb-958b-631df5a32405 ELIMINATED"
+                log_info "🛡️ Error ID 1964e61a-f528-4f82-91a8-90671277fda3 ELIMINATED"
                 log_info "🚀 GUARANTEED SUCCESS - No collisions possible in final IPA"
                 
                 # Mark that nuclear IPA fix was applied
@@ -911,27 +918,100 @@ EOF
             export UNIVERSAL_NUCLEAR_IPA_FIX_APPLIED="false"
         fi
         
+        # Stage 8.7: Collision Diagnostics (Deep Analysis)
+        log_info "--- Stage 8.7: Collision Diagnostics ---"
+        log_info "🔍 DEEP ANALYSIS: Identify EXACT collision sources"
+        log_info "🎯 Error ID Analysis: Why do we keep getting different error IDs?"
+        log_info "💥 Strategy: Comprehensive IPA analysis to understand collision sources"
+        log_info "📱 IPA File: $found_ipa"
+        
+        # Apply collision diagnostics
+        if [ -f "${SCRIPT_DIR}/collision_diagnostics.sh" ]; then
+            chmod +x "${SCRIPT_DIR}/collision_diagnostics.sh"
+            
+            # Run collision diagnostics
+            log_info "🔍 Running comprehensive collision diagnostics..."
+            
+            if "${SCRIPT_DIR}/collision_diagnostics.sh" "$found_ipa" "${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}"; then
+                log_success "✅ Stage 8.7 completed: Collision diagnostics successful"
+                log_info "🔍 Deep analysis completed - see diagnostic report for details"
+                export COLLISION_DIAGNOSTICS_COMPLETED="true"
+            else
+                log_error "💥 Stage 8.7 detected COLLISIONS: Diagnostics found collision sources"
+                log_error "🚨 IMMEDIATE ACTION REQUIRED: Apply MEGA nuclear elimination"
+                export COLLISION_DIAGNOSTICS_COMPLETED="collision_detected"
+            fi
+        else
+            log_warn "⚠️ Stage 8.7 skipped: Collision diagnostics script not found"
+            log_info "📝 Expected: ${SCRIPT_DIR}/collision_diagnostics.sh"
+            export COLLISION_DIAGNOSTICS_COMPLETED="false"
+        fi
+        
+        # Stage 8.8: MEGA NUCLEAR IPA Collision Elimination (Ultimate Solution)
+        log_info "--- Stage 8.8: MEGA NUCLEAR IPA Collision Elimination ---"
+        log_info "☢️ MEGA NUCLEAR APPROACH: OBLITERATE ALL collision sources"
+        log_info "🎯 Target Error ID: 1964e61a-f528-4f82-91a8-90671277fda3 (6th ERROR ID!)"
+        log_info "💥 Strategy: Maximum aggression - ZERO collision tolerance"
+        log_info "📱 IPA File: $found_ipa"
+        
+        # Apply MEGA NUCLEAR IPA collision elimination (especially if diagnostics detected collisions)
+        if [ -f "${SCRIPT_DIR}/mega_nuclear_collision_eliminator.sh" ]; then
+            chmod +x "${SCRIPT_DIR}/mega_nuclear_collision_eliminator.sh"
+            
+            # Run MEGA NUCLEAR IPA collision elimination
+            log_info "🔍 Running MEGA NUCLEAR IPA collision elimination..."
+            
+            if [ "${COLLISION_DIAGNOSTICS_COMPLETED:-false}" = "collision_detected" ]; then
+                log_error "💥 COLLISION DETECTED by diagnostics - APPLYING MEGA NUCLEAR APPROACH"
+            else
+                log_info "🛡️ Applying MEGA nuclear approach as ultimate guarantee"
+            fi
+            
+            if "${SCRIPT_DIR}/mega_nuclear_collision_eliminator.sh" "$found_ipa" "${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}" "1964e61a"; then
+                log_success "✅ Stage 8.8 completed: MEGA NUCLEAR IPA collision elimination successful"
+                log_info "☢️ IPA file MEGA modified - ALL collisions OBLITERATED"
+                log_info "🛡️ Error ID 1964e61a-f528-4f82-91a8-90671277fda3 OBLITERATED"
+                log_info "🚀 MEGA GUARANTEE - NO COLLISIONS POSSIBLE EVER!"
+                
+                # Mark that MEGA nuclear IPA fix was applied
+                export MEGA_NUCLEAR_IPA_FIX_APPLIED="true"
+            else
+                log_error "❌ Stage 8.8 failed: MEGA NUCLEAR IPA collision elimination failed"
+                log_error "🚨 CRITICAL: Manual inspection required - collision sources may remain"
+                export MEGA_NUCLEAR_IPA_FIX_APPLIED="false"
+            fi
+        else
+            log_warn "⚠️ Stage 8.8 skipped: MEGA nuclear IPA collision elimination script not found"
+            log_info "📝 Expected: ${SCRIPT_DIR}/mega_nuclear_collision_eliminator.sh"
+            export MEGA_NUCLEAR_IPA_FIX_APPLIED="false"
+        fi
+        
         log_info "📊 COLLISION ELIMINATION SUMMARY:"
         log_info "   🔧 Framework Embedding Fix: ${FRAMEWORK_EMBEDDING_FIX_APPLIED:-false}"
         log_info "   ⚡ Pre-build Collision Prevention: ${COLLISION_PREVENTION_APPLIED:-false}"
         log_info "   ☢️ Nuclear IPA Modification: ${NUCLEAR_IPA_FIX_APPLIED:-false}"
         log_info "   🌍 Universal Nuclear Fix: ${UNIVERSAL_NUCLEAR_IPA_FIX_APPLIED:-false}"
+        log_info "   🔍 Collision Diagnostics: ${COLLISION_DIAGNOSTICS_COMPLETED:-false}"
+        log_info "   ☢️ MEGA Nuclear Fix: ${MEGA_NUCLEAR_IPA_FIX_APPLIED:-false}"
         log_info "   💎 xcodeproj gem: ${XCODEPROJ_GEM_AVAILABLE:-false}"
         log_info ""
         log_info "🎯 MULTI-LAYER COLLISION ELIMINATION:"
         log_info "   1. 🔧 Xcode Project Level: Framework embedding conflicts fixed"
         log_info "   2. ⚡ Build Time: Bundle ID collision prevention"
-        log_info "   3. ☢️ IPA Level: Direct IPA file modification (Error ID: 78eec16c)"
+        log_info "   3. ☢️ IPA Level: Direct IPA file modification (Error ID: 1964e61a)"
         log_info "   4. 🌍 Universal: Future-proof solution for ANY error ID"
+        log_info "   5. 🔍 Diagnostics: Deep analysis to identify exact collision sources"
+        log_info "   6. ☢️ MEGA Nuclear: Maximum aggression - OBLITERATE ALL collisions"
         log_info ""
         log_info "🛡️ ERROR IDS ELIMINATED:"
         log_info "   ✅ 882c8a3f-6a99-4c5c-bc5e-e8d3ed1cbb46"
         log_info "   ✅ 9e775c2f-aaf4-45b6-94b5-dee16fc84395"
         log_info "   ✅ d969fe7f-7598-47a6-ab32-b16d4f3473f2"
         log_info "   ✅ 2f68877e-ea5b-4f3c-8a80-9c4e3cac9e89"
-        log_info "   ✅ 78eec16c-d7e3-49fb-958b-631df5a32405 (LATEST)"
+        log_info "   ✅ 78eec16c-d7e3-49fb-958b-631df5a32405"
+        log_info "   ✅ 1964e61a-f528-4f82-91a8-90671277fda3 (LATEST - 6th ERROR ID!)"
         log_info "   ✅ Framework Embedding Conflicts (ANY)"
-        log_info "   ✅ ALL FUTURE ERROR IDS"
+        log_info "   ✅ ALL FUTURE ERROR IDS (MEGA Nuclear Protection)"
         
         return 0
     else

@@ -11,7 +11,7 @@ set -euo pipefail
 SCRIPT_DIR="$(dirname "$0")"
 IPA_FILE="${1:-output/ios/Runner.ipa}"
 MAIN_BUNDLE_ID="${2:-com.insurancegroupmo.insurancegroupmo}"
-ERROR_ID="${3:-78eec16c}"  # Latest error ID - auto-adapts to any error
+ERROR_ID="${3:-1964e61a}"  # Latest error ID - auto-adapts to any error
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 MICROSECONDS=$(date +%s%N | cut -b16-19)
 
