@@ -3324,7 +3324,7 @@ workflows:
             echo "❌ Framework fix script not found"
           fi
 
-            - name: ☢️ NUCLEAR App Store Connect CFBundleIdentifier Collision Eliminator
+      - name: ☢️ NUCLEAR App Store Connect CFBundleIdentifier Collision Eliminator
         script: |
           echo "☢️ Running NUCLEAR App Store Connect collision elimination for persistent validation errors..."
           echo "🎯 Target: Persistent Transporter validation (409) CFBundleIdentifier collisions"
