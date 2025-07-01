@@ -2747,6 +2747,26 @@ workflows:
               echo "⚠️ IPA file appears to be corrupted"
             fi
             
+            # Fix CFBundleIdentifier collisions for App Store Connect upload
+            echo "🔧 Fixing CFBundleIdentifier collisions for App Store Connect..."
+            if lib/scripts/ios/ipa_bundle_collision_fix.sh "output/ios/Runner.ipa" "${BUNDLE_ID}" "output/ios/Runner_collision_free.ipa"; then
+              echo "✅ CFBundleIdentifier collision fix completed"
+              
+              # Show comparison
+              original_size=$(du -h output/ios/Runner.ipa | cut -f1)
+              fixed_size=$(du -h output/ios/Runner_collision_free.ipa | cut -f1)
+              echo "📊 Size comparison: Original: $original_size, Fixed: $fixed_size"
+              
+              echo "🎯 Collision-free IPA ready for App Store Connect: output/ios/Runner_collision_free.ipa"
+              echo "💡 Use Runner_collision_free.ipa for Transporter upload to avoid CFBundleIdentifier collisions"
+              echo "📱 Both versions available:"
+              echo "   - output/ios/Runner.ipa (original)"
+              echo "   - output/ios/Runner_collision_free.ipa (collision-free for App Store)"
+            else
+              echo "⚠️ CFBundleIdentifier collision fix failed, using original IPA"
+              echo "📱 Original IPA may still work if no collisions exist"
+            fi
+            
             echo "🎯 Profile Type: $PROFILE_TYPE"
             echo "📦 Distribution Status: READY"
             
@@ -2958,6 +2978,7 @@ workflows:
     artifacts:
       # 📱 IPA Files (Primary artifacts)
       - output/ios/*.ipa
+      - output/ios/*_collision_free.ipa # Collision-free IPA for App Store
       - build/ios/ipa/*.ipa
       - ios/build/*.ipa
       - "*.ipa"

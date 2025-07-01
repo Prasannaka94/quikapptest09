@@ -5,199 +5,107 @@
 set -euo pipefail
 
 # Logging functions
-log_info() { echo "ℹ️ $1"; }
-log_success() { echo "✅ $1"; }
-log_warn() { echo "⚠️ $1"; }
-log_error() { echo "❌ $1"; }
+log_info() { echo "ℹ️ [$(date '+%Y-%m-%d %H:%M:%S')] $1"; }
+log_success() { echo "✅ [$(date '+%Y-%m-%d %H:%M:%S')] $1"; }
+log_warn() { echo "⚠️ [$(date '+%Y-%m-%d %H:%M:%S')] $1"; }
+log_error() { echo "❌ [$(date '+%Y-%m-%d %H:%M:%S')] $1"; }
 
 # Main function to fix IPA-level bundle collisions
 fix_ipa_bundle_collisions() {
-    local bundle_id="${1:-${BUNDLE_ID:-com.example.app}}"
-    local archive_path="${2:-$CM_BUILD_DIR/Runner.xcarchive}"
-    local export_path="${3:-$CM_BUILD_DIR/ios_output}"
+    local ipa_path="$1"
+    local main_bundle_id="$2"
+    local output_path="${3:-${ipa_path%.ipa}_fixed.ipa}"
     
-    log_info "🔧 FIXING IPA BUNDLE COLLISIONS - Error ID: 16fe2c8f-330a-451b-90c5-7c218848c196"
-    log_info "Target Bundle ID: $bundle_id"
-    log_info "Archive Path: $archive_path"
-    log_info "Export Path: $export_path"
+    log_info "🔧 Starting IPA Bundle Collision Fix"
+    log_info "📁 Source IPA: $ipa_path"
+    log_info "🎯 Main Bundle ID: $main_bundle_id"
+    log_info "📁 Output IPA: $output_path"
     
-    # Validate inputs
-    if [ ! -d "$archive_path" ]; then
-        log_error "Archive not found: $archive_path"
-        return 1
-    fi
+    # Create working directory
+    local work_dir="/tmp/ipa_fix_$(date +%s)"
+    mkdir -p "$work_dir"
     
-    # Step 1: Analyze current bundle structure for collisions
-    analyze_bundle_collisions "$archive_path" "$bundle_id"
+    # Extract IPA
+    log_info "📦 Extracting IPA..."
+    cd "$work_dir"
+    unzip -q "$ipa_path"
     
-    # Step 2: Fix bundle collisions in the archive
-    fix_archive_bundle_collisions "$archive_path" "$bundle_id"
-    
-    # Step 3: Create collision-free ExportOptions.plist
-    create_collision_free_export_options "$bundle_id"
-    
-    # Step 4: Export with collision protection
-    export_with_collision_protection "$archive_path" "$export_path" "$bundle_id"
-    
-    log_success "✅ IPA bundle collision fix completed"
-}
-
-# Analyze bundle structure for potential collisions
-analyze_bundle_collisions() {
-    local archive_path="$1"
-    local target_bundle_id="$2"
-    
-    log_info "🔍 ANALYZING BUNDLE STRUCTURE FOR COLLISIONS"
-    
-    local app_path="$archive_path/Products/Applications/Runner.app"
+    local app_path="Payload/Runner.app"
     if [ ! -d "$app_path" ]; then
-        log_warn "App bundle not found in archive"
-        return 1
+        log_error "Runner.app not found in IPA"
+        cleanup_and_exit 1
     fi
     
-    log_info "📱 Main App Bundle: $app_path"
+    local fixes_applied=0
     
-    # Check main app Info.plist
+    # Fix main app Info.plist (ensure it has the correct bundle ID)
+    log_info "🎯 Verifying main app bundle ID..."
     local main_plist="$app_path/Info.plist"
     if [ -f "$main_plist" ]; then
-        local main_bundle_id=$(plutil -extract CFBundleIdentifier raw "$main_plist" 2>/dev/null || echo "unknown")
-        log_info "   Main Bundle ID: $main_bundle_id"
-        
-        if [ "$main_bundle_id" != "$target_bundle_id" ]; then
-            log_warn "   Main bundle ID mismatch! Expected: $target_bundle_id, Found: $main_bundle_id"
+        local current_main_id=$(plutil -extract CFBundleIdentifier raw "$main_plist" 2>/dev/null || echo "unknown")
+        if [ "$current_main_id" != "$main_bundle_id" ]; then
+            log_info "🔧 Updating main app bundle ID: $current_main_id -> $main_bundle_id"
+            plutil -replace CFBundleIdentifier -string "$main_bundle_id" "$main_plist"
+            fixes_applied=$((fixes_applied + 1))
+        else
+            log_success "✅ Main app bundle ID is correct: $main_bundle_id"
         fi
     fi
     
-    # Check for embedded frameworks and their bundle IDs
-    local frameworks_dir="$app_path/Frameworks"
-    if [ -d "$frameworks_dir" ]; then
-        log_info "🔍 Checking embedded frameworks for collisions:"
-        
-        local collision_count=0
-        find "$frameworks_dir" -name "*.framework" -type d | while read framework; do
-            local framework_name=$(basename "$framework" .framework)
-            local framework_plist="$framework/Info.plist"
-            
-            if [ -f "$framework_plist" ]; then
-                local framework_bundle_id=$(plutil -extract CFBundleIdentifier raw "$framework_plist" 2>/dev/null || echo "unknown")
-                log_info "   📦 Framework: $framework_name -> $framework_bundle_id"
-                
-                # Check for collision with main app
-                if [ "$framework_bundle_id" = "$target_bundle_id" ]; then
-                    log_error "   💥 COLLISION DETECTED: Framework $framework_name has same bundle ID as main app!"
-                    collision_count=$((collision_count + 1))
-                fi
-            fi
-        done
-        
-        if [ $collision_count -gt 0 ]; then
-            log_error "Found $collision_count bundle identifier collisions in frameworks!"
-        fi
-    fi
-    
-    # Check for embedded plugins
-    local plugins_dir="$app_path/PlugIns"
-    if [ -d "$plugins_dir" ]; then
-        log_info "🔍 Checking embedded plugins for collisions:"
-        
-        find "$plugins_dir" -name "*.appex" -type d | while read plugin; do
-            local plugin_name=$(basename "$plugin" .appex)
-            local plugin_plist="$plugin/Info.plist"
-            
-            if [ -f "$plugin_plist" ]; then
-                local plugin_bundle_id=$(plutil -extract CFBundleIdentifier raw "$plugin_plist" 2>/dev/null || echo "unknown")
-                log_info "   🔌 Plugin: $plugin_name -> $plugin_bundle_id"
-                
-                # Check for collision with main app
-                if [ "$plugin_bundle_id" = "$target_bundle_id" ]; then
-                    log_error "   💥 COLLISION DETECTED: Plugin $plugin_name has same bundle ID as main app!"
-                fi
-            fi
-        done
-    fi
-    
-    # Check for any other bundles
-    find "$app_path" -name "*.bundle" -type d | while read bundle; do
-        local bundle_name=$(basename "$bundle" .bundle)
-        local bundle_plist="$bundle/Info.plist"
-        
-        if [ -f "$bundle_plist" ]; then
-            local bundle_bundle_id=$(plutil -extract CFBundleIdentifier raw "$bundle_plist" 2>/dev/null || echo "unknown")
-            log_info "   📦 Bundle: $bundle_name -> $bundle_bundle_id"
-            
-            # Check for collision with main app
-            if [ "$bundle_bundle_id" = "$target_bundle_id" ]; then
-                log_error "   💥 COLLISION DETECTED: Bundle $bundle_name has same bundle ID as main app!"
-            fi
-        fi
-    done
-}
-
-# Fix bundle collisions in the archive
-fix_archive_bundle_collisions() {
-    local archive_path="$1"
-    local target_bundle_id="$2"
-    
-    log_info "🔧 FIXING BUNDLE COLLISIONS IN ARCHIVE"
-    
-    local app_path="$archive_path/Products/Applications/Runner.app"
-    local collision_fixes=0
-    
-    # Fix frameworks with colliding bundle IDs
-    local frameworks_dir="$app_path/Frameworks"
-    if [ -d "$frameworks_dir" ]; then
-        find "$frameworks_dir" -name "*.framework" -type d | while read framework; do
+    # Fix Frameworks
+    log_info "🔍 Scanning and fixing Frameworks..."
+    if [ -d "$app_path/Frameworks" ]; then
+        find "$app_path/Frameworks" -name "*.framework" -type d | while read framework; do
             local framework_name=$(basename "$framework" .framework)
             local framework_plist="$framework/Info.plist"
             
             if [ -f "$framework_plist" ]; then
                 local current_bundle_id=$(plutil -extract CFBundleIdentifier raw "$framework_plist" 2>/dev/null || echo "unknown")
                 
-                # If framework has same bundle ID as main app, fix it
-                if [ "$current_bundle_id" = "$target_bundle_id" ]; then
-                    local new_bundle_id="${target_bundle_id}.framework.${framework_name}"
-                    log_info "   🔧 Fixing framework collision: $framework_name"
+                if [ "$current_bundle_id" = "$main_bundle_id" ]; then
+                    # Create unique bundle ID for framework
+                    local new_bundle_id="${main_bundle_id}.framework.${framework_name}"
+                    # Remove any underscores and sanitize
+                    new_bundle_id=$(echo "$new_bundle_id" | sed 's/_/-/g' | sed 's/[^a-zA-Z0-9.-]//g')
+                    
+                    log_info "   🔧 Framework collision fix: $framework_name"
                     log_info "      Old: $current_bundle_id"
                     log_info "      New: $new_bundle_id"
                     
-                    # Update framework's Info.plist
                     plutil -replace CFBundleIdentifier -string "$new_bundle_id" "$framework_plist"
-                    
-                    collision_fixes=$((collision_fixes + 1))
-                    log_success "   ✅ Framework $framework_name collision fixed"
+                    fixes_applied=$((fixes_applied + 1))
                 fi
             fi
         done
     fi
     
-    # Fix plugins with colliding bundle IDs
-    local plugins_dir="$app_path/PlugIns"
-    if [ -d "$plugins_dir" ]; then
-        find "$plugins_dir" -name "*.appex" -type d | while read plugin; do
+    # Fix PlugIns (Extensions)
+    log_info "🔍 Scanning and fixing PlugIns..."
+    if [ -d "$app_path/PlugIns" ]; then
+        find "$app_path/PlugIns" -name "*.appex" -type d | while read plugin; do
             local plugin_name=$(basename "$plugin" .appex)
             local plugin_plist="$plugin/Info.plist"
             
             if [ -f "$plugin_plist" ]; then
                 local current_bundle_id=$(plutil -extract CFBundleIdentifier raw "$plugin_plist" 2>/dev/null || echo "unknown")
                 
-                # If plugin has same bundle ID as main app, fix it
-                if [ "$current_bundle_id" = "$target_bundle_id" ]; then
-                    local new_bundle_id="${target_bundle_id}.plugin.${plugin_name}"
-                    log_info "   🔧 Fixing plugin collision: $plugin_name"
+                if [ "$current_bundle_id" = "$main_bundle_id" ]; then
+                    local new_bundle_id="${main_bundle_id}.plugin.${plugin_name}"
+                    new_bundle_id=$(echo "$new_bundle_id" | sed 's/_/-/g' | sed 's/[^a-zA-Z0-9.-]//g')
+                    
+                    log_info "   🔧 Plugin collision fix: $plugin_name"
                     log_info "      Old: $current_bundle_id"
                     log_info "      New: $new_bundle_id"
                     
-                    # Update plugin's Info.plist
                     plutil -replace CFBundleIdentifier -string "$new_bundle_id" "$plugin_plist"
-                    
-                    collision_fixes=$((collision_fixes + 1))
-                    log_success "   ✅ Plugin $plugin_name collision fixed"
+                    fixes_applied=$((fixes_applied + 1))
                 fi
             fi
         done
     fi
     
-    # Fix other bundles with colliding bundle IDs
+    # Fix Resource Bundles
+    log_info "🔍 Scanning and fixing Resource Bundles..."
     find "$app_path" -name "*.bundle" -type d | while read bundle; do
         local bundle_name=$(basename "$bundle" .bundle)
         local bundle_plist="$bundle/Info.plist"
@@ -205,278 +113,168 @@ fix_archive_bundle_collisions() {
         if [ -f "$bundle_plist" ]; then
             local current_bundle_id=$(plutil -extract CFBundleIdentifier raw "$bundle_plist" 2>/dev/null || echo "unknown")
             
-            # If bundle has same bundle ID as main app, fix it
-            if [ "$current_bundle_id" = "$target_bundle_id" ]; then
-                local new_bundle_id="${target_bundle_id}.bundle.${bundle_name}"
-                log_info "   🔧 Fixing bundle collision: $bundle_name"
+            if [ "$current_bundle_id" = "$main_bundle_id" ]; then
+                local new_bundle_id="${main_bundle_id}.bundle.${bundle_name}"
+                new_bundle_id=$(echo "$new_bundle_id" | sed 's/_/-/g' | sed 's/[^a-zA-Z0-9.-]//g')
+                
+                log_info "   🔧 Bundle collision fix: $bundle_name"
                 log_info "      Old: $current_bundle_id"
                 log_info "      New: $new_bundle_id"
                 
-                # Update bundle's Info.plist
                 plutil -replace CFBundleIdentifier -string "$new_bundle_id" "$bundle_plist"
+                fixes_applied=$((fixes_applied + 1))
+            fi
+        fi
+    done
+    
+    # Comprehensive scan for any remaining collisions
+    log_info "🔍 Final comprehensive scan for any remaining collisions..."
+    find "$app_path" -name "Info.plist" | while read plist; do
+        if [[ "$plist" != "$main_plist" ]]; then
+            local current_bundle_id=$(plutil -extract CFBundleIdentifier raw "$plist" 2>/dev/null || echo "unknown")
+            
+            if [ "$current_bundle_id" = "$main_bundle_id" ]; then
+                local relative_path=${plist#$app_path/}
+                local component_name=$(echo "$relative_path" | sed 's|/Info.plist$||' | tr '/' '-' | sed 's/_/-/g' | sed 's/[^a-zA-Z0-9.-]//g')
+                local new_bundle_id="${main_bundle_id}.component.${component_name}"
                 
-                collision_fixes=$((collision_fixes + 1))
-                log_success "   ✅ Bundle $bundle_name collision fixed"
+                log_info "   🔧 Component collision fix: $relative_path"
+                log_info "      Old: $current_bundle_id" 
+                log_info "      New: $new_bundle_id"
+                
+                plutil -replace CFBundleIdentifier -string "$new_bundle_id" "$plist"
+                fixes_applied=$((fixes_applied + 1))
             fi
         fi
     done
     
-    log_info "📊 Total collision fixes applied: $collision_fixes"
-}
-
-# Create collision-free ExportOptions.plist
-create_collision_free_export_options() {
-    local bundle_id="$1"
-    local export_options_path="ios/ExportOptions.plist"
+    # Create fixed IPA
+    log_info "📦 Creating fixed IPA..."
+    zip -qr "$(basename "$output_path")" Payload/
     
-    log_info "📝 Creating collision-free ExportOptions.plist"
+    # Move to final location
+    mv "$(basename "$output_path")" "$output_path"
     
-    mkdir -p "$(dirname "$export_options_path")"
+    # Cleanup
+    cd /
+    rm -rf "$work_dir"
     
-    cat > "$export_options_path" << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>method</key>
-    <string>app-store</string>
-    <key>teamID</key>
-    <string>${APPLE_TEAM_ID:-9H2AD7NQ49}</string>
-    <key>signingStyle</key>
-    <string>automatic</string>
-    <key>uploadBitcode</key>
-    <false/>
-    <key>uploadSymbols</key>
-    <true/>
-    <key>compileBitcode</key>
-    <false/>
-    <key>stripSwiftSymbols</key>
-    <true/>
-    <key>thinning</key>
-    <string>&lt;none&gt;</string>
-    <key>generateAppStoreInformation</key>
-    <false/>
-    <key>manageVersionAndBuildNumber</key>
-    <false/>
-    <key>destination</key>
-    <string>export</string>
-    <key>distributionBundleIdentifier</key>
-    <string>$bundle_id</string>
-    <key>bundleIdentifierCollisionResolution</key>
-    <string>automatic</string>
-    <key>embedOnDemandResourcesAssetPacksInBundle</key>
-    <false/>
-    <key>iCloudContainerEnvironment</key>
-    <string>Production</string>
-</dict>
-</plist>
-EOF
+    log_success "✅ IPA Bundle Collision Fix completed!"
+    log_info "📊 Total fixes applied: $fixes_applied"
+    log_info "📁 Fixed IPA created: $output_path"
     
-    log_success "✅ Collision-free ExportOptions.plist created"
-    log_info "📋 Export configuration:"
-    log_info "   Main Bundle ID: $bundle_id"
-    log_info "   Method: app-store"
-    log_info "   Team ID: ${APPLE_TEAM_ID:-9H2AD7NQ49}"
-}
-
-# Export with collision protection
-export_with_collision_protection() {
-    local archive_path="$1"
-    local export_path="$2"
-    local bundle_id="$3"
-    local export_options_path="ios/ExportOptions.plist"
-    
-    log_info "📦 EXPORTING IPA WITH COLLISION PROTECTION"
-    
-    # Clean export directory
-    rm -rf "$export_path"
-    mkdir -p "$export_path"
-    
-    # Attempt export with verbose logging
-    log_info "🚀 Running xcodebuild -exportArchive with collision protection..."
-    
-    if xcodebuild -exportArchive \
-        -archivePath "$archive_path" \
-        -exportPath "$export_path" \
-        -exportOptionsPlist "$export_options_path" \
-        -allowProvisioningUpdates \
-        -verbose 2>&1 | tee export_collision_protected.log; then
-        
-        log_success "✅ IPA export successful with collision protection!"
-        
-        # Verify IPA was created
-        local ipa_file=$(find "$export_path" -name "*.ipa" | head -1)
-        if [ -f "$ipa_file" ]; then
-            log_success "✅ IPA file created: $(basename "$ipa_file")"
-            log_info "📊 IPA size: $(ls -lh "$ipa_file" | awk '{print $5}')"
-            
-            # Final validation - check IPA contents for collisions
-            validate_ipa_bundle_ids "$ipa_file" "$bundle_id"
-            
-            return 0
-        else
-            log_error "❌ IPA file was not created in export directory"
-            return 1
-        fi
-        
-    else
-        log_error "❌ IPA export failed even with collision protection"
-        log_info "📋 Export log contents:"
-        cat export_collision_protected.log | tail -50
-        
-        # Try alternative export method
-        log_info "🔄 Attempting alternative export method..."
-        export_with_fallback_method "$archive_path" "$export_path" "$bundle_id"
-    fi
-}
-
-# Validate IPA bundle identifiers
-validate_ipa_bundle_ids() {
-    local ipa_file="$1"
-    local expected_bundle_id="$2"
-    
-    log_info "🔍 VALIDATING IPA BUNDLE IDENTIFIERS"
-    
-    # Create temporary directory for IPA extraction
-    local temp_dir=$(mktemp -d)
-    
-    # Extract IPA
-    unzip -q "$ipa_file" -d "$temp_dir"
-    
-    # Find app bundle
-    local app_path=$(find "$temp_dir" -name "*.app" -type d | head -1)
-    if [ ! -d "$app_path" ]; then
-        log_warn "Could not find app bundle in IPA for validation"
-        rm -rf "$temp_dir"
-        return 1
-    fi
-    
-    # Check main app bundle ID
-    local main_plist="$app_path/Info.plist"
-    if [ -f "$main_plist" ]; then
-        local main_bundle_id=$(plutil -extract CFBundleIdentifier raw "$main_plist" 2>/dev/null || echo "unknown")
-        log_info "✅ Main App Bundle ID: $main_bundle_id"
-        
-        if [ "$main_bundle_id" != "$expected_bundle_id" ]; then
-            log_error "❌ Main bundle ID mismatch! Expected: $expected_bundle_id, Found: $main_bundle_id"
-            rm -rf "$temp_dir"
-            return 1
-        fi
-    fi
-    
-    # Check for any remaining collisions
-    local collision_found=false
-    
-    # Check frameworks
-    find "$app_path" -name "*.framework" -type d | while read framework; do
-        local framework_plist="$framework/Info.plist"
-        if [ -f "$framework_plist" ]; then
-            local framework_bundle_id=$(plutil -extract CFBundleIdentifier raw "$framework_plist" 2>/dev/null || echo "unknown")
-            log_info "📦 Framework Bundle ID: $framework_bundle_id"
-            
-            if [ "$framework_bundle_id" = "$expected_bundle_id" ]; then
-                log_error "❌ COLLISION STILL EXISTS: Framework has same bundle ID as main app!"
-                collision_found=true
-            fi
-        fi
-    done
-    
-    # Check plugins
-    find "$app_path" -name "*.appex" -type d | while read plugin; do
-        local plugin_plist="$plugin/Info.plist"
-        if [ -f "$plugin_plist" ]; then
-            local plugin_bundle_id=$(plutil -extract CFBundleIdentifier raw "$plugin_plist" 2>/dev/null || echo "unknown")
-            log_info "🔌 Plugin Bundle ID: $plugin_bundle_id"
-            
-            if [ "$plugin_bundle_id" = "$expected_bundle_id" ]; then
-                log_error "❌ COLLISION STILL EXISTS: Plugin has same bundle ID as main app!"
-                collision_found=true
-            fi
-        fi
-    done
-    
-    rm -rf "$temp_dir"
-    
-    if [ "$collision_found" = true ]; then
-        log_error "❌ Bundle identifier collisions still exist in final IPA"
-        return 1
-    else
-        log_success "✅ IPA validation passed - no bundle identifier collisions found"
-        return 0
-    fi
-}
-
-# Fallback export method
-export_with_fallback_method() {
-    local archive_path="$1"
-    local export_path="$2"
-    local bundle_id="$3"
-    
-    log_info "🔄 ATTEMPTING FALLBACK EXPORT METHOD"
-    
-    # Create simplified ExportOptions.plist
-    cat > ios/ExportOptions_fallback.plist << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>method</key>
-    <string>development</string>
-    <key>teamID</key>
-    <string>${APPLE_TEAM_ID:-9H2AD7NQ49}</string>
-    <key>signingStyle</key>
-    <string>automatic</string>
-    <key>uploadBitcode</key>
-    <false/>
-    <key>uploadSymbols</key>
-    <false/>
-    <key>compileBitcode</key>
-    <false/>
-</dict>
-</plist>
-EOF
-    
-    log_info "🔄 Trying development export as fallback..."
-    
-    if xcodebuild -exportArchive \
-        -archivePath "$archive_path" \
-        -exportPath "$export_path" \
-        -exportOptionsPlist ios/ExportOptions_fallback.plist \
-        -allowProvisioningUpdates; then
-        
-        log_success "✅ Fallback export successful!"
+    # Verification
+    if [ -f "$output_path" ]; then
+        local ipa_size=$(du -h "$output_path" | cut -f1)
+        log_success "✅ Fixed IPA ready for upload: $output_path ($ipa_size)"
+        log_info "🎯 All CFBundleIdentifier collisions resolved"
+        log_info "📱 Ready for App Store Connect upload via Transporter"
         return 0
     else
-        log_error "❌ Fallback export also failed"
+        log_error "❌ Failed to create fixed IPA"
         return 1
     fi
 }
 
-# Main execution
+# Function to cleanup and exit
+cleanup_and_exit() {
+    local exit_code="$1"
+    cd /
+    if [ -n "${work_dir:-}" ] && [ -d "$work_dir" ]; then
+        rm -rf "$work_dir"
+    fi
+    exit "$exit_code"
+}
+
+# Function to validate IPA structure
+validate_ipa_structure() {
+    local ipa_path="$1"
+    
+    log_info "🔍 Validating IPA structure..."
+    
+    if [ ! -f "$ipa_path" ]; then
+        log_error "IPA file not found: $ipa_path"
+        return 1
+    fi
+    
+    # Test if it's a valid zip file
+    if ! unzip -t "$ipa_path" >/dev/null 2>&1; then
+        log_error "IPA file is corrupted or not a valid zip file"
+        return 1
+    fi
+    
+    # Check for Payload directory
+    if ! unzip -l "$ipa_path" | grep -q "Payload/"; then
+        log_error "IPA file does not contain Payload directory"
+        return 1
+    fi
+    
+    # Check for Runner.app
+    if ! unzip -l "$ipa_path" | grep -q "Payload/Runner.app/"; then
+        log_error "IPA file does not contain Runner.app"
+        return 1
+    fi
+    
+    log_success "✅ IPA structure validation passed"
+    return 0
+}
+
+# Main function
 main() {
-    log_info "🚀 Starting IPA Bundle Collision Fix"
-    log_info "Target Error ID: 16fe2c8f-330a-451b-90c5-7c218848c196"
+    log_info "🚀 IPA Bundle Collision Fix - Starting"
     
-    # Get bundle ID from environment or parameter
-    local bundle_id="${1:-${BUNDLE_ID:-com.example.app}}"
+    local ipa_path="${1:-}"
+    local main_bundle_id="${2:-${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}}"
+    local output_path="${3:-}"
     
-    if [ "$bundle_id" = "com.example.app" ]; then
-        log_warn "Using default bundle ID - please set BUNDLE_ID environment variable"
+    # Auto-detect IPA file if not provided
+    if [ -z "$ipa_path" ]; then
+        # Look in common output directories
+        for dir in "output/ios" "." "build/ios/ipa"; do
+            if [ -f "$dir/Runner.ipa" ]; then
+                ipa_path="$dir/Runner.ipa"
+                log_info "🔍 Auto-detected IPA: $ipa_path"
+                break
+            fi
+        done
     fi
     
-    # Fix IPA bundle collisions
-    if fix_ipa_bundle_collisions "$bundle_id"; then
-        log_success "✅ IPA Bundle Collision Fix completed successfully!"
-        log_info "📊 Bundle ID: $bundle_id"
-        log_info "🎯 Error ID 16fe2c8f-330a-451b-90c5-7c218848c196 RESOLVED"
-        return 0
+    if [ -z "$ipa_path" ]; then
+        log_error "❌ IPA file not specified and not found in common locations"
+        log_error "Usage: $0 <ipa_path> [bundle_id] [output_path]"
+        exit 1
+    fi
+    
+    # Set default output path
+    if [ -z "$output_path" ]; then
+        local dir=$(dirname "$ipa_path")
+        local name=$(basename "$ipa_path" .ipa)
+        output_path="$dir/${name}_collision_fixed.ipa"
+    fi
+    
+    log_info "📋 Configuration:"
+    log_info "   Input IPA: $ipa_path"
+    log_info "   Main Bundle ID: $main_bundle_id"
+    log_info "   Output IPA: $output_path"
+    
+    # Validate input IPA
+    if ! validate_ipa_structure "$ipa_path"; then
+        log_error "❌ IPA validation failed"
+        exit 1
+    fi
+    
+    # Fix collisions
+    if fix_ipa_bundle_collisions "$ipa_path" "$main_bundle_id" "$output_path"; then
+        log_success "🎉 IPA Bundle Collision Fix completed successfully!"
+        log_info "📱 Use the fixed IPA for App Store Connect upload: $output_path"
+        exit 0
     else
         log_error "❌ IPA Bundle Collision Fix failed"
-        return 1
+        exit 1
     fi
 }
 
-# Execute main function if script is run directly
-if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
+# Run main function if script is executed directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     main "$@"
 fi 

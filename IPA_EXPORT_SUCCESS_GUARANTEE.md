@@ -9,14 +9,17 @@ Your iOS workflow is **99% perfect**. This guide provides the **final 1%** to gu
 ### **✅ VERIFIED WORKING COMPONENTS:**
 
 1. **Real-Time Collision Prevention**: ✅ PERFECT
+
    - All frameworks have unique bundle IDs
    - Error IDs 73b7b133, 66775b51, 16fe2c8f, b4b31bab, a2bd4f60 prevented
 
 2. **Firebase Compilation**: ✅ SUCCESS
+
    - Xcode 16.0 compatibility fixes applied
    - FIRHeartbeatLogger.m compilation resolved
 
 3. **Archive Creation**: ✅ SUCCESS
+
    - 170MB archive created successfully
    - Bundle ID: com.twinklub.twinklub (correct)
    - Profile Type: app-store (correct)
@@ -35,10 +38,12 @@ Your iOS workflow is **99% perfect**. This guide provides the **final 1%** to gu
 ### **STEP 1: Choose Certificate Method**
 
 #### **Option A: Direct P12 Certificate (Recommended)**
+
 Add this ONE environment variable in Codemagic:
 CERT_P12_URL=https://raw.githubusercontent.com/prasanna91/QuikApp/main/ios_distribution_certificate.p12
 
 #### **Option B: Auto-Generate P12 from CER + KEY**
+
 Add these TWO environment variables in Codemagic:
 CERT_CER_URL=https://raw.githubusercontent.com/prasanna91/QuikApp/main/certificate.cer
 CERT_KEY_URL=https://raw.githubusercontent.com/prasanna91/QuikApp/main/private_key.key
@@ -51,6 +56,7 @@ CERT_PASSWORD=YourCustomPassword
 After adding the certificate variable, your workflow will execute:
 
 ### **Stage 7.4: Enhanced Certificate Setup** 🔐
+
 ✅ Certificate method detection (Option A or B)
 ✅ P12 download/generation from CER+KEY
 ✅ macOS keychain installation
@@ -58,6 +64,7 @@ After adding the certificate variable, your workflow will execute:
 ✅ Export options configuration
 
 ### **Stage 8: IPA Export** 📱
+
 ✅ Real-time collision-free export options applied
 ✅ xcodebuild export with certificate
 ✅ App Store Connect API authentication
