@@ -395,6 +395,10 @@ main() {
                     export MOBILEPROVISION_UUID="$profile_uuid"
                     log_success "✅ Mobileprovision UUID extracted: $profile_uuid"
                     
+                    # Output UUID in a format that can be captured by parent script
+                    echo "UUID: $profile_uuid" >&2
+                    echo "MOBILEPROVISION_UUID=$profile_uuid" >&2
+                    
                     # Install provisioning profile
                     local profiles_dir="$HOME/Library/MobileDevice/Provisioning Profiles"
                     mkdir -p "$profiles_dir"

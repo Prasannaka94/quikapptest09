@@ -101,8 +101,58 @@ main() {
     # Make comprehensive certificate validation script executable
     chmod +x "${SCRIPT_DIR}/comprehensive_certificate_validation.sh"
     
-    # Run comprehensive certificate validation
-    if ! "${SCRIPT_DIR}/comprehensive_certificate_validation.sh"; then
+    # Run comprehensive certificate validation and capture output
+    log_info "🔒 Running comprehensive certificate validation..."
+    
+    # Create a temporary file to capture the UUID
+    local temp_uuid_file="/tmp/mobileprovision_uuid.txt"
+    rm -f "$temp_uuid_file"
+    
+    # Run validation and capture output
+    if "${SCRIPT_DIR}/comprehensive_certificate_validation.sh" 2>&1 | tee /tmp/cert_validation.log; then
+        log_success "✅ Comprehensive certificate validation completed successfully"
+        log_info "🎯 All certificate methods validated and configured"
+        
+        # Extract UUID from the log or try to get it from the script
+        if [ -n "${PROFILE_URL:-}" ]; then
+            log_info "🔍 Extracting provisioning profile UUID..."
+            
+            # Try to extract UUID from the validation log
+            local extracted_uuid
+            extracted_uuid=$(grep -o "UUID: [A-F0-9-]*" /tmp/cert_validation.log | head -1 | cut -d' ' -f2)
+            
+            # If not found in log, try to extract from MOBILEPROVISION_UUID= format
+            if [ -z "$extracted_uuid" ]; then
+                extracted_uuid=$(grep -o "MOBILEPROVISION_UUID=[A-F0-9-]*" /tmp/cert_validation.log | head -1 | cut -d'=' -f2)
+            fi
+            
+            if [ -n "$extracted_uuid" ]; then
+                export MOBILEPROVISION_UUID="$extracted_uuid"
+                log_success "✅ Extracted UUID from validation log: $extracted_uuid"
+            else
+                # Fallback: try to extract UUID directly from the profile
+                log_info "🔄 Fallback: Extracting UUID directly from profile..."
+                local profile_file="/tmp/profile.mobileprovision"
+                
+                if curl -fsSL -o "$profile_file" "${PROFILE_URL}" 2>/dev/null; then
+                    local fallback_uuid
+                    fallback_uuid=$(security cms -D -i "$profile_file" 2>/dev/null | plutil -extract UUID xml1 -o - - 2>/dev/null | sed -n 's/.*<string>\(.*\)<\/string>.*/\1/p' | head -1)
+                    
+                    if [ -n "$fallback_uuid" ]; then
+                        export MOBILEPROVISION_UUID="$fallback_uuid"
+                        log_success "✅ Extracted UUID via fallback method: $fallback_uuid"
+                    else
+                        log_error "❌ Failed to extract UUID from provisioning profile"
+                        log_error "🔧 IPA export may fail without proper UUID"
+                    fi
+                else
+                    log_error "❌ Failed to download provisioning profile for UUID extraction"
+                fi
+            fi
+        else
+            log_warn "⚠️ No PROFILE_URL provided - UUID extraction skipped"
+        fi
+    else
         log_error "❌ Comprehensive certificate validation failed"
         log_error "🔧 This will prevent successful IPA export"
         log_info "💡 Check the following:"
@@ -114,7 +164,6 @@ main() {
         return 1
     fi
     
-    log_success "✅ Comprehensive certificate validation completed successfully"
     log_info "📋 Certificate Status:"
     if [ -n "${MOBILEPROVISION_UUID:-}" ]; then
         log_info "   - Provisioning Profile UUID: $MOBILEPROVISION_UUID"
