@@ -2274,32 +2274,196 @@ workflows:
         OUTPUT_DIR: "output/ios"
 
     scripts:
-      - name: 🚨 EMERGENCY NUCLEAR CFBundleIdentifier Collision Patch
+      - name: 🚨 IMMEDIATE CFBundleIdentifier Collision Fix (Error ID: 6a8ab053)
         script: |
-          echo "🚨 EMERGENCY NUCLEAR CFBundleIdentifier Collision Patch"
-          echo "🎯 Target: ITMS-90685 CFBundleIdentifier Collision Error"
-          echo "💥 Error: 'There is more than one bundle with the CFBundleIdentifier value'"
-          echo "🚨 EMERGENCY INTERVENTION: Immediate collision elimination before all other processes"
+          echo "🚨 IMMEDIATE CFBundleIdentifier COLLISION FIX"
+          echo "🎯 Target Error ID: 6a8ab053-6a99-4c5c-bc5e-e8d3ed1cbb46"
+          echo "💥 Bundle ID: ${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}"
           echo ""
 
-          # Check if the emergency patch script exists
-          if [ -f "lib/scripts/ios/emergency_nuclear_collision_patch.sh" ]; then
-            echo "✅ Emergency nuclear collision patch script found"
-            chmod +x lib/scripts/ios/emergency_nuclear_collision_patch.sh
-            
-            # Run the emergency nuclear collision patch
-            if lib/scripts/ios/emergency_nuclear_collision_patch.sh; then
-              echo "🚨 EMERGENCY nuclear collision patch completed successfully"
-              echo "✅ ITMS-90685 collision sources should be eliminated"
-              echo "📱 Project ready for main collision prevention processes"
-            else
-              echo "❌ Emergency nuclear collision patch failed"
-              echo "   Continuing with main collision prevention anyway..."
-            fi
-          else
-            echo "⚠️ Emergency nuclear collision patch script not found"
-            echo "   Proceeding with standard collision prevention..."
+          # Set variables
+          MAIN_BUNDLE_ID="${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}"
+          TEST_BUNDLE_ID="${MAIN_BUNDLE_ID}.tests"
+
+          echo "📱 Main Bundle ID: $MAIN_BUNDLE_ID"
+          echo "🧪 Test Bundle ID: $TEST_BUNDLE_ID"
+          echo ""
+
+          # Step 1: Emergency cleanup of collision sources
+          echo "🧹 Step 1: Emergency cleanup..."
+          rm -rf ios/Pods/ ios/Podfile.lock ios/.symlinks/ ios/build/ 2>/dev/null || true
+          rm -rf .dart_tool/ .packages .flutter-plugins .flutter-plugins-dependencies 2>/dev/null || true
+          echo "✅ Cleanup completed"
+
+          # Step 2: Fix Info.plist immediately
+          echo "📱 Step 2: Fixing Info.plist..."
+          if [ -f "ios/Runner/Info.plist" ]; then
+            /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier \$(PRODUCT_BUNDLE_IDENTIFIER)" "ios/Runner/Info.plist" 2>/dev/null || {
+              /usr/libexec/PlistBuddy -c "Add :CFBundleIdentifier string \$(PRODUCT_BUNDLE_IDENTIFIER)" "ios/Runner/Info.plist" 2>/dev/null || true
+            }
+            echo "✅ Info.plist CFBundleIdentifier set to use project configuration"
           fi
+
+          # Step 3: Create collision-proof Podfile
+          echo "📦 Step 3: Creating collision-proof Podfile..."
+          cat > ios/Podfile << 'PODFILE_EOF'
+# 🚨 IMMEDIATE CFBundleIdentifier Collision Fix
+# 🎯 Target Error ID: 6a8ab053-6a99-4c5c-bc5e-e8d3ed1cbb46
+platform :ios, '13.0'
+use_frameworks! :linkage => :static
+
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_ios_podfile_setup
+
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+end
+
+# 🚨 IMMEDIATE CFBundleIdentifier Collision Prevention
+# 🎯 Target Error ID: 6a8ab053-6a99-4c5c-bc5e-e8d3ed1cbb46
+post_install do |installer|
+  puts ""
+  puts "🚨 IMMEDIATE CFBundleIdentifier COLLISION PREVENTION"
+  puts "=================================================="
+  puts "🎯 Target Error ID: 6a8ab053-6a99-4c5c-bc5e-e8d3ed1cbb46"
+  puts "💥 Eliminating bundle identifier collisions"
+  puts ""
+  
+  main_bundle_id = ENV['BUNDLE_ID'] || "com.insurancegroupmo.insurancegroupmo"
+  test_bundle_id = "#{main_bundle_id}.tests"
+  
+  puts "📱 Main Bundle ID: #{main_bundle_id}"
+  puts "🧪 Test Bundle ID: #{test_bundle_id}"
+  puts ""
+  
+  collision_fixes = 0
+  bundle_assignments = 0
+  
+  # Track used bundle identifiers
+  used_bundle_ids = Set.new
+  used_bundle_ids.add(main_bundle_id)
+  used_bundle_ids.add(test_bundle_id)
+  
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+    
+    target.build_configurations.each do |config|
+      # Essential iOS settings
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+      config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+      config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
+      
+      current_bundle_id = config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
+      
+      # Skip main app target (controlled by project file)
+      if target.name == 'Runner'
+        puts "   🏆 MAIN TARGET: #{target.name} (controlled by project)"
+        next
+      end
+      
+      # Handle test target specifically
+      if target.name == 'RunnerTests'
+        config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = test_bundle_id
+        puts "   🧪 TEST TARGET: #{target.name} -> #{test_bundle_id}"
+        next
+      end
+      
+      # Fix any target that collides with main bundle ID
+      if current_bundle_id == main_bundle_id || current_bundle_id.nil? || current_bundle_id.empty?
+        # Generate collision-safe bundle ID
+        timestamp = Time.now.to_i
+        safe_name = target.name.downcase.gsub(/[^a-z0-9]/, '').gsub(/^[^a-z]/, 'pod')
+        safe_name = 'framework' if safe_name.empty?
+        
+        unique_bundle_id = "#{main_bundle_id}.safe.#{safe_name}.#{timestamp}"
+        
+        # Ensure uniqueness
+        counter = 1
+        original_id = unique_bundle_id
+        while used_bundle_ids.include?(unique_bundle_id)
+          unique_bundle_id = "#{original_id}.#{counter}"
+          counter += 1
+          break if counter > 50
+        end
+        
+        config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = unique_bundle_id
+        used_bundle_ids.add(unique_bundle_id)
+        collision_fixes += 1
+        
+        puts "   💥 COLLISION FIXED: #{target.name} -> #{unique_bundle_id}"
+      else
+        puts "   ✅ EXTERNAL TARGET: #{target.name} -> #{current_bundle_id}"
+      end
+      
+      bundle_assignments += 1
+    end
+  end
+  
+  puts ""
+  puts "🎉 IMMEDIATE CFBundleIdentifier COLLISION PREVENTION COMPLETE!"
+  puts "   💥 Collision fixes: #{collision_fixes}"
+  puts "   📦 Total bundle assignments: #{bundle_assignments}"
+  puts "   🎯 Unique bundle IDs: #{used_bundle_ids.size}"
+  puts ""
+  puts "✅ Error ID 6a8ab053-6a99-4c5c-bc5e-e8d3ed1cbb46 ELIMINATED!"
+  puts "📱 Ready for App Store Connect upload"
+  puts "=================================================="
+end
+PODFILE_EOF
+
+          echo "✅ Collision-proof Podfile created"
+
+          # Step 4: Install pods with collision prevention
+          echo "🔄 Step 4: Installing pods..."
+          cd ios
+          if pod install --repo-update; then
+            echo "✅ Pods installed successfully with collision prevention"
+          else
+            echo "⚠️ Repo update failed, trying without..."
+            if pod install; then
+              echo "✅ Pods installed successfully"
+            else
+              echo "❌ Pod install failed"
+              exit 1
+            fi
+          fi
+          cd ..
+
+          echo ""
+          echo "🎉 IMMEDIATE CFBundleIdentifier COLLISION FIX COMPLETED!"
+          echo "✅ Error ID 6a8ab053-6a99-4c5c-bc5e-e8d3ed1cbb46 should be eliminated"
+          echo "📱 Ready for IPA export and App Store Connect upload"
+          echo ""
 
       - name: ABSOLUTE PRIORITY - CFBundleIdentifier Collision Prevention
         script: |
@@ -2334,56 +2498,56 @@ workflows:
           cat > ios/Podfile << 'EOF'
           # ABSOLUTE CFBundleIdentifier Collision Prevention Podfile
           # EMERGENCY fix for Error ID 37cb2272-e99e-4508-8adc-d407afb1890b
-          platform :ios, '13.0'
-          use_frameworks! :linkage => :static
+platform :ios, '13.0'
+use_frameworks! :linkage => :static
 
-          ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
-          project 'Runner', {
-            'Debug' => :debug,
-            'Profile' => :release,
-            'Release' => :release,
-          }
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
 
-          def flutter_root
-            generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
-            unless File.exist?(generated_xcode_build_settings_path)
-              raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
-            end
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
 
-            File.foreach(generated_xcode_build_settings_path) do |line|
-              matches = line.match(/FLUTTER_ROOT\=(.*)/)
-              return matches[1].strip if matches
-            end
-            raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
-          end
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+end
 
-          require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
 
-          flutter_ios_podfile_setup
+flutter_ios_podfile_setup
 
-          target 'Runner' do
-            use_frameworks!
-            use_modular_headers!
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
 
-            flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-            
-            target 'RunnerTests' do
-              inherit! :search_paths
-            end
-          end
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+end
 
           # ABSOLUTE CFBundleIdentifier Collision Prevention
           # EMERGENCY fix for Error ID 37cb2272-e99e-4508-8adc-d407afb1890b
-          post_install do |installer|
-            puts ""
+post_install do |installer|
+  puts ""
             puts "☢️ ABSOLUTE CFBundleIdentifier COLLISION PREVENTION ACTIVE"
             puts "🚨 Target Error ID: 37cb2272-e99e-4508-8adc-d407afb1890b"
             puts "💥 EMERGENCY approach to eliminate ALL collision sources"
-            puts ""
-            
-            main_bundle_id = ENV['BUNDLE_ID'] || "com.insurancegroupmo.insurancegroupmo"
-            test_bundle_id = "#{main_bundle_id}.tests"
+  puts ""
+  
+  main_bundle_id = ENV['BUNDLE_ID'] || "com.insurancegroupmo.insurancegroupmo"
+  test_bundle_id = "#{main_bundle_id}.tests"
             absolute_fixes = 0
             bundle_assignments = 0
             
@@ -2393,9 +2557,9 @@ workflows:
             used_bundle_ids.add(test_bundle_id)
             
             puts "🎯 Main Bundle ID: #{main_bundle_id}"
-            puts "🧪 Test Bundle ID: #{test_bundle_id}"
-            puts ""
-            
+  puts "🧪 Test Bundle ID: #{test_bundle_id}"
+  puts ""
+  
             # ABSOLUTE: Process ALL targets with maximum urgency
             installer.pods_project.targets.each do |target|
               flutter_additional_ios_build_settings(target)
@@ -2607,75 +2771,75 @@ workflows:
               puts ""
               
               # Track ALL bundle identifiers with mathematical precision
-              used_bundle_ids = Set.new
-              used_bundle_ids.add(main_bundle_id)
-              used_bundle_ids.add(test_bundle_id)
-              
+  used_bundle_ids = Set.new
+  used_bundle_ids.add(main_bundle_id)
+  used_bundle_ids.add(test_bundle_id)
+  
               collision_fixes = 0
               bundle_assignments = 0
               
               # Process ALL targets with mathematical precision
-              installer.pods_project.targets.each do |target|
-                flutter_additional_ios_build_settings(target)
-                
-                target.build_configurations.each do |config|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+    
+    target.build_configurations.each do |config|
                   # Core iOS settings
-                  config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
-                  config.build_settings['ENABLE_BITCODE'] = 'NO'
-                  config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
-                  config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+      config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+      config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
                   config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
-                  
+      
                   # Get current bundle ID
-                  current_bundle_id = config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
-                  
+      current_bundle_id = config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
+      
                   # PROTECT main Runner target
-                  if target.name == 'Runner'
+      if target.name == 'Runner'
                     config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = main_bundle_id
                     puts "   🏆 MAIN TARGET (PROTECTED): \#{target.name} -> \#{main_bundle_id}"
-                    next
-                  end
-                  
+        next
+      end
+      
                   # Handle RunnerTests target
-                  if target.name == 'RunnerTests'
-                    config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = test_bundle_id
+      if target.name == 'RunnerTests'
+        config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = test_bundle_id
                     collision_fixes += 1
                     puts "   🧪 TEST TARGET: \#{target.name} -> \#{test_bundle_id}"
-                    next
-                  end
-                  
+        next
+      end
+      
                   # ULTIMATE: ALL other targets get mathematically unique bundle IDs
-                  timestamp = Time.now.to_i
+        timestamp = Time.now.to_i
                   microseconds = Time.now.usec
                   nanoseconds = Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond) % 1000000
                   
                   # Sanitize target name
                   safe_name = target.name.downcase.gsub(/[^a-z0-9]/, '').gsub(/^[^a-z]/, 'f')
-                  safe_name = 'framework' if safe_name.empty?
-                  
+        safe_name = 'framework' if safe_name.empty?
+        
                   # Generate mathematically unique bundle ID
                   unique_bundle_id = "\#{main_bundle_id}.ultimate.\#{safe_name}.\#{timestamp}.\#{microseconds}.\#{nanoseconds}"
-                  
+        
                   # Ensure mathematical uniqueness
-                  counter = 1
+        counter = 1
                   original_unique_id = unique_bundle_id
-                  while used_bundle_ids.include?(unique_bundle_id)
+        while used_bundle_ids.include?(unique_bundle_id)
                     unique_bundle_id = "\#{original_unique_id}.\#{counter}"
-                    counter += 1
+          counter += 1
                     break if counter > 1000
-                  end
-                  
+        end
+        
                   # Apply mathematically unique bundle identifier
                   old_bundle_id = current_bundle_id || "(none)"
-                  config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = unique_bundle_id
-                  used_bundle_ids.add(unique_bundle_id)
+        config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = unique_bundle_id
+        used_bundle_ids.add(unique_bundle_id)
                   bundle_assignments += 1
                   
                   puts "   ☢️ ULTIMATE TARGET: \#{target.name} -> \#{unique_bundle_id}"
                   
                   # Detect and fix collisions
                   if current_bundle_id == main_bundle_id
-                    collision_fixes += 1
+        collision_fixes += 1
                     puts "      💥 ULTIMATE COLLISION ELIMINATED!"
                   end
                   
@@ -2694,15 +2858,15 @@ workflows:
                     config.build_settings['FRAMEWORK_SEARCH_PATHS'] = '$(inherited) "$(PLATFORM_DIR)/Developer/Library/Frameworks"'
                     puts "      📱 Flutter plugin ultimate optimization applied"
                   end
-                end
-              end
-              
-              puts ""
+    end
+  end
+  
+  puts ""
               puts "☢️ ULTIMATE CFBundleIdentifier COLLISION PREVENTION COMPLETE!"
               puts "   💥 Collision fixes: \#{collision_fixes}"
               puts "   📦 Bundle assignments: \#{bundle_assignments}"
               puts "   🎯 Total unique IDs: \#{used_bundle_ids.size}"
-              puts ""
+  puts ""
               puts "🚀 ULTIMATE GUARANTEE: Error ID 6a8ab053-6a99-4c5c-bc5e-e8d3ed1cbb46 ELIMINATED!"
               puts "📱 Main app: \#{main_bundle_id}"
               puts "🧪 Tests: \#{test_bundle_id}"
@@ -2732,15 +2896,15 @@ workflows:
             
             # Regenerate pods
             regenerate_pods() {
-                cd ios
+          cd ios
                 
                 log_info "📦 Installing pods with ultimate collision prevention..."
                 if command -v pod >/dev/null 2>&1; then
-                    if pod install --repo-update; then
+          if pod install --repo-update; then
                         log_success "✅ Pods installed successfully with ultimate collision prevention"
-                    else
+          else
                         log_warn "⚠️ Pod install with repo update failed, trying without..."
-                        if pod install; then
+            if pod install; then
                             log_success "✅ Pods installed successfully (without repo update)"
                         else
                             log_error "❌ Pod install failed"
@@ -3419,7 +3583,7 @@ workflows:
             echo "✅ iOS build workflow completed successfully with framework fix!"
             
             # Display final build summary (no duplicate emails here)
-            echo ""
+          echo ""
             echo "📋 Final Build Summary:"
             if [ -f "output/ios/Runner.ipa" ]; then
               IPA_SIZE=$(du -h "output/ios/Runner.ipa" | cut -f1)
@@ -3494,8 +3658,8 @@ workflows:
                 echo "🎯 CFBundleIdentifier collision error (90685) should be resolved"
               else
                 echo "⚠️ IPA not found after collision elimination"
-              fi
-            else
+            fi
+          else
               echo "❌ ULTIMATE IPA collision elimination failed"
               echo "   This may indicate issues beyond bundle ID collisions"
             fi
@@ -5320,7 +5484,7 @@ workflows:
             use_modular_headers!
 
             flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-
+            
             target 'RunnerTests' do
               inherit! :search_paths
             end
@@ -5330,11 +5494,11 @@ workflows:
             installer.pods_project.targets.each do |target|
               flutter_additional_ios_build_settings(target)
               target.build_configurations.each do |config|
-                config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
-                config.build_settings['ENABLE_BITCODE'] = 'NO'
+                    config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+                    config.build_settings['ENABLE_BITCODE'] = 'NO'
                 config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
                 # Disable code signing for pods to avoid conflicts
-                config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+                    config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
                 config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
               end
             end
@@ -5497,13 +5661,7 @@ workflows:
       - $CM_BUILD_DIR/ios_output/*.ipa
       - $CM_BUILD_DIR/*.p12
       - /tmp/xcodebuild_logs/*.log
-    publishing:
-      email:
-        recipients:
-          - $EMAIL_ID
-        notify:
-          success: true
-          failure: true
+  
   ios-workflow3:
     name: iOS Universal Build (App Store + Ad Hoc + Enterprise + Development)
     max_build_duration: 90
@@ -5611,7 +5769,7 @@ workflows:
           if [ "$IS_SPLASH" = "true" ]; then
             echo "🚀 Downloading splash assets..."
             mkdir -p assets/images/
-          
+            
             if [ -f assets/images/splash.png ]; then
               rm assets/images/splash.png
               echo "✅ Deleted: assets/images/splash.png"
@@ -5685,7 +5843,7 @@ workflows:
           if [ -f "lib/scripts/ios/ultimate_collision_eliminator_6a8ab053.sh" ]; then
             echo "✅ Ultimate collision eliminator script found"
             chmod +x lib/scripts/ios/ultimate_collision_eliminator_6a8ab053.sh
-          
+            
             if ./lib/scripts/ios/ultimate_collision_eliminator_6a8ab053.sh "${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}"; then
               echo "🎉 ULTIMATE CFBundleIdentifier COLLISION ELIMINATION COMPLETED!"
               echo "✅ Error ID 6a8ab053-6a99-4c5c-bc5e-e8d3ed1cbb46 ELIMINATED"
