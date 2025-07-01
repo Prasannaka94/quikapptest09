@@ -170,8 +170,10 @@ post_install do |installer|
         # Keep main app bundle ID unchanged
         config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = base_bundle_id
       else
-        # Generate unique bundle ID for this target
-        unique_suffix = "rt.#{target.name.downcase.gsub(/[^a-z0-9]/, '')}.#{Time.now.to_i}"
+        # Generate unique bundle ID for this target (properly sanitize underscores)
+        safe_target_name = target.name.downcase.gsub(/_+/, '').gsub(/[^a-z0-9]/, '')
+        safe_target_name = 'framework' if safe_target_name.empty?
+        unique_suffix = "rt.#{safe_target_name}.#{Time.now.to_i}"
         config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = "#{base_bundle_id}.#{unique_suffix}"
       end
       
