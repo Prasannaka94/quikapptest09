@@ -230,17 +230,17 @@ EOF
         cat export_method3.log | tail -20
     fi
     
-    # Method 4: Enterprise distribution (if applicable)
-    if [[ "$cert_identity" == *"Enterprise"* ]]; then
-        log_info "🎯 Method 4: Enterprise distribution..."
+    # Method 4: App Store Connect API with automatic certificate management
+    if [[ -n "${APP_STORE_CONNECT_KEY_IDENTIFIER:-}" && -n "${APP_STORE_CONNECT_ISSUER_ID:-}" && -n "${APP_STORE_CONNECT_API_KEY_PATH:-}" ]]; then
+        log_info "🎯 Method 4: App Store Connect API with automatic certificate management..."
         
-        cat > "ios/ExportOptionsEnterprise.plist" << EOF
+        cat > "ios/ExportOptionsAPI.plist" << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
     <key>method</key>
-    <string>enterprise</string>
+    <string>app-store-connect</string>
     <key>teamID</key>
     <string>${team_id}</string>
     <key>signingStyle</key>
@@ -252,28 +252,48 @@ EOF
     <key>compileBitcode</key>
     <false/>
     <key>uploadSymbols</key>
-    <false/>
+    <true/>
     <key>destination</key>
     <string>export</string>
     <key>distributionBundleIdentifier</key>
     <string>${bundle_id}</string>
+    <key>manageAppVersionAndBuildNumber</key>
+    <false/>
 </dict>
 </plist>
 EOF
         
+        # Download API key if it's a URL
+        local api_key_path="${APP_STORE_CONNECT_API_KEY_PATH}"
+        if [[ "${APP_STORE_CONNECT_API_KEY_PATH}" == http* ]]; then
+            api_key_path="/tmp/AuthKey_${APP_STORE_CONNECT_KEY_IDENTIFIER}.p8"
+            log_info "📥 Downloading App Store Connect API key..."
+            if curl -fsSL -o "$api_key_path" "${APP_STORE_CONNECT_API_KEY_PATH}"; then
+                log_success "✅ API key downloaded to $api_key_path"
+            else
+                log_warn "⚠️ Failed to download API key, using original path"
+                api_key_path="${APP_STORE_CONNECT_API_KEY_PATH}"
+            fi
+        fi
+        
         if xcodebuild -exportArchive \
             -archivePath "$archive_path" \
             -exportPath "$export_path" \
-            -exportOptionsPlist "ios/ExportOptionsEnterprise.plist" \
-            -allowProvisioningUpdates \
-            DEVELOPMENT_TEAM="$team_id" 2>&1 | tee export_method4.log; then
+            -exportOptionsPlist "ios/ExportOptionsAPI.plist" \
+            -authenticationKeyPath "$api_key_path" \
+            -authenticationKeyID "${APP_STORE_CONNECT_KEY_IDENTIFIER}" \
+            -authenticationKeyIssuerID "${APP_STORE_CONNECT_ISSUER_ID}" \
+            -allowProvisioningUpdates 2>&1 | tee export_method4.log; then
             
-            log_success "✅ Method 4 successful - Enterprise distribution"
+            log_success "✅ Method 4 successful - App Store Connect API with automatic certificate management"
             return 0
         else
-            log_warn "⚠️ Method 4 failed - Enterprise distribution"
+            log_warn "⚠️ Method 4 failed - App Store Connect API"
             cat export_method4.log | tail -20
         fi
+    else
+        log_info "ℹ️ App Store Connect API credentials not complete, skipping Method 4"
+        log_info "   Required: APP_STORE_CONNECT_KEY_IDENTIFIER, APP_STORE_CONNECT_ISSUER_ID, APP_STORE_CONNECT_API_KEY_PATH"
     fi
     
     log_error "❌ All export methods failed"
@@ -317,8 +337,11 @@ main() {
         return 1
     fi
     
-    if [ -z "$profile_uuid" ]; then
-        log_error "❌ Provisioning profile UUID is required"
+    # Validate UUID format (should be in format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+    if [ -z "$profile_uuid" ] || [[ ! "$profile_uuid" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]]; then
+        log_error "❌ Invalid provisioning profile UUID format: '$profile_uuid'"
+        log_error "🔧 Expected format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        log_error "💡 Check PROFILE_URL variable and UUID extraction"
         return 1
     fi
     
