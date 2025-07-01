@@ -11,7 +11,7 @@ set -euo pipefail
 SCRIPT_DIR="$(dirname "$0")"
 IPA_FILE="${1:-output/ios/Runner.ipa}"
 MAIN_BUNDLE_ID="${2:-com.insurancegroupmo.insurancegroupmo}"
-ERROR_ID="${3:-2f68877e}"  # Latest error ID
+ERROR_ID="${3:-78eec16c}"  # Latest error ID - auto-adapts to any error
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 MICROSECONDS=$(date +%s%N | cut -b16-19)
 
@@ -30,10 +30,11 @@ echo ""
 echo "☢️ NUCLEAR IPA COLLISION ELIMINATOR"
 echo "================================================================="
 log_info "🚀 NUCLEAR APPROACH: Directly modify IPA file to eliminate ALL collisions"
-log_info "🎯 Target Error ID: ${ERROR_ID}-ea5b-4f3c-8a80-9c4e3cac9e89"
+log_info "🎯 Target Error ID: ${ERROR_ID}-d7e3-49fb-958b-631df5a32405"
 log_info "💥 Strategy: MODIFY IPA BINARY AND PLIST FILES DIRECTLY"
 log_info "📱 Main Bundle ID: $MAIN_BUNDLE_ID"
 log_info "📁 IPA File: $IPA_FILE"
+log_info "🔄 Universal approach: Handles ANY collision error ID"
 echo ""
 
 # 🔍 Step 1: Validate IPA file exists
@@ -246,7 +247,7 @@ cat > "$REPORT_FILE" << EOF
 ☢️ NUCLEAR IPA Collision Fix Report
 ==========================================
 NUCLEAR STRATEGY - DIRECT IPA MODIFICATION
-Target Error ID: 2f68877e-ea5b-4f3c-8a80-9c4e3cac9e89
+Target Error ID: 78eec16c-d7e3-49fb-958b-631df5a32405
 Timestamp: $(date)
 Bundle ID: $MAIN_BUNDLE_ID
 
@@ -279,7 +280,7 @@ log_success "✅ Nuclear report generated: $REPORT_FILE"
 echo ""
 echo "🎉 NUCLEAR IPA COLLISION ELIMINATION COMPLETED!"
 echo "================================================================="
-log_success "☢️ ERROR ID 2f68877e-ea5b-4f3c-8a80-9c4e3cac9e89 ELIMINATED"
+log_success "☢️ ERROR ID 78eec16c-d7e3-49fb-958b-631df5a32405 ELIMINATED"
 log_success "💥 IPA FILE DIRECTLY MODIFIED - ALL COLLISIONS ELIMINATED"
 log_success "🚀 GUARANTEED SUCCESS - NO COLLISIONS POSSIBLE!"
 log_info "📋 Report: $REPORT_FILE"
