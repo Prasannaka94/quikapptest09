@@ -192,8 +192,8 @@ export_ipa_with_framework_fix() {
         
         # Method 3: Ad-hoc distribution (for testing)
         log_info "🎯 Method 3: Ad-hoc distribution for testing..."
-    
-    cat > "ios/ExportOptionsAdHoc.plist" << EOF
+        
+        cat > "ios/ExportOptionsAdHoc.plist" << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -219,19 +219,20 @@ export_ipa_with_framework_fix() {
 </dict>
 </plist>
 EOF
-    
-    if xcodebuild -exportArchive \
-        -archivePath "$archive_path" \
-        -exportPath "$export_path" \
-        -exportOptionsPlist "ios/ExportOptionsAdHoc.plist" \
-        -allowProvisioningUpdates \
-        DEVELOPMENT_TEAM="$team_id" 2>&1 | tee export_method3.log; then
         
-        log_success "✅ Method 3 successful - Ad-hoc distribution"
-        return 0
-    else
-        log_warn "⚠️ Method 3 failed - Ad-hoc distribution"
-        cat export_method3.log | tail -20
+        if xcodebuild -exportArchive \
+            -archivePath "$archive_path" \
+            -exportPath "$export_path" \
+            -exportOptionsPlist "ios/ExportOptionsAdHoc.plist" \
+            -allowProvisioningUpdates \
+            DEVELOPMENT_TEAM="$team_id" 2>&1 | tee export_method3.log; then
+            
+            log_success "✅ Method 3 successful - Ad-hoc distribution"
+            return 0
+        else
+            log_warn "⚠️ Method 3 failed - Ad-hoc distribution"
+            cat export_method3.log | tail -20
+        fi
     fi
     
     # Method 4: App Store Connect API with automatic certificate management
