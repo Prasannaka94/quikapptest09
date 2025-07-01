@@ -535,35 +535,20 @@ main() {
         return 1
     fi
     
-    # Step 6: Apply ULTIMATE Bundle Collision Prevention (BEFORE archive creation)
-    log_info "🚨 ULTIMATE BUNDLE COLLISION PREVENTION: Applying pre-archive collision fixes..."
+    # Step 6: Apply Simple Bundle Collision Prevention (BEFORE archive creation)
+    log_info "🔧 SIMPLE COLLISION PREVENTION: Applying pre-archive collision fixes..."
     
-    if [ -f "lib/scripts/ios/ultimate_bundle_collision_prevention.sh" ]; then
-        chmod +x lib/scripts/ios/ultimate_bundle_collision_prevention.sh
-        if lib/scripts/ios/ultimate_bundle_collision_prevention.sh "${BUNDLE_ID:-com.example.app}" "ios/Runner.xcodeproj/project.pbxproj"; then
-            log_success "✅ ULTIMATE COLLISION PREVENTION: Pre-archive fixes applied successfully"
-            log_info "🎯 All CFBundleIdentifier collisions resolved before archive creation"
-            
-            # Reinstall CocoaPods with collision-free Podfile
-            log_info "🔄 Reinstalling CocoaPods with collision-free configuration..."
-            cd ios
-            
-            # Clean and reinstall
-            rm -rf Pods Podfile.lock
-            if pod install --repo-update --verbose; then
-                log_success "✅ CocoaPods reinstalled with collision prevention"
-            else
-                log_warn "⚠️ CocoaPods reinstall failed, but continuing with existing pods"
-            fi
-            
-            cd ..
+    if [ -f "lib/scripts/ios/simple_collision_prevention.sh" ]; then
+        chmod +x lib/scripts/ios/simple_collision_prevention.sh
+        if lib/scripts/ios/simple_collision_prevention.sh "${BUNDLE_ID:-com.example.app}"; then
+            log_success "✅ SIMPLE COLLISION PREVENTION: Pre-archive fixes applied successfully"
+            log_info "🎯 CFBundleIdentifier collisions resolved before archive creation"
         else
-            log_warn "⚠️ ULTIMATE COLLISION PREVENTION: Pre-archive fixes had issues, but continuing"
-            log_warn "🔧 Archive creation may still succeed with existing fixes"
+            log_warn "⚠️ SIMPLE COLLISION PREVENTION: Pre-archive fixes had issues, but continuing"
         fi
     else
-        log_warn "⚠️ Ultimate collision prevention script not found"
-        log_info "📝 Expected: lib/scripts/ios/ultimate_bundle_collision_prevention.sh"
+        log_warn "⚠️ Simple collision prevention script not found"
+        log_info "📝 Expected: lib/scripts/ios/simple_collision_prevention.sh"
     fi
     
     # Step 7: Create Xcode archive
