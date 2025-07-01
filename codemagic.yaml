@@ -2274,6 +2274,33 @@ workflows:
         OUTPUT_DIR: "output/ios"
 
     scripts:
+      - name: 🚨 EMERGENCY NUCLEAR CFBundleIdentifier Collision Patch
+        script: |
+          echo "🚨 EMERGENCY NUCLEAR CFBundleIdentifier Collision Patch"
+          echo "🎯 Target: ITMS-90685 CFBundleIdentifier Collision Error"
+          echo "💥 Error: 'There is more than one bundle with the CFBundleIdentifier value'"
+          echo "🚨 EMERGENCY INTERVENTION: Immediate collision elimination before all other processes"
+          echo ""
+          
+          # Check if the emergency patch script exists
+          if [ -f "lib/scripts/ios/emergency_nuclear_collision_patch.sh" ]; then
+            echo "✅ Emergency nuclear collision patch script found"
+            chmod +x lib/scripts/ios/emergency_nuclear_collision_patch.sh
+            
+            # Run the emergency nuclear collision patch
+            if lib/scripts/ios/emergency_nuclear_collision_patch.sh; then
+              echo "🚨 EMERGENCY nuclear collision patch completed successfully"
+              echo "✅ ITMS-90685 collision sources should be eliminated"
+              echo "📱 Project ready for main collision prevention processes"
+            else
+              echo "❌ Emergency nuclear collision patch failed"
+              echo "   Continuing with main collision prevention anyway..."
+            fi
+          else
+            echo "⚠️ Emergency nuclear collision patch script not found"
+            echo "   Proceeding with standard collision prevention..."
+          fi
+
       - name: ABSOLUTE PRIORITY - CFBundleIdentifier Collision Prevention
         script: |
           echo "☢️ ABSOLUTE PRIORITY: CFBundleIdentifier Collision Prevention"
