@@ -2585,6 +2585,23 @@ workflows:
             exit 1
           fi
 
+          # Apply ADDITIONAL framework embedding collision fix
+          echo "🔧 Applying Framework Embedding Collision Fix..."
+          if [ -f "lib/scripts/ios/framework_embedding_collision_fix.sh" ]; then
+            chmod +x lib/scripts/ios/framework_embedding_collision_fix.sh
+            if lib/scripts/ios/framework_embedding_collision_fix.sh "${BUNDLE_ID}"; then
+              echo "✅ Framework Embedding Collision Fix applied successfully"
+              echo "🎯 Framework 'Embed & Sign' conflicts resolved"
+              echo "📦 CocoaPods and SPM will handle proper linking"
+            else
+              echo "⚠️ Framework Embedding Collision Fix had issues, but continuing..."
+              echo "💡 Manual framework embedding verification may be needed"
+            fi
+          else
+            echo "⚠️ Framework Embedding Collision Fix script not found"
+            echo "📝 Expected: lib/scripts/ios/framework_embedding_collision_fix.sh"
+          fi
+
           # 🔥 Perfect Conditional Firebase System
           echo "🔍 Initializing Perfect Conditional Firebase System..."
           echo "📋 PUSH_NOTIFY setting: ${PUSH_NOTIFY:-false}"
