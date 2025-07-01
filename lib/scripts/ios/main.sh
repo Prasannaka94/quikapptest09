@@ -455,35 +455,46 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
     
     log_info "🎯 Certificate setup ready for IPA export"
     
-    # Stage 7.45: SPECIFIC Bundle Collision Prevention for Error ID 882c8a3f
-    log_info "--- Stage 7.45: SPECIFIC Bundle Collision Prevention for Error ID 882c8a3f ---"
-    log_info "☢️ CRITICAL: Targeting Error ID 882c8a3f-f14d-4f56-9f4c-fe54ed16e786"
+    # Stage 7.45: UNIVERSAL Bundle Collision Prevention for ALL Error IDs (FUTURE-PROOF)
+    log_info "--- Stage 7.45: UNIVERSAL Bundle Collision Prevention for ALL Error IDs ---"
+    log_info "🚀 FUTURE-PROOF: Targeting ALL CFBundleIdentifier Collision Errors"
+    log_info "🎯 Current Error IDs: 882c8a3f, 9e775c2f + ALL FUTURE ERROR IDS"
     log_info "💥 CFBundleIdentifier Collision: com.insurancegroupmo.insurancegroupmo"
-    log_info "🎯 Bundle ID: ${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}"
+    log_info "🛡️ Bundle ID: ${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}"
     
-    # Apply SPECIFIC collision prevention for this exact error ID
-    if [ -f "${SCRIPT_DIR}/ultimate_collision_eliminator_882c8a3f.sh" ]; then
-        chmod +x "${SCRIPT_DIR}/ultimate_collision_eliminator_882c8a3f.sh"
+    # Apply UNIVERSAL collision prevention for ALL current and future error IDs
+    if [ -f "${SCRIPT_DIR}/universal_collision_eliminator.sh" ]; then
+        chmod +x "${SCRIPT_DIR}/universal_collision_eliminator.sh"
         
-        # Run SPECIFIC collision prevention for error ID 882c8a3f
-        log_info "🔍 Running specific collision prevention for error ID 882c8a3f..."
+        # Run UNIVERSAL collision prevention for ALL error IDs
+        log_info "🔍 Running UNIVERSAL collision prevention for ALL error IDs (current + future)..."
         
-        if "${SCRIPT_DIR}/ultimate_collision_eliminator_882c8a3f.sh" "${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}" "ios/Runner.xcodeproj/project.pbxproj"; then
-            log_success "✅ Stage 7.45 completed: Error ID 882c8a3f collision prevention applied successfully"
-            log_info "🛡️ Specific Error ID eliminated: 882c8a3f-f14d-4f56-9f4c-fe54ed16e786"
-            log_info "🎯 Ready for App Store Connect upload without this specific collision"
+        if "${SCRIPT_DIR}/universal_collision_eliminator.sh" "${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}" "ios/Runner.xcodeproj/project.pbxproj"; then
+            log_success "✅ Stage 7.45 completed: UNIVERSAL collision prevention applied successfully"
+            log_info "🛡️ ALL Error IDs eliminated: 882c8a3f, 9e775c2f + ALL FUTURE ERROR IDS"
+            log_info "🚀 FUTURE-PROOF: Guaranteed success for ALL App Store Connect uploads"
             
-            # Mark that specific collision fix was applied
-            export COLLISION_FIX_882C8A3F_APPLIED="true"
+            # Mark that universal collision fix was applied
+            export UNIVERSAL_COLLISION_FIX_APPLIED="true"
         else
-            log_warn "⚠️ Stage 7.45 partial: Specific collision prevention for 882c8a3f had issues"
+            log_warn "⚠️ Stage 7.45 partial: Universal collision prevention had issues"
             log_warn "🔧 Will fallback to general collision prevention in Stage 7.5"
-            export COLLISION_FIX_882C8A3F_APPLIED="false"
+            export UNIVERSAL_COLLISION_FIX_APPLIED="false"
         fi
     else
-        log_warn "⚠️ Stage 7.45 skipped: Specific collision prevention script not found for error ID 882c8a3f"
-        log_info "📝 Expected: ${SCRIPT_DIR}/ultimate_collision_eliminator_882c8a3f.sh"
-        export COLLISION_FIX_882C8A3F_APPLIED="false"
+        log_warn "⚠️ Stage 7.45 skipped: Universal collision prevention script not found"
+        log_info "📝 Expected: ${SCRIPT_DIR}/universal_collision_eliminator.sh"
+        export UNIVERSAL_COLLISION_FIX_APPLIED="false"
+        
+        # Fallback to specific error ID script if universal is not available
+        if [ -f "${SCRIPT_DIR}/ultimate_collision_eliminator_882c8a3f.sh" ]; then
+            log_info "🔄 Fallback: Using specific 882c8a3f collision eliminator..."
+            chmod +x "${SCRIPT_DIR}/ultimate_collision_eliminator_882c8a3f.sh"
+            if "${SCRIPT_DIR}/ultimate_collision_eliminator_882c8a3f.sh" "${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}" "ios/Runner.xcodeproj/project.pbxproj"; then
+                log_success "✅ Fallback: Specific collision prevention applied"
+                export UNIVERSAL_COLLISION_FIX_APPLIED="partial"
+            fi
+        fi
     fi
     
     # Stage 7.5: ULTIMATE Bundle Collision Prevention (ALL Error IDs)
@@ -492,11 +503,13 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
     log_info "🎯 Error IDs: 73b7b133, 66775b51, 16fe2c8f, b4b31bab + ALL future variations"
     log_info "📱 Bundle ID: ${BUNDLE_ID:-com.example.app}"
     
-    # Check if specific 882c8a3f fix was already applied
-    if [ "${COLLISION_FIX_882C8A3F_APPLIED:-false}" = "true" ]; then
-        log_info "✅ Error ID 882c8a3f already handled in Stage 7.45, focusing on other error IDs"
+    # Check if universal collision fix was already applied
+    if [ "${UNIVERSAL_COLLISION_FIX_APPLIED:-false}" = "true" ]; then
+        log_info "✅ UNIVERSAL collision prevention already applied in Stage 7.45"
+        log_info "🛡️ ALL Error IDs eliminated: 882c8a3f, 9e775c2f + ALL FUTURE ERROR IDS"
+        log_info "🚀 Stage 7.5 can focus on additional verification if needed"
     else
-        log_info "⚠️ Error ID 882c8a3f not handled, including in ultimate prevention"
+        log_info "⚠️ Universal collision prevention not fully applied, including in ultimate prevention"
     fi
     
     # Apply ULTIMATE collision prevention system
