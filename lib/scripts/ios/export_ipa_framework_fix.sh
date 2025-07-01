@@ -147,46 +147,51 @@ export_ipa_with_framework_fix() {
     security list-keychains -d user -s "$keychain_path" $(security list-keychains -d user | xargs) 2>/dev/null || true
     security default-keychain -s "$keychain_path" 2>/dev/null || true
     
-    # Method 1: Manual signing with framework-safe options
-    log_info "🎯 Method 1: Manual signing with framework-safe export options..."
-    create_framework_safe_export_options "$cert_identity" "$profile_uuid" "$bundle_id" "$team_id"
-    
-    if xcodebuild -exportArchive \
-        -archivePath "$archive_path" \
-        -exportPath "$export_path" \
-        -exportOptionsPlist "ios/ExportOptions.plist" \
-        -allowProvisioningUpdates \
-        DEVELOPMENT_TEAM="$team_id" \
-        CODE_SIGN_IDENTITY="$cert_identity" \
-        PROVISIONING_PROFILE="$profile_uuid" 2>&1 | tee export_method1.log; then
-        
-        log_success "✅ Method 1 successful - Manual signing with framework-safe options"
-        return 0
+    # Check if we should skip manual methods and go directly to App Store Connect API
+    if [ "${SKIP_MANUAL_METHODS:-false}" = "true" ]; then
+        log_info "🔄 Skipping manual methods due to invalid UUID - going directly to App Store Connect API..."
+        # Jump directly to Method 4
     else
-        log_warn "⚠️ Method 1 failed - Manual signing with framework-safe options"
-        cat export_method1.log | tail -20
-    fi
+        # Method 1: Manual signing with framework-safe options
+        log_info "🎯 Method 1: Manual signing with framework-safe export options..."
+        create_framework_safe_export_options "$cert_identity" "$profile_uuid" "$bundle_id" "$team_id"
     
-    # Method 2: Automatic signing for frameworks
-    log_info "🎯 Method 2: Automatic signing for frameworks..."
-    create_automatic_framework_export_options "$cert_identity" "$profile_uuid" "$bundle_id" "$team_id"
-    
-    if xcodebuild -exportArchive \
-        -archivePath "$archive_path" \
-        -exportPath "$export_path" \
-        -exportOptionsPlist "ios/ExportOptionsAutomatic.plist" \
-        -allowProvisioningUpdates \
-        DEVELOPMENT_TEAM="$team_id" 2>&1 | tee export_method2.log; then
+        if xcodebuild -exportArchive \
+            -archivePath "$archive_path" \
+            -exportPath "$export_path" \
+            -exportOptionsPlist "ios/ExportOptions.plist" \
+            -allowProvisioningUpdates \
+            DEVELOPMENT_TEAM="$team_id" \
+            CODE_SIGN_IDENTITY="$cert_identity" \
+            PROVISIONING_PROFILE="$profile_uuid" 2>&1 | tee export_method1.log; then
+            
+            log_success "✅ Method 1 successful - Manual signing with framework-safe options"
+            return 0
+        else
+            log_warn "⚠️ Method 1 failed - Manual signing with framework-safe options"
+            cat export_method1.log | tail -20
+        fi
         
-        log_success "✅ Method 2 successful - Automatic signing for frameworks"
-        return 0
-    else
-        log_warn "⚠️ Method 2 failed - Automatic signing for frameworks"
-        cat export_method2.log | tail -20
-    fi
-    
-    # Method 3: Ad-hoc distribution (for testing)
-    log_info "🎯 Method 3: Ad-hoc distribution for testing..."
+        # Method 2: Automatic signing for frameworks
+        log_info "🎯 Method 2: Automatic signing for frameworks..."
+        create_automatic_framework_export_options "$cert_identity" "$profile_uuid" "$bundle_id" "$team_id"
+        
+        if xcodebuild -exportArchive \
+            -archivePath "$archive_path" \
+            -exportPath "$export_path" \
+            -exportOptionsPlist "ios/ExportOptionsAutomatic.plist" \
+            -allowProvisioningUpdates \
+            DEVELOPMENT_TEAM="$team_id" 2>&1 | tee export_method2.log; then
+            
+            log_success "✅ Method 2 successful - Automatic signing for frameworks"
+            return 0
+        else
+            log_warn "⚠️ Method 2 failed - Automatic signing for frameworks"
+            cat export_method2.log | tail -20
+        fi
+        
+        # Method 3: Ad-hoc distribution (for testing)
+        log_info "🎯 Method 3: Ad-hoc distribution for testing..."
     
     cat > "ios/ExportOptionsAdHoc.plist" << EOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -209,8 +214,8 @@ export_ipa_with_framework_fix() {
     <false/>
     <key>destination</key>
     <string>export</string>
-    <key>distributionBundleIdentifier</key>
-    <string>${bundle_id}</string>
+    <key>signEmbeddedFrameworks</key>
+    <false/>
 </dict>
 </plist>
 EOF
@@ -222,8 +227,7 @@ EOF
         -allowProvisioningUpdates \
         DEVELOPMENT_TEAM="$team_id" 2>&1 | tee export_method3.log; then
         
-        log_success "✅ Method 3 successful - Ad-hoc distribution (for testing)"
-        log_warn "⚠️ Note: This is an ad-hoc build, not suitable for App Store distribution"
+        log_success "✅ Method 3 successful - Ad-hoc distribution"
         return 0
     else
         log_warn "⚠️ Method 3 failed - Ad-hoc distribution"
@@ -338,11 +342,21 @@ main() {
     fi
     
     # Validate UUID format (should be in format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+    # But allow bypass if App Store Connect API is available
     if [ -z "$profile_uuid" ] || [[ ! "$profile_uuid" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]]; then
         log_error "❌ Invalid provisioning profile UUID format: '$profile_uuid'"
         log_error "🔧 Expected format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
         log_error "💡 Check PROFILE_URL variable and UUID extraction"
-        return 1
+        
+        # Check if App Store Connect API is available as fallback
+        if [[ -n "${APP_STORE_CONNECT_KEY_IDENTIFIER:-}" && -n "${APP_STORE_CONNECT_ISSUER_ID:-}" && -n "${APP_STORE_CONNECT_API_KEY_PATH:-}" ]]; then
+            log_warn "⚠️ Invalid manual profile UUID, but App Store Connect API is available"
+            log_info "🔄 Will skip methods 1-3 and try Method 4 (App Store Connect API) directly"
+            export SKIP_MANUAL_METHODS="true"
+        else
+            log_error "❌ No fallback available - App Store Connect API credentials not complete"
+            return 1
+        fi
     fi
     
     if [ -z "$bundle_id" ]; then

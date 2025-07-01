@@ -117,19 +117,29 @@ main() {
         if [ -n "${PROFILE_URL:-}" ]; then
             log_info "🔍 Extracting provisioning profile UUID..."
             
-            # Try to extract UUID from the validation log
+            # Try to extract UUID from the validation log (support both uppercase and lowercase)
             local extracted_uuid
-            extracted_uuid=$(grep -o "UUID: [A-F0-9-]*" /tmp/cert_validation.log | head -1 | cut -d' ' -f2)
+            extracted_uuid=$(grep -o "UUID: [A-Fa-f0-9-]*" /tmp/cert_validation.log | head -1 | cut -d' ' -f2)
             
             # If not found in log, try to extract from MOBILEPROVISION_UUID= format
             if [ -z "$extracted_uuid" ]; then
-                extracted_uuid=$(grep -o "MOBILEPROVISION_UUID=[A-F0-9-]*" /tmp/cert_validation.log | head -1 | cut -d'=' -f2)
+                extracted_uuid=$(grep -o "MOBILEPROVISION_UUID=[A-Fa-f0-9-]*" /tmp/cert_validation.log | head -1 | cut -d'=' -f2)
             fi
             
-            if [ -n "$extracted_uuid" ]; then
+            # Additional fallback: look for any valid UUID pattern in the log
+            if [ -z "$extracted_uuid" ]; then
+                extracted_uuid=$(grep -oE "[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}" /tmp/cert_validation.log | head -1)
+            fi
+            
+            # Validate extracted UUID format
+            if [ -n "$extracted_uuid" ] && [[ "$extracted_uuid" =~ ^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}$ ]]; then
                 export MOBILEPROVISION_UUID="$extracted_uuid"
-                log_success "✅ Extracted UUID from validation log: $extracted_uuid"
+                log_success "✅ Extracted valid UUID from validation log: $extracted_uuid"
             else
+                if [ -n "$extracted_uuid" ]; then
+                    log_warn "⚠️ Extracted invalid UUID format: '$extracted_uuid'"
+                fi
+                
                 # Fallback: try to extract UUID directly from the profile
                 log_info "🔄 Fallback: Extracting UUID directly from profile..."
                 local profile_file="/tmp/profile.mobileprovision"
@@ -138,15 +148,28 @@ main() {
                     local fallback_uuid
                     fallback_uuid=$(security cms -D -i "$profile_file" 2>/dev/null | plutil -extract UUID xml1 -o - - 2>/dev/null | sed -n 's/.*<string>\(.*\)<\/string>.*/\1/p' | head -1)
                     
-                    if [ -n "$fallback_uuid" ]; then
+                    # Validate fallback UUID format
+                    if [ -n "$fallback_uuid" ] && [[ "$fallback_uuid" =~ ^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}$ ]]; then
                         export MOBILEPROVISION_UUID="$fallback_uuid"
-                        log_success "✅ Extracted UUID via fallback method: $fallback_uuid"
+                        log_success "✅ Extracted valid UUID via fallback method: $fallback_uuid"
                     else
-                        log_error "❌ Failed to extract UUID from provisioning profile"
-                        log_error "🔧 IPA export may fail without proper UUID"
+                        log_error "❌ Failed to extract valid UUID from provisioning profile"
+                        log_error "🔧 Invalid UUID format: '$fallback_uuid'"
+                        log_error "💡 Check PROFILE_URL and ensure it's a valid .mobileprovision file"
+                        
+                        # Critical: exit if no valid UUID found
+                        log_error "❌ Cannot proceed with IPA export without valid provisioning profile UUID"
+                        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Failed to extract valid provisioning profile UUID."
+                        return 1
                     fi
                 else
                     log_error "❌ Failed to download provisioning profile for UUID extraction"
+                    log_error "💡 Check PROFILE_URL accessibility: ${PROFILE_URL:-NOT_SET}"
+                    
+                    # Critical: exit if profile can't be downloaded
+                    log_error "❌ Cannot proceed with IPA export without provisioning profile"
+                    send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Failed to download provisioning profile from PROFILE_URL."
+                    return 1
                 fi
             fi
         else
