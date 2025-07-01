@@ -94,10 +94,33 @@ main() {
     fi
     
     # Stage 3: Handle Certificates and Provisioning Profiles
-    log_info "--- Stage 3: Handling Certificates and Provisioning Profiles ---"
-    if ! "${SCRIPT_DIR}/handle_certificates.sh"; then
-        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Certificate and profile handling failed."
+    log_info "--- Stage 3: Comprehensive Certificate Validation and Setup ---"
+    log_info "🔒 Using Comprehensive Certificate Validation System"
+    log_info "🎯 Features: P12 validation, CER+KEY conversion, App Store Connect API validation"
+    
+    # Make comprehensive certificate validation script executable
+    chmod +x "${SCRIPT_DIR}/comprehensive_certificate_validation.sh"
+    
+    # Run comprehensive certificate validation
+    if ! "${SCRIPT_DIR}/comprehensive_certificate_validation.sh"; then
+        log_error "❌ Comprehensive certificate validation failed"
+        log_error "🔧 This will prevent successful IPA export"
+        log_info "💡 Check the following:"
+        log_info "   1. CERT_P12_URL and CERT_PASSWORD are set correctly"
+        log_info "   2. CERT_CER_URL and CERT_KEY_URL are accessible"
+        log_info "   3. APP_STORE_CONNECT_API_KEY_PATH is valid"
+        log_info "   4. PROFILE_URL is accessible"
+        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Comprehensive certificate validation failed."
         return 1
+    fi
+    
+    log_success "✅ Comprehensive certificate validation completed successfully"
+    log_info "📋 Certificate Status:"
+    if [ -n "${MOBILEPROVISION_UUID:-}" ]; then
+        log_info "   - Provisioning Profile UUID: $MOBILEPROVISION_UUID"
+    fi
+    if [ -n "${APP_STORE_CONNECT_API_KEY_DOWNLOADED_PATH:-}" ]; then
+        log_info "   - App Store Connect API: Ready for upload"
     fi
     
     # Stage 4: Branding Assets Setup (Downloads logo and sets up assets)
@@ -138,16 +161,14 @@ main() {
         return 1
     fi
     
-    # Stage 6.5: Certificate and API Validation
-    log_info "--- Stage 6.5: Certificate and API Validation ---"
-    
-    # Make certificate validation script executable  
-    chmod +x "${SCRIPT_DIR}/certificate_validation.sh"
-    
-    # Run certificate and API validation for proper IPA export
-    if ! "${SCRIPT_DIR}/certificate_validation.sh"; then
-        log_warn "⚠️ Certificate validation failed - IPA export may not work properly"
-        # Don't fail the build here, just warn
+    # Stage 6.5: Certificate validation already completed in Stage 3
+    log_info "--- Stage 6.5: Certificate Validation Status ---"
+    log_info "✅ Comprehensive certificate validation completed in Stage 3"
+    if [ -n "${MOBILEPROVISION_UUID:-}" ]; then
+        log_info "📱 Provisioning Profile UUID: $MOBILEPROVISION_UUID"
+    fi
+    if [ -n "${APP_STORE_CONNECT_API_KEY_DOWNLOADED_PATH:-}" ]; then
+        log_info "🔐 App Store Connect API: Ready for upload"
     fi
     
     # Stage 6.7: Firebase Setup (Only if PUSH_NOTIFY=true)
@@ -360,123 +381,28 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
         return 1
     fi
     
-    # Stage 7.4: Enhanced Certificate Setup (CRITICAL FOR IPA EXPORT)
-    log_info "--- Stage 7.4: Enhanced Certificate Setup with P12 Generation ---"
-    log_info "🔐 CERTIFICATE VALIDATION AND AUTO-GENERATION FOR IPA EXPORT"
-    log_info "🎯 Purpose: Fix 'No signing certificate iOS Distribution found' error"
-    log_info "✨ Features: Auto P12 generation from CER/KEY files"
+    # Stage 7.4: Certificate Setup Status (Comprehensive validation completed in Stage 3)
+    log_info "--- Stage 7.4: Certificate Setup Status ---"
+    log_info "✅ Comprehensive certificate validation completed in Stage 3"
+    log_info "🎯 All certificate methods validated and configured"
     
-    # Check certificate configuration methods (using POSIX-compatible syntax)
-    cert_method_available=false
-    
-    # Method 1: Direct P12 URL
+    # Display certificate status
     if [ -n "${CERT_P12_URL:-}" ]; then
-        case "${CERT_P12_URL}" in
-            http://*|https://*)
-                log_success "✅ Method 1: Direct P12 certificate URL available"
-                log_info "   CERT_P12_URL: ${CERT_P12_URL}"
-                cert_method_available=true
-                ;;
-            *)
-                log_warn "⚠️ CERT_P12_URL set but invalid URL format: ${CERT_P12_URL}"
-                ;;
-        esac
+        log_success "📦 P12 Certificate: Configured and validated"
+    elif [ -n "${CERT_CER_URL:-}" ] && [ -n "${CERT_KEY_URL:-}" ]; then
+        log_success "🔑 CER+KEY Certificate: Converted to P12 and validated"
     fi
     
-    # Method 2: CER + KEY files for P12 generation
-    if [ -n "${CERT_CER_URL:-}" ] && [ -n "${CERT_KEY_URL:-}" ]; then
-        case "${CERT_CER_URL}" in
-            http://*|https://*)
-                case "${CERT_KEY_URL}" in
-                    http://*|https://*)
-                        log_success "✅ Method 2: CER + KEY files available for P12 generation"
-                        log_info "   CERT_CER_URL: ${CERT_CER_URL}"
-                        log_info "   CERT_KEY_URL: ${CERT_KEY_URL}"
-                        log_info "   CERT_PASSWORD: ${CERT_PASSWORD:+Custom (${#CERT_PASSWORD} chars)}${CERT_PASSWORD:-Default (Password@1234)}"
-                        cert_method_available=true
-                        ;;
-                    *)
-                        log_warn "⚠️ CERT_KEY_URL invalid format: ${CERT_KEY_URL:-NOT_SET}"
-                        ;;
-                esac
-                ;;
-            *)
-                log_warn "⚠️ CERT_CER_URL invalid format: ${CERT_CER_URL:-NOT_SET}"
-                ;;
-        esac
+    if [ -n "${MOBILEPROVISION_UUID:-}" ]; then
+        log_success "📱 Provisioning Profile: UUID extracted and installed"
+        log_info "   UUID: $MOBILEPROVISION_UUID"
     fi
     
-    # Validate certificate setup
-    if [ "$cert_method_available" = "false" ]; then
-        log_error "❌ CRITICAL: No valid certificate method configured"
-        log_error "   This is the PRIMARY cause of IPA export failure"
-        log_info ""
-        log_info "💡 SOLUTION OPTIONS:"
-        log_info ""
-        log_info "Option A - Direct P12 Certificate:"
-        log_info "   Variable Name: CERT_P12_URL"
-        log_info "   Variable Value: https://raw.githubusercontent.com/prasanna91/QuikApp/main/ios_distribution_certificate.p12"
-        log_info ""
-        log_info "Option B - Auto-Generate P12 from CER + KEY:"
-        log_info "   Variable Name: CERT_CER_URL"
-        log_info "   Variable Value: https://raw.githubusercontent.com/prasanna91/QuikApp/main/certificate.cer"
-        log_info "   Variable Name: CERT_KEY_URL"  
-        log_info "   Variable Value: https://raw.githubusercontent.com/prasanna91/QuikApp/main/private_key.key"
-        log_info "   Variable Name: CERT_PASSWORD (optional)"
-        log_info "   Variable Value: YourCustomPassword (default: Password@1234)"
-        log_info ""
-        log_warn "⚠️ IPA export will fail without certificate configuration"
-        log_info "🎯 Add one of the certificate methods above and re-run ios-workflow"
-    else
-        log_success "✅ Certificate method configured correctly"
-        
-        # Run enhanced certificate setup
-        if [ -f "${SCRIPT_DIR}/enhanced_certificate_setup.sh" ]; then
-            chmod +x "${SCRIPT_DIR}/enhanced_certificate_setup.sh"
-            log_info "🔧 Running enhanced certificate setup with P12 generation..."
-            
-            if "${SCRIPT_DIR}/enhanced_certificate_setup.sh"; then
-                log_success "✅ Enhanced certificate setup completed successfully"
-                log_info "🎯 Certificates configured for IPA export"
-                
-                # Check if P12 was generated from CER/KEY
-                if [ "${GENERATED_P12:-}" = "true" ]; then
-                    log_success "🔧 P12 certificate auto-generated from CER/KEY files"
-                    log_info "📋 Generated P12 ready for code signing"
-                fi
-                
-                # Check if code signing identity was extracted
-                if [ -n "${CODE_SIGN_IDENTITY:-}" ]; then
-                    log_success "🎯 Code signing identity extracted: ${CODE_SIGN_IDENTITY}"
-                fi
-            else
-                log_warn "⚠️ Enhanced certificate setup had issues"
-                log_warn "🔧 IPA export may fail due to certificate problems"
-            fi
-        else
-            log_warn "⚠️ Enhanced certificate setup script not found"
-            log_info "📝 Expected: ${SCRIPT_DIR}/enhanced_certificate_setup.sh"
-        fi
+    if [ -n "${APP_STORE_CONNECT_API_KEY_DOWNLOADED_PATH:-}" ]; then
+        log_success "🔐 App Store Connect API: Ready for upload"
     fi
     
-    # Validate other certificate-related environment variables
-    cert_issues=0
-    
-    if [ -z "${PROFILE_URL:-}" ]; then
-        log_warn "⚠️ PROFILE_URL not set"
-        cert_issues=$((cert_issues + 1))
-    fi
-    
-    if [ -z "${APPLE_TEAM_ID:-}" ]; then
-        log_warn "⚠️ APPLE_TEAM_ID not set"
-        cert_issues=$((cert_issues + 1))
-    fi
-    
-    if [ $cert_issues -eq 0 ]; then
-        log_success "✅ All certificate-related variables validated"
-    else
-        log_warn "⚠️ $cert_issues certificate-related variables have issues"
-    fi
+    log_info "🎯 Certificate setup ready for IPA export"
     
     # Stage 7.5: ULTIMATE Bundle Collision Prevention (ALL Error IDs)
     log_info "--- Stage 7.5: ULTIMATE Bundle Collision Prevention ---"
@@ -558,21 +484,15 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
         return 1
     fi
     
-    # Download and install provisioning profile
-    log_info "📥 Downloading provisioning profile..."
-    local profile_file="/tmp/profile.mobileprovision"
-    if curl -fsSL -o "$profile_file" "${PROFILE_URL}"; then
-        log_success "✅ Profile downloaded"
-        
-        # Install profile and get UUID
-        mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
-        local profile_uuid=$(/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i "$profile_file"))
-        local profile_name=$(/usr/libexec/PlistBuddy -c 'Print :Name' /dev/stdin <<< $(security cms -D -i "$profile_file"))
-        cp "$profile_file" "$HOME/Library/MobileDevice/Provisioning Profiles/$profile_uuid.mobileprovision"
-        log_success "✅ Profile installed with UUID: $profile_uuid"
-        log_info "📋 Profile name: $profile_name"
+    # Use provisioning profile UUID from comprehensive validation
+    log_info "📱 Using provisioning profile UUID from comprehensive validation..."
+    if [ -n "${MOBILEPROVISION_UUID:-}" ]; then
+        local profile_uuid="${MOBILEPROVISION_UUID}"
+        log_success "✅ Using extracted UUID: $profile_uuid"
+        log_info "📋 Profile already installed by comprehensive validation"
     else
-        log_error "❌ Profile download failed"
+        log_error "❌ No provisioning profile UUID available"
+        log_error "🔧 Comprehensive certificate validation should have extracted UUID"
         return 1
     fi
     
