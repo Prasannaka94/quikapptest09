@@ -2668,9 +2668,15 @@ workflows:
           echo "  - Firebase: $([ "$PUSH_NOTIFY" = "true" ] && echo "ENABLED" || echo "DISABLED")"
 
           # Run main iOS build workflow
-          echo "🚀 Executing main iOS build workflow..."
+          echo "🚀 Executing main iOS build workflow with enhanced framework provisioning profile fix..."
+          echo "🔧 Framework Fix Features:"
+          echo "   - Resolves 'framework does not support provisioning profiles' errors"
+          echo "   - Multiple fallback methods for IPA export"
+          echo "   - Firebase, Flutter plugins, and CocoaPods framework compatibility"
+          echo "   - Automatic and manual signing support"
+          echo ""
           if lib/scripts/ios/main.sh; then
-            echo "✅ iOS build workflow completed successfully!"
+            echo "✅ iOS build workflow completed successfully with framework fix!"
             
             # Display final build summary (no duplicate emails here)
             echo ""
@@ -2724,9 +2730,9 @@ workflows:
             exit 1
           fi
 
-      - name: Final Validation and Summary
+      - name: Final Validation and Enhanced Framework Export Recovery
         script: |
-          echo "🔍 Final build validation and IPA export recovery..."
+          echo "🔍 Final build validation with enhanced framework provisioning profile recovery..."
 
           # Check for IPA file
           if [ -f "output/ios/Runner.ipa" ]; then
@@ -2736,6 +2742,7 @@ workflows:
             # Validate IPA structure
             if unzip -t "output/ios/Runner.ipa" >/dev/null 2>&1; then
               echo "✅ IPA file is valid"
+              echo "🎯 Framework provisioning profile issues resolved"
             else
               echo "⚠️ IPA file appears to be corrupted"
             fi
@@ -2746,75 +2753,109 @@ workflows:
           elif [ -d "output/ios/Runner.xcarchive" ]; then
             archive_size=$(du -h output/ios/Runner.xcarchive | cut -f1)
             echo "⚠️ IPA export failed, but archive is available ($archive_size)"
-            echo "🔍 Analyzing why IPA export failed..."
+            echo "🔍 Analyzing framework provisioning profile issues..."
             
-            # Diagnose certificate configuration
+            # Check for specific framework provisioning profile errors
             echo ""
-            echo "🔐 CERTIFICATE CONFIGURATION ANALYSIS:"
-            echo "   CERT_P12_URL: ${CERT_P12_URL:-❌ NOT_SET}"
-            echo "   CERT_CER_URL: ${CERT_CER_URL:-❌ NOT_SET}"
-            echo "   CERT_KEY_URL: ${CERT_KEY_URL:-❌ NOT_SET}"
-            echo "   CERT_PASSWORD: ${CERT_PASSWORD:+✅ SET (${#CERT_PASSWORD} chars)}${CERT_PASSWORD:-❌ NOT_SET}"
-            echo "   APP_STORE_CONNECT_KEY_IDENTIFIER: ${APP_STORE_CONNECT_KEY_IDENTIFIER:+✅ SET}${APP_STORE_CONNECT_KEY_IDENTIFIER:-❌ NOT_SET}"
-            echo "   APP_STORE_CONNECT_ISSUER_ID: ${APP_STORE_CONNECT_ISSUER_ID:+✅ SET}${APP_STORE_CONNECT_ISSUER_ID:-❌ NOT_SET}"
+            echo "🔍 FRAMEWORK PROVISIONING PROFILE ANALYSIS:"
             
-            # Determine the root cause
-            echo ""
-            if [ -z "${CERT_P12_URL:-}" ] && [ -z "${CERT_CER_URL:-}" ]; then
-              echo "🎯 ROOT CAUSE: Missing iOS Distribution Certificate"
-              echo ""
-              echo "💡 IMMEDIATE SOLUTION - Add one of these certificate configurations:"
-              echo ""
-              echo "🔧 Option A - Direct P12 Certificate (Recommended):"
-              echo "   Variable: CERT_P12_URL"
-              echo "   Example: https://raw.githubusercontent.com/yourrepo/ios_distribution_certificate.p12"
-              echo "   Variable: CERT_PASSWORD"
-              echo "   Example: YourP12Password"
-              echo ""
-              echo "🔧 Option B - Auto-Generate P12 from CER + KEY:"
-              echo "   Variable: CERT_CER_URL"
-              echo "   Example: https://raw.githubusercontent.com/yourrepo/certificate.cer"
-              echo "   Variable: CERT_KEY_URL"
-              echo "   Example: https://raw.githubusercontent.com/yourrepo/private_key.key"
-              echo "   Variable: CERT_PASSWORD (optional)"
-              echo "   Example: Password@1234 (default if not set)"
-              echo ""
-            elif [ -n "${CERT_P12_URL:-}" ] || [ -n "${CERT_CER_URL:-}" ]; then
-              echo "🔍 Certificate URLs configured, attempting recovery export..."
-              
-              # Attempt enhanced certificate setup and export
-              if [ -f "lib/scripts/ios/enhanced_certificate_setup.sh" ]; then
-                echo "🔧 Running enhanced certificate setup for recovery..."
-                chmod +x lib/scripts/ios/enhanced_certificate_setup.sh
+            # Look for framework errors in logs
+            if ls export_method*.log 2>/dev/null; then
+              echo "📋 Checking export logs for framework issues..."
+              if grep -q "framework does not support provisioning profiles" export_method*.log 2>/dev/null; then
+                echo "🎯 ROOT CAUSE: Framework provisioning profile error detected"
+                echo "   ❌ Frameworks like Firebase, Flutter plugins don't support manual provisioning profiles"
+                echo ""
+                echo "🚀 ATTEMPTING ENHANCED FRAMEWORK-SAFE EXPORT RECOVERY..."
                 
-                if lib/scripts/ios/enhanced_certificate_setup.sh; then
-                  echo "✅ Enhanced certificate setup completed"
+                # Use our enhanced framework export script
+                if [ -f "lib/scripts/ios/export_ipa_framework_fix.sh" ]; then
+                  echo "🔧 Running enhanced framework-safe export script..."
+                  chmod +x lib/scripts/ios/export_ipa_framework_fix.sh
                   
-                  # Attempt IPA export with certificates
-                  if [ -f "lib/scripts/ios/export_ipa.sh" ] && [ -f "ios/ExportOptions.plist" ]; then
-                    echo "🚀 Attempting recovery IPA export..."
-                    chmod +x lib/scripts/ios/export_ipa.sh
+                  # Extract certificate identity and other required variables
+                  CERT_IDENTITY="iPhone Distribution: Pixaware Technology Solutions Private Limited (9H2AD7NQ49)"
+                  PROFILE_UUID="${MOBILEPROVISION_UUID:-f62f712b-b4a1-47e1-90f9-db7093485ec4}"
+                  KEYCHAIN_PATH="$HOME/Library/Keychains/ios-build.keychain-db"
+                  
+                  echo "🔐 Using certificate: $CERT_IDENTITY"
+                  echo "📱 Using profile UUID: $PROFILE_UUID"
+                  echo "📦 Using bundle ID: $BUNDLE_ID"
+                  echo "👥 Using team ID: $APPLE_TEAM_ID"
+                  
+                  if lib/scripts/ios/export_ipa_framework_fix.sh \
+                    "output/ios/Runner.xcarchive" \
+                    "output/ios" \
+                    "$CERT_IDENTITY" \
+                    "$PROFILE_UUID" \
+                    "$BUNDLE_ID" \
+                    "$APPLE_TEAM_ID" \
+                    "$KEYCHAIN_PATH"; then
                     
-                    if lib/scripts/ios/export_ipa.sh; then
-                      echo "🎉 RECOVERY SUCCESS: IPA export completed!"
-                      if [ -f "output/ios/Runner.ipa" ]; then
-                        ipa_size=$(du -h output/ios/Runner.ipa | cut -f1)
-                        echo "✅ IPA file recovered: output/ios/Runner.ipa ($ipa_size)"
-                        echo "🎯 Profile Type: $PROFILE_TYPE"
-                        echo "📦 Distribution Status: READY"
-                      fi
-                    else
-                      echo "❌ Recovery IPA export failed"
-                      echo "🔧 Manual export still required"
+                    echo "🎉 FRAMEWORK-SAFE EXPORT SUCCESS!"
+                    if [ -f "output/ios/Runner.ipa" ]; then
+                      ipa_size=$(du -h output/ios/Runner.ipa | cut -f1)
+                      echo "✅ IPA file recovered with framework fix: output/ios/Runner.ipa ($ipa_size)"
+                      echo "🎯 Framework provisioning profile issues resolved"
+                      echo "📦 Distribution Status: READY"
                     fi
                   else
-                    echo "⚠️ Export script or options not found for recovery"
+                    echo "❌ Enhanced framework export failed, checking fallback methods..."
+                    
+                    # Show method-specific logs
+                    if [ -f export_method1.log ]; then
+                      echo "📋 Method 1 (Manual signing) errors:"
+                      tail -10 export_method1.log
+                    fi
+                    if [ -f export_method2.log ]; then
+                      echo "📋 Method 2 (Automatic signing) errors:"
+                      tail -10 export_method2.log
+                    fi
+                    echo "🔧 Manual export still required"
                   fi
                 else
-                  echo "❌ Enhanced certificate setup failed during recovery"
+                  echo "❌ Enhanced framework export script not found"
+                  echo "   Expected: lib/scripts/ios/export_ipa_framework_fix.sh"
                 fi
               else
-                echo "⚠️ Enhanced certificate setup script not found"
+                echo "ℹ️ No framework provisioning profile errors detected in logs"
+              fi
+            else
+              echo "ℹ️ No export logs found to analyze"
+            fi
+            
+            # Diagnose certificate configuration if framework fix didn't work
+            if [ ! -f "output/ios/Runner.ipa" ]; then
+              echo ""
+              echo "🔐 CERTIFICATE CONFIGURATION ANALYSIS:"
+              echo "   CERT_P12_URL: ${CERT_P12_URL:-❌ NOT_SET}"
+              echo "   CERT_CER_URL: ${CERT_CER_URL:-❌ NOT_SET}"
+              echo "   CERT_KEY_URL: ${CERT_KEY_URL:-❌ NOT_SET}"
+              echo "   CERT_PASSWORD: ${CERT_PASSWORD:+✅ SET (${#CERT_PASSWORD} chars)}${CERT_PASSWORD:-❌ NOT_SET}"
+              echo "   APP_STORE_CONNECT_KEY_IDENTIFIER: ${APP_STORE_CONNECT_KEY_IDENTIFIER:+✅ SET}${APP_STORE_CONNECT_KEY_IDENTIFIER:-❌ NOT_SET}"
+              echo "   APP_STORE_CONNECT_ISSUER_ID: ${APP_STORE_CONNECT_ISSUER_ID:+✅ SET}${APP_STORE_CONNECT_ISSUER_ID:-❌ NOT_SET}"
+              
+              # Determine the root cause
+              echo ""
+              if [ -z "${CERT_P12_URL:-}" ] && [ -z "${CERT_CER_URL:-}" ]; then
+                echo "🎯 ROOT CAUSE: Missing iOS Distribution Certificate"
+                echo ""
+                echo "💡 IMMEDIATE SOLUTION - Add one of these certificate configurations:"
+                echo ""
+                echo "🔧 Option A - Direct P12 Certificate (Recommended):"
+                echo "   Variable: CERT_P12_URL"
+                echo "   Example: https://raw.githubusercontent.com/yourrepo/ios_distribution_certificate.p12"
+                echo "   Variable: CERT_PASSWORD"
+                echo "   Example: YourP12Password"
+                echo ""
+                echo "🔧 Option B - Auto-Generate P12 from CER + KEY:"
+                echo "   Variable: CERT_CER_URL"
+                echo "   Example: https://raw.githubusercontent.com/yourrepo/certificate.cer"
+                echo "   Variable: CERT_KEY_URL"
+                echo "   Example: https://raw.githubusercontent.com/yourrepo/private_key.key"
+                echo "   Variable: CERT_PASSWORD (optional)"
+                echo "   Example: Password@1234 (default if not set)"
+                echo ""
               fi
             fi
             
@@ -2832,6 +2873,16 @@ workflows:
               echo "8. Follow the signing wizard"
               echo ""
               echo "📦 Archive: output/ios/Runner.xcarchive ($archive_size)"
+              echo ""
+              echo "🔧 OR try the enhanced framework export fix manually:"
+              echo "   lib/scripts/ios/export_ipa_framework_fix.sh \\"
+              echo "     'output/ios/Runner.xcarchive' \\"
+              echo "     'output/ios' \\"
+              echo "     'Your Certificate Identity' \\"
+              echo "     'Your Profile UUID' \\"
+              echo "     '$BUNDLE_ID' \\"
+              echo "     '$APPLE_TEAM_ID' \\"
+              echo "     'Your Keychain Path'"
             fi
             
           else
@@ -2844,6 +2895,20 @@ workflows:
             echo ""
             echo "📋 Build Summary:"
             cat output/ios/ARTIFACTS_SUMMARY.txt
+          fi
+
+          # Display framework fix status
+          echo ""
+          echo "🔧 Enhanced Framework Provisioning Profile Fix Status:"
+          if [ -f "lib/scripts/ios/export_ipa_framework_fix.sh" ]; then
+            echo "✅ Framework fix script available"
+            echo "📋 Supported methods:"
+            echo "   1. Manual signing with framework-safe options"
+            echo "   2. Automatic signing for frameworks"
+            echo "   3. Ad-hoc distribution (testing fallback)"
+            echo "   4. Enterprise distribution (if applicable)"
+          else
+            echo "❌ Framework fix script not found"
           fi
 
       - name: Send Final Email Notification
