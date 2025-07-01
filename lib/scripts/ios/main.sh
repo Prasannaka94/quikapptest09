@@ -610,12 +610,25 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
     <false/>
     <key>compileBitcode</key>
     <false/>
+    <key>uploadSymbols</key>
+    <true/>
     <key>signingCertificate</key>
     <string>${cert_identity}</string>
     <key>provisioningProfiles</key>
     <dict>
         <key>${BUNDLE_ID}</key>
         <string>${profile_uuid}</string>
+    </dict>
+    <key>manageAppVersionAndBuildNumber</key>
+    <false/>
+    <key>destination</key>
+    <string>export</string>
+    <key>iCloudContainerEnvironment</key>
+    <string>Production</string>
+    <key>signingOptions</key>
+    <dict>
+        <key>signEmbeddedFrameworks</key>
+        <false/>
     </dict>
 </dict>
 </plist>
@@ -638,8 +651,7 @@ EOF
         -allowProvisioningUpdates \
         DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
         CODE_SIGN_IDENTITY="${cert_identity}" \
-        PROVISIONING_PROFILE="${profile_uuid}" \
-        OTHER_CODE_SIGN_FLAGS="--keychain $keychain_path" 2>&1 | tee export.log; then
+        PROVISIONING_PROFILE="${profile_uuid}" 2>&1 | tee export.log; then
         
         log_error "❌ IPA export failed"
         cat export.log
