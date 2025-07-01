@@ -3297,6 +3297,43 @@ workflows:
             echo "❌ Framework fix script not found"
           fi
 
+      - name: 🚀 App Store Connect CFBundleIdentifier Collision Eliminator
+        script: |
+          echo "🚀 Running App Store Connect collision elimination for Transporter validation..."
+          echo "🎯 Target: Transporter validation (409) CFBundleIdentifier collision"
+          echo "💥 Error ID: d9cd9287-ed84-4ae8-a873-071641003b37"
+          echo ""
+
+          # Check if IPA exists before running App Store Connect collision eliminator
+          if [ -f "output/ios/Runner.ipa" ]; then
+            echo "✅ IPA found, running App Store Connect collision eliminator..."
+            chmod +x lib/scripts/ios/app_store_connect_collision_eliminator.sh
+            
+            # Run the App Store Connect collision eliminator
+            if lib/scripts/ios/app_store_connect_collision_eliminator.sh; then
+              echo "🚀 App Store Connect collision elimination completed successfully"
+              echo "✅ IPA should now pass Transporter validation"
+              
+              # Verify the fixed IPA
+              if [ -f "output/ios/Runner.ipa" ]; then
+                ipa_size=$(du -h output/ios/Runner.ipa | cut -f1)
+                echo "📦 Final App Store Connect compatible IPA: output/ios/Runner.ipa ($ipa_size)"
+                echo "🎯 Transporter validation (409) error should be resolved"
+                echo "📱 Ready for App Store Connect upload"
+              else
+                echo "⚠️ IPA not found after App Store Connect collision elimination"
+              fi
+            else
+              echo "❌ App Store Connect collision elimination failed"
+              echo "   This may indicate deeper validation issues"
+              echo "   IPA may still have App Store Connect compatibility problems"
+            fi
+          else
+            echo "⚠️ IPA not found, App Store Connect collision eliminator skipped"
+            echo "   IPA path: output/ios/Runner.ipa"
+            echo "   This step requires an existing IPA to eliminate App Store Connect collisions"
+          fi
+
       - name: Send Final Email Notification
         script: |
           echo "📧 Sending final build notification..."
@@ -3345,6 +3382,7 @@ workflows:
       # 📱 IPA Files (Primary artifacts)
       - output/ios/*.ipa
       - output/ios/*_collision_free.ipa # Collision-free IPA for App Store
+      - output/ios/*_AppStoreConnect_Fixed.ipa # App Store Connect compatible IPA
       - build/ios/ipa/*.ipa
       - ios/build/*.ipa
       - "*.ipa"
