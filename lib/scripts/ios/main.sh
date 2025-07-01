@@ -698,14 +698,46 @@ EOF
         return 1
     fi
     
-    # Verify IPA was created
-    if [ -f "${OUTPUT_DIR:-output/ios}/Runner.ipa" ]; then
-        local ipa_size=$(du -h "${OUTPUT_DIR:-output/ios}/Runner.ipa" | cut -f1)
-        log_success "✅ IPA created successfully: $ipa_size"
+    # Verify IPA was created - check multiple possible names
+    local export_dir="${OUTPUT_DIR:-output/ios}"
+    local ipa_files=(
+        "$export_dir/Runner.ipa"
+        "$export_dir/${APP_NAME:-Insurancegroupmo}.ipa"
+        "$export_dir/Insurancegroupmo.ipa"
+    )
+    
+    local found_ipa=""
+    for ipa_file in "${ipa_files[@]}"; do
+        if [ -f "$ipa_file" ]; then
+            found_ipa="$ipa_file"
+            break
+        fi
+    done
+    
+    # Also check for any IPA file in the directory
+    if [ -z "$found_ipa" ]; then
+        found_ipa=$(find "$export_dir" -name "*.ipa" -type f | head -1)
+    fi
+    
+    if [ -n "$found_ipa" ]; then
+        local ipa_size=$(du -h "$found_ipa" | cut -f1)
+        local ipa_name=$(basename "$found_ipa")
+        log_success "✅ IPA created successfully: $ipa_name ($ipa_size)"
+        log_info "📱 IPA location: $found_ipa"
         log_info "🎯 Framework provisioning profile issues resolved"
+        
+        # Ensure there's also a Runner.ipa for backwards compatibility
+        local runner_ipa="$export_dir/Runner.ipa"
+        if [ "$found_ipa" != "$runner_ipa" ] && [ ! -f "$runner_ipa" ]; then
+            log_info "🔄 Creating Runner.ipa symlink for compatibility..."
+            ln -sf "$(basename "$found_ipa")" "$runner_ipa"
+        fi
+        
         return 0
     else
         log_error "❌ IPA file not found after enhanced export"
+        log_info "🔍 Checking export directory contents:"
+        ls -la "$export_dir" | head -10
         log_error "🔧 Check export logs for details"
         return 1
     fi

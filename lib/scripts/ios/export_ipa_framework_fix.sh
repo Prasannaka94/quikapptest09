@@ -166,6 +166,18 @@ export_ipa_with_framework_fix() {
             PROVISIONING_PROFILE="$profile_uuid" 2>&1 | tee export_method1.log; then
             
             log_success "✅ Method 1 successful - Manual signing with framework-safe options"
+            
+            # Check if IPA was created and copy to expected location if needed
+            local found_ipa=$(find "$export_path" -name "*.ipa" -type f | head -1)
+            if [ -n "$found_ipa" ] && [ -f "$found_ipa" ]; then
+                local expected_ipa="${export_path}/Runner.ipa"
+                if [ "$found_ipa" != "$expected_ipa" ]; then
+                    log_info "🔄 Copying IPA to expected location..."
+                    cp "$found_ipa" "$expected_ipa"
+                    log_success "✅ IPA copied to: $expected_ipa"
+                fi
+            fi
+            
             return 0
         else
             log_warn "⚠️ Method 1 failed - Manual signing with framework-safe options"
@@ -184,6 +196,18 @@ export_ipa_with_framework_fix() {
             DEVELOPMENT_TEAM="$team_id" 2>&1 | tee export_method2.log; then
             
             log_success "✅ Method 2 successful - Automatic signing for frameworks"
+            
+            # Check if IPA was created and copy to expected location if needed
+            local found_ipa=$(find "$export_path" -name "*.ipa" -type f | head -1)
+            if [ -n "$found_ipa" ] && [ -f "$found_ipa" ]; then
+                local expected_ipa="${export_path}/Runner.ipa"
+                if [ "$found_ipa" != "$expected_ipa" ]; then
+                    log_info "🔄 Copying IPA to expected location..."
+                    cp "$found_ipa" "$expected_ipa"
+                    log_success "✅ IPA copied to: $expected_ipa"
+                fi
+            fi
+            
             return 0
         else
             log_warn "⚠️ Method 2 failed - Automatic signing for frameworks"
@@ -228,6 +252,18 @@ EOF
             DEVELOPMENT_TEAM="$team_id" 2>&1 | tee export_method3.log; then
             
             log_success "✅ Method 3 successful - Ad-hoc distribution"
+            
+            # Check if IPA was created and copy to expected location if needed
+            local found_ipa=$(find "$export_path" -name "*.ipa" -type f | head -1)
+            if [ -n "$found_ipa" ] && [ -f "$found_ipa" ]; then
+                local expected_ipa="${export_path}/Runner.ipa"
+                if [ "$found_ipa" != "$expected_ipa" ]; then
+                    log_info "🔄 Copying IPA to expected location..."
+                    cp "$found_ipa" "$expected_ipa"
+                    log_success "✅ IPA copied to: $expected_ipa"
+                fi
+            fi
+            
             return 0
         else
             log_warn "⚠️ Method 3 failed - Ad-hoc distribution"
@@ -291,6 +327,43 @@ EOF
             -allowProvisioningUpdates 2>&1 | tee export_method4.log; then
             
             log_success "✅ Method 4 successful - App Store Connect API with automatic certificate management"
+            
+            # Check if IPA was created - Method 4 might create it with app name
+            local possible_ipa_files=(
+                "${export_path}/Runner.ipa"
+                "${export_path}/${APP_NAME:-Insurancegroupmo}.ipa"
+                "${export_path}/Insurancegroupmo.ipa"
+                "${export_path}"/*.ipa
+            )
+            
+            local found_ipa=""
+            for ipa_pattern in "${possible_ipa_files[@]}"; do
+                # Use shell expansion to find files matching pattern
+                for ipa_file in $ipa_pattern; do
+                    if [ -f "$ipa_file" ]; then
+                        found_ipa="$ipa_file"
+                        break 2  # Break out of both loops
+                    fi
+                done
+            done
+            
+            if [ -n "$found_ipa" ]; then
+                local ipa_size=$(du -h "$found_ipa" | cut -f1)
+                log_success "✅ IPA created successfully: $(basename "$found_ipa") (${ipa_size})"
+                
+                # If IPA has different name, copy it to expected location
+                local expected_ipa="${export_path}/Runner.ipa"
+                if [ "$found_ipa" != "$expected_ipa" ]; then
+                    log_info "🔄 Copying IPA to expected location..."
+                    cp "$found_ipa" "$expected_ipa"
+                    log_success "✅ IPA copied to: $expected_ipa"
+                fi
+            else
+                log_warn "⚠️ Method 4 reported success but no IPA file found"
+                log_info "🔍 Checking export directory contents:"
+                ls -la "$export_path" | head -10
+            fi
+            
             return 0
         else
             log_warn "⚠️ Method 4 failed - App Store Connect API"
