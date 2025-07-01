@@ -535,20 +535,39 @@ main() {
         return 1
     fi
     
-    # Step 6: Apply Simple Bundle Collision Prevention (BEFORE archive creation)
-    log_info "🔧 SIMPLE COLLISION PREVENTION: Applying pre-archive collision fixes..."
+    # Step 6: Apply Pre-Archive Collision Prevention (BEFORE archive creation)
+    log_info "🚀 PRE-ARCHIVE COLLISION PREVENTION: Applying comprehensive collision fixes..."
     
-    if [ -f "lib/scripts/ios/simple_collision_prevention.sh" ]; then
-        chmod +x lib/scripts/ios/simple_collision_prevention.sh
-        if lib/scripts/ios/simple_collision_prevention.sh "${BUNDLE_ID:-com.example.app}"; then
-            log_success "✅ SIMPLE COLLISION PREVENTION: Pre-archive fixes applied successfully"
-            log_info "🎯 CFBundleIdentifier collisions resolved before archive creation"
+    if [ -f "lib/scripts/ios/pre_archive_collision_prevention.sh" ]; then
+        chmod +x lib/scripts/ios/pre_archive_collision_prevention.sh
+        if lib/scripts/ios/pre_archive_collision_prevention.sh "${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}"; then
+            log_success "✅ PRE-ARCHIVE COLLISION PREVENTION: Comprehensive fixes applied successfully"
+            log_info "🎯 ALL CFBundleIdentifier collisions resolved before archive creation"
+            log_info "📱 Components will have unique bundle IDs in final IPA"
         else
-            log_warn "⚠️ SIMPLE COLLISION PREVENTION: Pre-archive fixes had issues, but continuing"
+            log_warn "⚠️ PRE-ARCHIVE COLLISION PREVENTION: Fixes had issues, but continuing"
+            log_info "🔄 Attempting fallback simple collision prevention..."
+            
+            # Fallback to simple collision prevention
+            if [ -f "lib/scripts/ios/simple_collision_prevention.sh" ]; then
+                chmod +x lib/scripts/ios/simple_collision_prevention.sh
+                if lib/scripts/ios/simple_collision_prevention.sh "${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}"; then
+                    log_success "✅ FALLBACK: Simple collision prevention applied"
+                else
+                    log_warn "⚠️ Both collision prevention methods had issues, but continuing"
+                fi
+            fi
         fi
     else
-        log_warn "⚠️ Simple collision prevention script not found"
-        log_info "📝 Expected: lib/scripts/ios/simple_collision_prevention.sh"
+        log_warn "⚠️ Pre-archive collision prevention script not found"
+        log_info "📝 Expected: lib/scripts/ios/pre_archive_collision_prevention.sh"
+        
+        # Fallback to simple collision prevention
+        if [ -f "lib/scripts/ios/simple_collision_prevention.sh" ]; then
+            log_info "🔄 Using fallback simple collision prevention..."
+            chmod +x lib/scripts/ios/simple_collision_prevention.sh
+            lib/scripts/ios/simple_collision_prevention.sh "${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}" || true
+        fi
     fi
     
     # Step 7: Create Xcode archive

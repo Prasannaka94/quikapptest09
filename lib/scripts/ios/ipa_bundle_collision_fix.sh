@@ -30,9 +30,21 @@ fix_ipa_bundle_collisions() {
     cd "$work_dir"
     unzip -q "$ipa_path"
     
-    local app_path="Payload/Runner.app"
-    if [ ! -d "$app_path" ]; then
-        log_error "Runner.app not found in IPA"
+    # Find the actual app bundle (could be Runner.app or app-specific name)
+    local app_path=""
+    if [ -d "Payload/Runner.app" ]; then
+        app_path="Payload/Runner.app"
+        log_info "Using Runner.app as app bundle"
+    else
+        # Find any .app bundle in Payload directory
+        app_path=$(find Payload -name "*.app" -type d | head -1)
+        if [ -n "$app_path" ]; then
+            log_info "Using $(basename "$app_path") as app bundle"
+        fi
+    fi
+    
+    if [ -z "$app_path" ] || [ ! -d "$app_path" ]; then
+        log_error "No .app bundle found in IPA"
         cleanup_and_exit 1
     fi
     
@@ -209,9 +221,19 @@ validate_ipa_structure() {
         return 1
     fi
     
-    # Check for Runner.app
-    if ! unzip -l "$ipa_path" | grep -q "Payload/Runner.app/"; then
-        log_error "IPA file does not contain Runner.app"
+    # Check for app bundle (could be Runner.app or app-specific name like Insurancegroupmo.app)
+    local app_found=false
+    if unzip -l "$ipa_path" | grep -q "Payload/Runner.app/"; then
+        app_found=true
+        log_info "Found Runner.app in IPA"
+    elif unzip -l "$ipa_path" | grep -q "Payload/.*\.app/"; then
+        local app_name=$(unzip -l "$ipa_path" | grep "Payload/.*\.app/" | head -1 | sed 's/.*Payload\/\([^\/]*\.app\)\/.*/\1/')
+        app_found=true
+        log_info "Found $app_name in IPA"
+    fi
+    
+    if [ "$app_found" = false ]; then
+        log_error "IPA file does not contain any .app bundle"
         return 1
     fi
     
@@ -249,7 +271,7 @@ main() {
     if [ -z "$output_path" ]; then
         local dir=$(dirname "$ipa_path")
         local name=$(basename "$ipa_path" .ipa)
-        output_path="$dir/${name}_collision_fixed.ipa"
+        output_path="$dir/${name}_collision_free.ipa"
     fi
     
     log_info "📋 Configuration:"
