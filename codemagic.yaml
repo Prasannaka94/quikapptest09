@@ -2280,28 +2280,28 @@ workflows:
           echo "🚨 Target Error ID: 37cb2272-e99e-4508-8adc-d407afb1890b"
           echo "💥 Multiple Error IDs detected - NUCLEAR approach required"
           echo "🎯 Bundle ID: ${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}"
-          
+
           # ABSOLUTE PRIORITY: Stop ALL build processes and fix collisions FIRST
           set -euo pipefail
-          
+
           # Emergency cleanup of ALL potential collision sources
           echo "🧹 EMERGENCY cleanup of ALL collision sources..."
           rm -rf ios/Pods ios/Podfile.lock ios/.symlinks 2>/dev/null || true
           rm -rf ios/build ios/Runner.xcworkspace/xcuserdata 2>/dev/null || true
           rm -rf .dart_tool .packages .flutter-plugins .flutter-plugins-dependencies 2>/dev/null || true
           rm -rf ~/Library/Developer/Xcode/DerivedData/Runner-* 2>/dev/null || true
-          
+
           # ABSOLUTE: Set bundle identifier in Info.plist IMMEDIATELY
           BUNDLE_ID_SAFE="${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}"
           echo "🎯 Setting bundle identifier in Info.plist: $BUNDLE_ID_SAFE"
-          
+
           if [ -f "ios/Runner/Info.plist" ]; then
             /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_ID_SAFE" "ios/Runner/Info.plist" 2>/dev/null || {
               /usr/libexec/PlistBuddy -c "Add :CFBundleIdentifier string $BUNDLE_ID_SAFE" "ios/Runner/Info.plist" 2>/dev/null || true
             }
             echo "✅ Info.plist CFBundleIdentifier set to: $BUNDLE_ID_SAFE"
           fi
-          
+
           # ABSOLUTE: Create collision-free Podfile IMMEDIATELY
           echo "☢️ Creating ABSOLUTE collision-free Podfile..."
           cat > ios/Podfile << 'EOF'
@@ -2309,43 +2309,43 @@ workflows:
           # EMERGENCY fix for Error ID 37cb2272-e99e-4508-8adc-d407afb1890b
           platform :ios, '13.0'
           use_frameworks! :linkage => :static
-          
+
           ENV['COCOAPODS_DISABLE_STATS'] = 'true'
-          
+
           project 'Runner', {
             'Debug' => :debug,
             'Profile' => :release,
             'Release' => :release,
           }
-          
+
           def flutter_root
             generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
             unless File.exist?(generated_xcode_build_settings_path)
               raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
             end
-          
+
             File.foreach(generated_xcode_build_settings_path) do |line|
               matches = line.match(/FLUTTER_ROOT\=(.*)/)
               return matches[1].strip if matches
             end
             raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
           end
-          
+
           require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
-          
+
           flutter_ios_podfile_setup
-          
+
           target 'Runner' do
             use_frameworks!
             use_modular_headers!
-          
+
             flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
             
             target 'RunnerTests' do
               inherit! :search_paths
             end
           end
-          
+
           # ABSOLUTE CFBundleIdentifier Collision Prevention
           # EMERGENCY fix for Error ID 37cb2272-e99e-4508-8adc-d407afb1890b
           post_install do |installer|
@@ -2744,12 +2744,12 @@ workflows:
           fi
 
           echo "✅ Build process components validated"
-#      - name: Setup Fastlane
-#        script: |
-#          echo "📦 Installing fastlane..."
-#          gem install fastlane
-#          fastlane --version
-#          echo "✅ Fastlane setup completed"
+      #      - name: Setup Fastlane
+      #        script: |
+      #          echo "📦 Installing fastlane..."
+      #          gem install fastlane
+      #          fastlane --version
+      #          echo "✅ Fastlane setup completed"
       - name: Test App Store Connect API Credentials
         script: |
           echo "🔍 Testing App Store Connect API credentials before build..."
@@ -3009,6 +3009,41 @@ workflows:
             export FINAL_BUILD_STATUS="error"
             export FINAL_BUILD_MESSAGE="iOS build failed: Build must succeed cleanly - check Firebase and dependency configuration for $APP_NAME"
             exit 1
+          fi
+
+      - name: ☢️ ULTIMATE IPA CFBundleIdentifier Collision Eliminator
+        script: |
+          echo "☢️ Running ULTIMATE IPA collision elimination after build completion..."
+          echo "🎯 This addresses collision during IPA export phase specifically"
+          echo "💥 Target: CFBundleIdentifier collision error (90685)"
+          echo ""
+
+          # Check if archive exists before running collision eliminator
+          if [ -d "ios/build/Runner.xcarchive" ]; then
+            echo "✅ Archive found, running collision eliminator..."
+            chmod +x lib/scripts/ios/ultimate_ipa_collision_eliminator.sh
+            
+            # Run the collision eliminator which will create collision-free IPA
+            if lib/scripts/ios/ultimate_ipa_collision_eliminator.sh; then
+              echo "☢️ ULTIMATE IPA collision elimination completed successfully"
+              echo "✅ Collision-free IPA should be created"
+              
+              # Verify the IPA was created/fixed
+              if [ -f "output/ios/Runner.ipa" ]; then
+                ipa_size=$(du -h output/ios/Runner.ipa | cut -f1)
+                echo "📦 Final IPA: output/ios/Runner.ipa ($ipa_size)"
+                echo "🎯 CFBundleIdentifier collision error (90685) should be resolved"
+              else
+                echo "⚠️ IPA not found after collision elimination"
+              fi
+            else
+              echo "❌ ULTIMATE IPA collision elimination failed"
+              echo "   This may indicate issues beyond bundle ID collisions"
+            fi
+          else
+            echo "⚠️ Archive not found, collision eliminator skipped"
+            echo "   Archive path: ios/build/Runner.xcarchive"
+            echo "   This step requires an existing archive to eliminate collisions"
           fi
 
       - name: Final Validation and Enhanced Framework Export Recovery
