@@ -574,14 +574,34 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
     # Get the actual certificate identity from keychain
     log_info "🔍 Extracting certificate identity for export..."
     local cert_identity
-    cert_identity=$(security find-identity -v -p codesigning "$keychain_name" | grep -E "iPhone Distribution|iOS Distribution|Apple Distribution" | head -1 | sed 's/^[[:space:]]*[0-9]*[[:space:]]*"\([^"]*\)".*/\1/')
+    
+    # Method 1: Extract from security command output
+    cert_identity=$(security find-identity -v -p codesigning "$keychain_name" | grep -E "iPhone Distribution|iOS Distribution|Apple Distribution" | head -1 | sed 's/.*"\([^"]*\)".*/\1/')
+    
+    # Clean up any leading/trailing whitespace
+    cert_identity=$(echo "$cert_identity" | xargs)
+    
+    # Method 2: Fallback - try to extract just the certificate name without the hash
+    if [ -z "$cert_identity" ] || [[ "$cert_identity" == *"1DBEE49627AB50AB6C87811901BEBDE374CD0E18"* ]]; then
+        log_info "🔄 Fallback: Extracting certificate name without hash..."
+        cert_identity=$(security find-identity -v -p codesigning "$keychain_name" | grep -E "iPhone Distribution|iOS Distribution|Apple Distribution" | head -1 | sed 's/.*"\([^"]*\)".*/\1/' | sed 's/^[[:space:]]*[0-9A-F]*[[:space:]]*//')
+        cert_identity=$(echo "$cert_identity" | xargs)
+    fi
+    
+    # Method 3: Ultimate fallback - use a simpler extraction
+    if [ -z "$cert_identity" ] || [[ "$cert_identity" == *"1DBEE49627AB50AB6C87811901BEBDE374CD0E18"* ]]; then
+        log_info "🔄 Ultimate fallback: Using simplified certificate extraction..."
+        cert_identity=$(security find-identity -v -p codesigning "$keychain_name" | grep -E "iPhone Distribution|iOS Distribution|Apple Distribution" | head -1 | awk -F'"' '{print $2}')
+        cert_identity=$(echo "$cert_identity" | xargs)
+    fi
     
     if [ -z "$cert_identity" ]; then
         log_error "❌ Could not extract certificate identity from keychain"
         return 1
     fi
     
-    log_success "✅ Using certificate identity: $cert_identity"
+    log_success "✅ Using certificate identity: '$cert_identity'"
+    log_info "🔍 Raw certificate identity length: ${#cert_identity} characters"
     
     # Create enhanced export options with proper keychain path
     log_info "📝 Creating enhanced export options..."
