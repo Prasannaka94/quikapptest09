@@ -152,50 +152,10 @@ echo "🎬 STAGE 4: Enhanced Podfile integration"
 if [[ -f "$IOS_DIR/Podfile" ]]; then
     echo "🔧 Integrating real-time collision prevention into Podfile..."
     
-    # Add our collision prevention to Podfile if not already present
-    if ! grep -q "REAL-TIME COLLISION PREVENTION" "$IOS_DIR/Podfile"; then
-        cat >> "$IOS_DIR/Podfile" << 'EOF'
-
-# REAL-TIME COLLISION PREVENTION - INTERCEPTOR INTEGRATION
-post_install do |installer|
-  installer.pods_project.targets.each do |target|
-    flutter_additional_ios_build_settings(target) if defined?(flutter_additional_ios_build_settings)
-    
-    # Real-time collision prevention for ALL targets
-    target.build_configurations.each do |config|
-      base_bundle_id = ENV['BUNDLE_ID'] || ENV['APP_ID'] || 'com.twinklub.twinklub'
-      
-      # Generate ultra-unique bundle IDs for each target
-      if target.name.include?('Runner')
-        # Keep main app bundle ID unchanged
-        config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = base_bundle_id
-      else
-        # Generate unique bundle ID for this target (properly sanitize underscores)
-        safe_target_name = target.name.downcase.gsub(/_+/, '').gsub(/[^a-z0-9]/, '')
-        safe_target_name = 'framework' if safe_target_name.empty?
-        unique_suffix = "rt.#{safe_target_name}.#{Time.now.to_i}"
-        config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = "#{base_bundle_id}.#{unique_suffix}"
-      end
-      
-      # Ultra-aggressive build settings to prevent any issues
-      config.build_settings['CODE_SIGN_IDENTITY'] = ''
-      config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
-      config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
-      config.build_settings['ENABLE_BITCODE'] = 'NO'
-      config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
-      
-      # Prevent any framework-level collisions
-      config.build_settings['FRAMEWORK_SEARCH_PATHS'] ||= []
-      config.build_settings['FRAMEWORK_SEARCH_PATHS'] << '$(inherited)'
-      config.build_settings['FRAMEWORK_SEARCH_PATHS'] << '$(PROJECT_DIR)'
-    end
-  end
-end
-EOF
-        echo "✅ Podfile enhanced with real-time collision prevention"
-    else
-        echo "✅ Podfile already has collision prevention"
-    fi
+    # DISABLED: Real-time collision prevention is disabled because the main Podfile
+    # already contains fixed collision prevention code without underscore issues
+    echo "🚫 Real-time collision prevention DISABLED - using main Podfile collision prevention"
+    echo "✅ Main Podfile contains fixed collision prevention without underscore issues"
 fi
 
 # Stage 5: Create collision-free export options

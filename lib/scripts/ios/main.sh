@@ -387,33 +387,12 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
         log_info "🔧 Applying static bundle identifier collision fixes..."
     fi
     
-    # Stage 6.95: Real-Time Collision Interceptor (CRITICAL - MUST RUN BEFORE BUILD)
+    # Stage 6.95: Real-Time Collision Interceptor (DISABLED - Using Fixed Podfile Instead)
     log_info "--- Stage 6.95: Real-Time Collision Interceptor ---"
-    log_info "🚨 REAL-TIME FRAMEWORK COLLISION MONITORING"
-    log_info "🎯 ALL Error IDs: 73b7b133, 66775b51, 16fe2c8f, b4b31bab, a2bd4f60"
-    log_info "⚡ Starting background collision detection and fixing..."
-    
-    # Make real-time collision interceptor executable
-    if [ -f "${SCRIPT_DIR}/realtime_collision_interceptor.sh" ]; then
-        chmod +x "${SCRIPT_DIR}/realtime_collision_interceptor.sh"
-        
-        log_info "🔍 Launching real-time framework monitoring..."
-        
-        # Source the real-time interceptor to activate background monitoring
-        if source "${SCRIPT_DIR}/realtime_collision_interceptor.sh"; then
-            log_success "✅ Real-Time Collision Interceptor ACTIVE"
-            log_info "👀 Background monitoring started for build process"
-            log_info "🔧 Framework collision detection and fixing enabled"
-            log_info "📱 Export options created for collision-free IPA export"
-            export REALTIME_EXPORT_OPTIONS="/tmp/realtime_export_options.plist"
-        else
-            log_warn "⚠️ Real-time collision interceptor had issues, but continuing"
-            log_warn "🔧 Standard collision prevention will be used"
-        fi
-    else
-        log_warn "⚠️ Real-time collision interceptor not found: ${SCRIPT_DIR}/realtime_collision_interceptor.sh"
-        log_info "📝 Using standard collision prevention methods"
-    fi
+    log_info "🚫 REAL-TIME COLLISION INTERCEPTOR DISABLED"
+    log_info "✅ Using fixed collision prevention in main Podfile (no underscores)"
+    log_info "🎯 Bundle identifiers will be properly sanitized without underscore issues"
+    log_info "📋 Fixed collision prevention handles ALL Error IDs: 73b7b133, 66775b51, 16fe2c8f, b4b31bab"
     
     # Stage 7: Flutter Build Process (must succeed for clean build)
     log_info "--- Stage 7: Building Flutter iOS App ---"
