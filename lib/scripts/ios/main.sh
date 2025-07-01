@@ -599,7 +599,7 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
 <plist version="1.0">
 <dict>
     <key>method</key>
-    <string>app-store</string>
+    <string>app-store-connect</string>
     <key>teamID</key>
     <string>${APPLE_TEAM_ID}</string>
     <key>signingStyle</key>
@@ -625,36 +625,53 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
     <string>export</string>
     <key>iCloudContainerEnvironment</key>
     <string>Production</string>
-    <key>signingOptions</key>
-    <dict>
-        <key>signEmbeddedFrameworks</key>
-        <false/>
-    </dict>
+    <key>onDemandInstallCapable</key>
+    <false/>
+    <key>embedOnDemandResourcesAssetPacksInBundle</key>
+    <false/>
+    <key>generateAppStoreInformation</key>
+    <true/>
+    <key>distributionBundleIdentifier</key>
+    <string>${BUNDLE_ID}</string>
 </dict>
 </plist>
 EOF
     
-    # Export IPA with enhanced settings and proper keychain
-    log_info "📦 Exporting IPA with enhanced settings..."
+    # Export IPA using enhanced framework-safe export script
+    log_info "📦 Exporting IPA with enhanced framework-safe export script..."
     log_info "🔐 Using keychain: $keychain_path"
     log_info "🎯 Using certificate: $cert_identity"
     log_info "📱 Using profile UUID: $profile_uuid"
     
-    # Set keychain as default for the export
-    security list-keychains -d user -s "$keychain_path" $(security list-keychains -d user | xargs)
-    security default-keychain -s "$keychain_path"
+    # Make the enhanced export script executable
+    chmod +x "${SCRIPT_DIR}/export_ipa_framework_fix.sh"
     
-    if ! xcodebuild -exportArchive \
-        -archivePath "${OUTPUT_DIR:-output/ios}/Runner.xcarchive" \
-        -exportPath "${OUTPUT_DIR:-output/ios}" \
-        -exportOptionsPlist "ios/ExportOptions.plist" \
-        -allowProvisioningUpdates \
-        DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
-        CODE_SIGN_IDENTITY="${cert_identity}" \
-        PROVISIONING_PROFILE="${profile_uuid}" 2>&1 | tee export.log; then
+    # Use the enhanced export script that handles framework provisioning profile issues
+    if "${SCRIPT_DIR}/export_ipa_framework_fix.sh" \
+        "${OUTPUT_DIR:-output/ios}/Runner.xcarchive" \
+        "${OUTPUT_DIR:-output/ios}" \
+        "$cert_identity" \
+        "$profile_uuid" \
+        "${BUNDLE_ID}" \
+        "${APPLE_TEAM_ID}" \
+        "$keychain_path"; then
         
-        log_error "❌ IPA export failed"
-        cat export.log
+        log_success "✅ Enhanced IPA export completed successfully"
+    else
+        log_error "❌ Enhanced IPA export failed"
+        log_error "🔧 Framework provisioning profile issues could not be resolved"
+        
+        # Show logs for debugging
+        if [ -f export_method1.log ]; then
+            log_info "📋 Manual signing log (last 10 lines):"
+            tail -10 export_method1.log
+        fi
+        
+        if [ -f export_method2.log ]; then
+            log_info "📋 Automatic signing log (last 10 lines):"
+            tail -10 export_method2.log
+        fi
+        
         return 1
     fi
     
@@ -662,9 +679,11 @@ EOF
     if [ -f "${OUTPUT_DIR:-output/ios}/Runner.ipa" ]; then
         local ipa_size=$(du -h "${OUTPUT_DIR:-output/ios}/Runner.ipa" | cut -f1)
         log_success "✅ IPA created successfully: $ipa_size"
+        log_info "🎯 Framework provisioning profile issues resolved"
         return 0
     else
-        log_error "❌ IPA file not found after export"
+        log_error "❌ IPA file not found after enhanced export"
+        log_error "🔧 Check export logs for details"
         return 1
     fi
 }
