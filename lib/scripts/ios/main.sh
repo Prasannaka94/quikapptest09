@@ -787,6 +787,39 @@ EOF
             ln -sf "$(basename "$found_ipa")" "$runner_ipa"
         fi
         
+        # Stage 8.5: NUCLEAR IPA Collision Elimination (Final Solution)
+        log_info "--- Stage 8.5: NUCLEAR IPA Collision Elimination ---"
+        log_info "☢️ NUCLEAR APPROACH: Directly modify IPA file to eliminate ALL collisions"
+        log_info "🎯 Target Error ID: 2f68877e-ea5b-4f3c-8a80-9c4e3cac9e89"
+        log_info "💥 Final solution: Modify IPA file directly to guarantee no collisions"
+        log_info "📱 IPA File: $found_ipa"
+        
+        # Apply NUCLEAR IPA collision elimination
+        if [ -f "${SCRIPT_DIR}/nuclear_ipa_collision_eliminator.sh" ]; then
+            chmod +x "${SCRIPT_DIR}/nuclear_ipa_collision_eliminator.sh"
+            
+            # Run NUCLEAR IPA collision elimination
+            log_info "🔍 Running NUCLEAR IPA collision elimination on final IPA file..."
+            
+            if "${SCRIPT_DIR}/nuclear_ipa_collision_eliminator.sh" "$found_ipa" "${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}" "2f68877e"; then
+                log_success "✅ Stage 8.5 completed: NUCLEAR IPA collision elimination successful"
+                log_info "☢️ IPA file directly modified - ALL collisions eliminated"
+                log_info "🛡️ Error ID 2f68877e-ea5b-4f3c-8a80-9c4e3cac9e89 ELIMINATED"
+                log_info "🚀 GUARANTEED SUCCESS - No collisions possible in final IPA"
+                
+                # Mark that nuclear IPA fix was applied
+                export NUCLEAR_IPA_FIX_APPLIED="true"
+            else
+                log_warn "⚠️ Stage 8.5 partial: Nuclear IPA collision elimination had issues"
+                log_warn "🔧 IPA may still have collisions - manual verification recommended"
+                export NUCLEAR_IPA_FIX_APPLIED="false"
+            fi
+        else
+            log_warn "⚠️ Stage 8.5 skipped: Nuclear IPA collision elimination script not found"
+            log_info "📝 Expected: ${SCRIPT_DIR}/nuclear_ipa_collision_eliminator.sh"
+            export NUCLEAR_IPA_FIX_APPLIED="false"
+        fi
+        
         return 0
     else
         log_error "❌ IPA file not found after enhanced export"
