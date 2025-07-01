@@ -109,7 +109,8 @@ post_install do |installer|
       end
       
       # NUCLEAR TREATMENT: ALL other targets get GUARANTEED unique bundle IDs
-      base_name = target.name.downcase.gsub(/[^a-z0-9]/, '').gsub(/^[^a-z]/, 'pod')
+      # Double-sanitize to ensure underscores are completely removed
+      base_name = target.name.downcase.gsub(/_+/, '').gsub(/[^a-z0-9]/, '').gsub(/^[^a-z]/, 'pod')
       base_name = 'pod' if base_name.empty?
       
       # Generate NUCLEAR-level unique bundle ID with multiple fallbacks
