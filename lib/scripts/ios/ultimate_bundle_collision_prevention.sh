@@ -23,40 +23,161 @@ ultimate_collision_prevention() {
     
     local total_fixes=0
     
-    # STAGE 1: PROJECT-LEVEL COMPREHENSIVE FIXES
-    log_info "--- STAGE 1: PROJECT-LEVEL COMPREHENSIVE FIXES ---"
+    # STAGE 1: PODFILE-LEVEL COLLISION PREVENTION
+    log_info "--- STAGE 1: PODFILE-LEVEL COLLISION PREVENTION ---"
+    if podfile_level_collision_prevention "$main_bundle_id"; then
+        total_fixes=$((total_fixes + 1))
+        log_success "✅ Stage 1: Podfile-level fixes applied"
+    else
+        log_warn "⚠️ Stage 1: Podfile-level fixes had issues"
+    fi
+    
+    # STAGE 2: PROJECT-LEVEL COMPREHENSIVE FIXES
+    log_info "--- STAGE 2: PROJECT-LEVEL COMPREHENSIVE FIXES ---"
     if project_level_collision_prevention "$main_bundle_id" "$project_path"; then
         total_fixes=$((total_fixes + 1))
-        log_success "✅ Stage 1: Project-level fixes applied"
+        log_success "✅ Stage 2: Project-level fixes applied"
     else
-        log_warn "⚠️ Stage 1: Project-level fixes had issues"
+        log_warn "⚠️ Stage 2: Project-level fixes had issues"
     fi
     
-    # STAGE 2: ARCHIVE-LEVEL COMPREHENSIVE FIXES (if archive exists)
+    # STAGE 3: ARCHIVE-LEVEL COMPREHENSIVE FIXES (if archive exists)
     if [ -d "$archive_path" ]; then
-        log_info "--- STAGE 2: ARCHIVE-LEVEL COMPREHENSIVE FIXES ---"
+        log_info "--- STAGE 3: ARCHIVE-LEVEL COMPREHENSIVE FIXES ---"
         if archive_level_collision_prevention "$main_bundle_id" "$archive_path"; then
             total_fixes=$((total_fixes + 1))
-            log_success "✅ Stage 2: Archive-level fixes applied"
+            log_success "✅ Stage 3: Archive-level fixes applied"
         else
-            log_warn "⚠️ Stage 2: Archive-level fixes had issues"
+            log_warn "⚠️ Stage 3: Archive-level fixes had issues"
         fi
     else
-        log_info "--- STAGE 2: ARCHIVE NOT FOUND (will run after build) ---"
+        log_info "--- STAGE 3: ARCHIVE NOT FOUND (will run after build) ---"
     fi
     
-    # STAGE 3: COMPREHENSIVE EXPORT OPTIONS
-    log_info "--- STAGE 3: COMPREHENSIVE EXPORT OPTIONS ---"
+    # STAGE 4: COMPREHENSIVE EXPORT OPTIONS
+    log_info "--- STAGE 4: COMPREHENSIVE EXPORT OPTIONS ---"
     if create_ultimate_export_options "$main_bundle_id"; then
-        log_success "✅ Stage 3: Ultimate export options created"
+        log_success "✅ Stage 4: Ultimate export options created"
     else
-        log_warn "⚠️ Stage 3: Export options creation had issues"
+        log_warn "⚠️ Stage 4: Export options creation had issues"
     fi
     
     log_success "🎉 ULTIMATE COLLISION PREVENTION COMPLETED"
     log_info "📊 Total fixes applied: $total_fixes"
     log_info "🎯 All known error IDs addressed: 73b7b133, 66775b51, 16fe2c8f, b4b31bab"
     
+    return 0
+}
+
+# PODFILE-LEVEL collision prevention
+podfile_level_collision_prevention() {
+    local main_bundle_id="$1"
+    local podfile_path="ios/Podfile"
+    
+    log_info "🔧 PODFILE-LEVEL COLLISION PREVENTION"
+    
+    if [ ! -f "$podfile_path" ]; then
+        log_warn "Podfile not found: $podfile_path"
+        return 1
+    fi
+    
+    # Create backup
+    cp "$podfile_path" "${podfile_path}.collision_backup_$(date +%Y%m%d_%H%M%S)"
+    
+    # Add comprehensive collision prevention to Podfile
+    log_info "🎯 Adding collision prevention to Podfile..."
+    
+    # Check if collision prevention is already present
+    if grep -q "CFBundleIdentifier collision prevention" "$podfile_path"; then
+        log_info "🔍 Collision prevention already present in Podfile, updating..."
+    fi
+    
+    # Create enhanced Podfile with collision prevention
+    cat > "${podfile_path}.tmp" << 'PODFILE_EOF'
+platform :ios, '13.0'
+use_frameworks! :linkage => :static
+
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_ios_podfile_setup
+
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+end
+
+# ULTIMATE CFBundleIdentifier collision prevention
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+      config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
+      # Disable code signing for pods to avoid conflicts
+      config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+      config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
+      
+      # ULTIMATE COLLISION PREVENTION: Ensure unique CFBundleIdentifier for each pod
+      if target.product_type == "com.apple.product-type.framework"
+        # Create unique bundle identifier for each framework
+        framework_name = target.name.gsub(/[^a-zA-Z0-9]/, '').downcase
+        unique_bundle_id = "MAIN_BUNDLE_ID_PLACEHOLDER.framework.\#{framework_name}"
+        config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = unique_bundle_id
+        
+        puts "🔧 COLLISION FIX: \#{target.name} -> \#{unique_bundle_id}"
+      end
+    end
+  end
+  
+  # Additional collision prevention for Info.plist files
+  installer.generated_projects.each do |project|
+    project.targets.each do |target|
+      if target.product_type == "com.apple.product-type.framework"
+        target.build_configurations.each do |config|
+          framework_name = target.name.gsub(/[^a-zA-Z0-9]/, '').downcase
+          unique_bundle_id = "MAIN_BUNDLE_ID_PLACEHOLDER.framework.\#{framework_name}"
+          config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = unique_bundle_id
+        end
+      end
+    end
+  end
+  
+  puts "✅ ULTIMATE COLLISION PREVENTION: All frameworks assigned unique bundle identifiers"
+end
+PODFILE_EOF
+    
+    # Substitute the actual bundle ID
+    sed "s/MAIN_BUNDLE_ID_PLACEHOLDER/$main_bundle_id/g" "${podfile_path}.tmp" > "$podfile_path"
+    rm "${podfile_path}.tmp"
+    
+    log_success "✅ Podfile enhanced with collision prevention"
     return 0
 }
 

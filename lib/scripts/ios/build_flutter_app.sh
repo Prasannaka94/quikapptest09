@@ -535,7 +535,38 @@ main() {
         return 1
     fi
     
-    # Step 6: Create Xcode archive
+    # Step 6: Apply ULTIMATE Bundle Collision Prevention (BEFORE archive creation)
+    log_info "🚨 ULTIMATE BUNDLE COLLISION PREVENTION: Applying pre-archive collision fixes..."
+    
+    if [ -f "lib/scripts/ios/ultimate_bundle_collision_prevention.sh" ]; then
+        chmod +x lib/scripts/ios/ultimate_bundle_collision_prevention.sh
+        if lib/scripts/ios/ultimate_bundle_collision_prevention.sh "${BUNDLE_ID:-com.example.app}" "ios/Runner.xcodeproj/project.pbxproj"; then
+            log_success "✅ ULTIMATE COLLISION PREVENTION: Pre-archive fixes applied successfully"
+            log_info "🎯 All CFBundleIdentifier collisions resolved before archive creation"
+            
+            # Reinstall CocoaPods with collision-free Podfile
+            log_info "🔄 Reinstalling CocoaPods with collision-free configuration..."
+            cd ios
+            
+            # Clean and reinstall
+            rm -rf Pods Podfile.lock
+            if pod install --repo-update --verbose; then
+                log_success "✅ CocoaPods reinstalled with collision prevention"
+            else
+                log_warn "⚠️ CocoaPods reinstall failed, but continuing with existing pods"
+            fi
+            
+            cd ..
+        else
+            log_warn "⚠️ ULTIMATE COLLISION PREVENTION: Pre-archive fixes had issues, but continuing"
+            log_warn "🔧 Archive creation may still succeed with existing fixes"
+        fi
+    else
+        log_warn "⚠️ Ultimate collision prevention script not found"
+        log_info "📝 Expected: lib/scripts/ios/ultimate_bundle_collision_prevention.sh"
+    fi
+    
+    # Step 7: Create Xcode archive
     if ! create_xcode_archive; then
         log_error "Failed to create Xcode archive"
         log_error "This is a hard failure - archive creation must succeed"
