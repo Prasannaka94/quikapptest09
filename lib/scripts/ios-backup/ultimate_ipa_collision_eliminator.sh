@@ -283,6 +283,7 @@ if xcodebuild -exportArchive \
         echo "✅ IPA file created: output/ios/Runner.ipa"
         
         # Get IPA file size
+        # shellcheck disable=SC2168
         local ipa_size=$(ls -lh output/ios/Runner.ipa | awk '{print $5}')
         echo "📦 IPA size: $ipa_size"
         
@@ -329,12 +330,15 @@ if unzip -q "output/ios/Runner.ipa" -d "$VALIDATION_DIR"; then
     echo "🔍 Scanning IPA contents for bundle IDs..."
     
     declare -A ipa_bundle_ids
+    # shellcheck disable=SC2168
     local ipa_collision_count=0
     
     find "$VALIDATION_DIR" -name "Info.plist" -print0 | while IFS= read -r -d '' plist_file; do
+        # shellcheck disable=SC2168
         local bundle_id=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$plist_file" 2>/dev/null || echo "NOT_FOUND")
         
         if [ "$bundle_id" != "NOT_FOUND" ]; then
+            # shellcheck disable=SC2168
             local relative_path=${plist_file#$VALIDATION_DIR/}
             echo "   📄 $relative_path: $bundle_id"
             

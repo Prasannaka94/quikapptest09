@@ -309,12 +309,15 @@ if unzip -q "$FIXED_IPA_PATH" -d "$FINAL_VALIDATION_DIR"; then
     echo "📋 Final bundle ID verification:"
     
     declare -A final_bundle_ids
+    # shellcheck disable=SC2168
     local final_collision_count=0
     
     find "$FINAL_VALIDATION_DIR" -name "Info.plist" -print0 | while IFS= read -r -d '' plist_file; do
+        # shellcheck disable=SC2168
         local bundle_id=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$plist_file" 2>/dev/null || echo "NOT_FOUND")
         
         if [ "$bundle_id" != "NOT_FOUND" ]; then
+            # shellcheck disable=SC2168
             local relative_path=${plist_file#$FINAL_VALIDATION_DIR/}
             echo "   📄 $relative_path: $bundle_id"
             

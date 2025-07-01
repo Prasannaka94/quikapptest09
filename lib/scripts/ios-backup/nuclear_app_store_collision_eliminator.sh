@@ -307,12 +307,15 @@ echo "🔍 NUCLEAR: Ultimate App Store Connect compatibility checks..."
 echo ""
 echo "🔍 NUCLEAR CHECK 1: Absolute bundle ID uniqueness verification..."
 declare -A final_bundle_map
+# shellcheck disable=SC2168
 local final_duplicates=0
 
 find "$RUNNER_APP" -name "Info.plist" -print0 | while IFS= read -r -d '' plist_file; do
+    # shellcheck disable=SC2168
     local bundle_id=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$plist_file" 2>/dev/null || echo "NOT_FOUND")
     
     if [ "$bundle_id" != "NOT_FOUND" ]; then
+        # shellcheck disable=SC2168
         local relative_path=${plist_file#$RUNNER_APP/}
         echo "   📄 $relative_path: $bundle_id"
         
@@ -333,7 +336,9 @@ fi
 # Check 2: Version consistency across all components
 echo ""
 echo "🔍 NUCLEAR CHECK 2: Version and build number consistency..."
+# shellcheck disable=SC2168
 local main_version=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$RUNNER_APP/Info.plist" 2>/dev/null || echo "NOT_FOUND")
+# shellcheck disable=SC2168
 local main_build=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$RUNNER_APP/Info.plist" 2>/dev/null || echo "NOT_FOUND")
 
 echo "   📱 Main app version: $main_version ($main_build)"
@@ -342,6 +347,7 @@ echo "   📱 Main app version: $main_version ($main_build)"
 echo ""
 echo "🔍 NUCLEAR CHECK 3: Main app Info.plist validation..."
 if [ -f "$RUNNER_APP/Info.plist" ]; then
+    # shellcheck disable=SC2168
     local current_bundle_id=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$RUNNER_APP/Info.plist" 2>/dev/null || echo "NOT_FOUND")
     if [ "$current_bundle_id" = "$BUNDLE_ID" ]; then
         echo "✅ Main app bundle ID is correct: $current_bundle_id"
@@ -408,6 +414,7 @@ if unzip -q "$NUCLEAR_IPA_PATH" -d "$FINAL_NUCLEAR_DIR"; then
     
     # Final bundle ID verification
     echo "📋 NUCLEAR: Final bundle ID verification..."
+    # shellcheck disable=SC2168
     local final_main_id=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$FINAL_NUCLEAR_DIR/Payload/Runner.app/Info.plist" 2>/dev/null || echo "NOT_FOUND")
     
     if [ "$final_main_id" = "$BUNDLE_ID" ]; then
@@ -417,6 +424,7 @@ if unzip -q "$NUCLEAR_IPA_PATH" -d "$FINAL_NUCLEAR_DIR"; then
     fi
     
     # Count final unique bundle IDs
+    # shellcheck disable=SC2168
     local unique_ids=$(find "$FINAL_NUCLEAR_DIR" -name "Info.plist" -exec /usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" {} \; 2>/dev/null | grep -v "NOT_FOUND" | sort | uniq | wc -l)
     echo "📊 NUCLEAR: Total unique bundle IDs in final IPA: $unique_ids"
     
