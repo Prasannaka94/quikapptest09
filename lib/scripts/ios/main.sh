@@ -564,10 +564,13 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
     if curl -fsSL -o "$profile_file" "${PROFILE_URL}"; then
         log_success "✅ Profile downloaded"
         
-        # Install profile
+        # Install profile and get UUID
         mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
-        cp "$profile_file" "$HOME/Library/MobileDevice/Provisioning Profiles/"
-        log_success "✅ Profile installed"
+        local profile_uuid=$(/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i "$profile_file"))
+        local profile_name=$(/usr/libexec/PlistBuddy -c 'Print :Name' /dev/stdin <<< $(security cms -D -i "$profile_file"))
+        cp "$profile_file" "$HOME/Library/MobileDevice/Provisioning Profiles/$profile_uuid.mobileprovision"
+        log_success "✅ Profile installed with UUID: $profile_uuid"
+        log_info "📋 Profile name: $profile_name"
     else
         log_error "❌ Profile download failed"
         return 1
@@ -597,7 +600,7 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
     <key>provisioningProfiles</key>
     <dict>
         <key>${BUNDLE_ID}</key>
-        <string>comtwinklubtwinklub__IOS_APP_STORE</string>
+        <string>${profile_uuid}</string>
     </dict>
 </dict>
 </plist>
@@ -612,7 +615,7 @@ EOF
         -allowProvisioningUpdates \
         DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
         CODE_SIGN_IDENTITY="Apple Distribution" \
-        PROVISIONING_PROFILE_SPECIFIER="comtwinklubtwinklub__IOS_APP_STORE" \
+        PROVISIONING_PROFILE="${profile_uuid}" \
         OTHER_CODE_SIGN_FLAGS="--keychain ios-build.keychain" 2>&1 | tee export.log; then
         
         log_error "❌ IPA export failed"
