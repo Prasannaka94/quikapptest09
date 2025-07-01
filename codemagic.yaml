@@ -2567,22 +2567,42 @@ workflows:
           chmod +x lib/scripts/ios/main.sh
           fi
 
-          # Apply CRITICAL pre-archive collision prevention (BEFORE build)
-          echo "🔧 Applying CRITICAL Pre-Archive Bundle Identifier Collision Prevention..."
-          if [ -f "lib/scripts/ios/pre_archive_collision_prevention.sh" ]; then
-            chmod +x lib/scripts/ios/pre_archive_collision_prevention.sh
-            if lib/scripts/ios/pre_archive_collision_prevention.sh; then
-              echo "✅ Pre-Archive Bundle Identifier Collision Prevention applied successfully"
-              echo "🎯 All frameworks now have unique bundle identifiers before archive creation"
+          # Apply NUCLEAR CFBundleIdentifier collision fix (ULTIMATE SOLUTION)
+          echo "☢️ Applying NUCLEAR CFBundleIdentifier Collision Fix..."
+          echo "🚨 Target Error ID: 080fc934-d684-463e-9da0-deb9e240cfef"
+          echo "💥 NUCLEAR approach to eliminate ALL collision sources"
+          if [ -f "lib/scripts/ios/nuclear_cfbundleidentifier_collision_fix.sh" ]; then
+            chmod +x lib/scripts/ios/nuclear_cfbundleidentifier_collision_fix.sh
+            if lib/scripts/ios/nuclear_cfbundleidentifier_collision_fix.sh "${BUNDLE_ID}"; then
+              echo "☢️ NUCLEAR CFBundleIdentifier Collision Fix applied successfully"
+              echo "💥 Error ID 080fc934-d684-463e-9da0-deb9e240cfef NUCLEAR ELIMINATED"
+              echo "🎯 ALL collision sources eliminated at nuclear level"
             else
-              echo "❌ PRE-ARCHIVE COLLISION PREVENTION FAILED - This is critical!"
-              echo "❌ CFBundleIdentifier collisions will occur during App Store validation"
+              echo "❌ NUCLEAR CFBUNDLEIDENTIFIER COLLISION FIX FAILED - This is critical!"
+              echo "❌ CFBundleIdentifier collisions will persist during App Store validation"
               exit 1
             fi
           else
-            echo "❌ CRITICAL: pre_archive_collision_prevention.sh not found!"
-            echo "❌ Expected: lib/scripts/ios/pre_archive_collision_prevention.sh"
-            exit 1
+            echo "⚠️ Nuclear CFBundleIdentifier fix script not found, falling back to standard prevention"
+            echo "📝 Expected: lib/scripts/ios/nuclear_cfbundleidentifier_collision_fix.sh"
+            
+            # Fallback to previous collision prevention
+            echo "🔧 Applying CRITICAL Pre-Archive Bundle Identifier Collision Prevention..."
+            if [ -f "lib/scripts/ios/pre_archive_collision_prevention.sh" ]; then
+              chmod +x lib/scripts/ios/pre_archive_collision_prevention.sh
+              if lib/scripts/ios/pre_archive_collision_prevention.sh; then
+                echo "✅ Pre-Archive Bundle Identifier Collision Prevention applied successfully"
+                echo "🎯 All frameworks now have unique bundle identifiers before archive creation"
+              else
+                echo "❌ PRE-ARCHIVE COLLISION PREVENTION FAILED - This is critical!"
+                echo "❌ CFBundleIdentifier collisions will occur during App Store validation"
+                exit 1
+              fi
+            else
+              echo "❌ CRITICAL: pre_archive_collision_prevention.sh not found!"
+              echo "❌ Expected: lib/scripts/ios/pre_archive_collision_prevention.sh"
+              exit 1
+            fi
           fi
 
           # Apply ADDITIONAL framework embedding collision fix
