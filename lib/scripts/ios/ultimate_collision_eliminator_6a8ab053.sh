@@ -2,7 +2,7 @@
 
 # ☢️ ULTIMATE CFBundleIdentifier Collision Eliminator
 # 🎯 Target Error ID: 6a8ab053-6a99-4c5c-bc5e-e8d3ed1cbb46
-# 💥 "There is more than one bundle with the CFBundleIdentifier value 'com.insurancegroupmo.insurancegroupmo'"
+# 💥 Conservative approach - only fix actual collisions
 
 set -euo pipefail
 
@@ -100,7 +100,7 @@ create_conservative_podfile() {
     local podfile="ios/Podfile"
     
     # Create conservative collision-free Podfile
-    cat > "$podfile" << EOF
+    cat > "$podfile" << 'PODFILE_EOF'
 # ☢️ CONSERVATIVE CFBundleIdentifier Collision Prevention Podfile
 # 🎯 Target Error ID: 6a8ab053-6a99-4c5c-bc5e-e8d3ed1cbb46
 # 💥 Conservative approach - only fix actual collisions with main app bundle ID
@@ -155,11 +155,11 @@ post_install do |installer|
   puts "💥 Conservative approach - only fix actual collisions"
   puts ""
   
-  main_bundle_id = ENV['BUNDLE_ID'] || "$main_bundle_id"
-  test_bundle_id = "\#{main_bundle_id}.tests"
+  main_bundle_id = ENV['BUNDLE_ID'] || "com.insurancegroupmo.insurancegroupmo"
+  test_bundle_id = "#{main_bundle_id}.tests"
   
-  puts "🎯 Main Bundle ID: \#{main_bundle_id}"
-  puts "🧪 Test Bundle ID: \#{test_bundle_id}"
+  puts "🎯 Main Bundle ID: #{main_bundle_id}"
+  puts "🧪 Test Bundle ID: #{test_bundle_id}"
   puts ""
   
   # Track bundle identifiers for collision detection
@@ -189,7 +189,7 @@ post_install do |installer|
       # PROTECT main Runner target
       if target.name == 'Runner'
         config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = main_bundle_id
-        puts "   🏆 MAIN TARGET (PROTECTED): \#{target.name} -> \#{main_bundle_id}"
+        puts "   🏆 MAIN TARGET (PROTECTED): #{target.name} -> #{main_bundle_id}"
         next
       end
       
@@ -197,7 +197,7 @@ post_install do |installer|
       if target.name == 'RunnerTests'
         config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = test_bundle_id
         collision_fixes += 1
-        puts "   🧪 TEST TARGET: \#{target.name} -> \#{test_bundle_id}"
+        puts "   🧪 TEST TARGET: #{target.name} -> #{test_bundle_id}"
         next
       end
       
@@ -212,13 +212,13 @@ post_install do |installer|
         safe_name = 'framework' if safe_name.empty?
         
         # Generate unique bundle ID for collision
-        unique_bundle_id = "\#{main_bundle_id}.collision.\#{safe_name}.\#{timestamp}.\#{microseconds}"
+        unique_bundle_id = "#{main_bundle_id}.collision.#{safe_name}.#{timestamp}.#{microseconds}"
         
         # Ensure uniqueness
         counter = 1
         original_unique_id = unique_bundle_id
         while used_bundle_ids.include?(unique_bundle_id)
-          unique_bundle_id = "\#{original_unique_id}.\#{counter}"
+          unique_bundle_id = "#{original_unique_id}.#{counter}"
           counter += 1
           break if counter > 100
         end
@@ -229,12 +229,12 @@ post_install do |installer|
         bundle_assignments += 1
         collision_fixes += 1
         
-        puts "   💥 COLLISION FIXED: \#{target.name} -> \#{unique_bundle_id}"
-        puts "      (was: \#{current_bundle_id})"
+        puts "   💥 COLLISION FIXED: #{target.name} -> #{unique_bundle_id}"
+        puts "      (was: #{current_bundle_id})"
       else
         # No collision - leave external package bundle ID unchanged
         skipped_targets += 1
-        puts "   ✅ EXTERNAL PACKAGE (UNCHANGED): \#{target.name} -> \#{current_bundle_id}"
+        puts "   ✅ EXTERNAL PACKAGE (UNCHANGED): #{target.name} -> #{current_bundle_id}"
         
         # Add to used bundle IDs to prevent future collisions
         used_bundle_ids.add(current_bundle_id) if current_bundle_id
@@ -260,18 +260,18 @@ post_install do |installer|
   
   puts ""
   puts "☢️ CONSERVATIVE CFBundleIdentifier COLLISION PREVENTION COMPLETE!"
-  puts "   💥 Collision fixes: \#{collision_fixes}"
-  puts "   📦 Bundle assignments: \#{bundle_assignments}"
-  puts "   ✅ External packages left unchanged: \#{skipped_targets}"
-  puts "   🎯 Total unique IDs: \#{used_bundle_ids.size}"
+  puts "   💥 Collision fixes: #{collision_fixes}"
+  puts "   📦 Bundle assignments: #{bundle_assignments}"
+  puts "   ✅ External packages left unchanged: #{skipped_targets}"
+  puts "   🎯 Total unique IDs: #{used_bundle_ids.size}"
   puts ""
   puts "🚀 CONSERVATIVE GUARANTEE: Error ID 6a8ab053-6a99-4c5c-bc5e-e8d3ed1cbb46 ELIMINATED!"
-  puts "📱 Main app: \#{main_bundle_id}"
-  puts "🧪 Tests: \#{test_bundle_id}"
+  puts "📱 Main app: #{main_bundle_id}"
+  puts "🧪 Tests: #{test_bundle_id}"
   puts "💥 Only actual collisions fixed - external packages preserved"
   puts "=============================================================="
 end
-EOF
+PODFILE_EOF
     
     log_success "✅ Conservative collision-free Podfile created"
 }
