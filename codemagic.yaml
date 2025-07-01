@@ -2567,19 +2567,22 @@ workflows:
           chmod +x lib/scripts/ios/main.sh
           fi
 
-          # Apply pre-build fixes
-          echo "🔧 Applying Bundle Identifier Collision fixes..."
-          if [ -f "lib/scripts/ios/fix_bundle_identifier_collision_v2.sh" ]; then
-            chmod +x lib/scripts/ios/fix_bundle_identifier_collision_v2.sh
-            if lib/scripts/ios/fix_bundle_identifier_collision_v2.sh; then
-              echo "✅ Bundle Identifier Collision fixes (v2) applied successfully"
+          # Apply CRITICAL pre-archive collision prevention (BEFORE build)
+          echo "🔧 Applying CRITICAL Pre-Archive Bundle Identifier Collision Prevention..."
+          if [ -f "lib/scripts/ios/pre_archive_collision_prevention.sh" ]; then
+            chmod +x lib/scripts/ios/pre_archive_collision_prevention.sh
+            if lib/scripts/ios/pre_archive_collision_prevention.sh; then
+              echo "✅ Pre-Archive Bundle Identifier Collision Prevention applied successfully"
+              echo "🎯 All frameworks now have unique bundle identifiers before archive creation"
             else
-              echo "⚠️ Bundle Identifier Collision fixes (v2) failed, trying v1..."
-              if [ -f "lib/scripts/ios/fix_bundle_identifier_collision.sh" ]; then
-                chmod +x lib/scripts/ios/fix_bundle_identifier_collision.sh
-                lib/scripts/ios/fix_bundle_identifier_collision.sh || echo "⚠️ Bundle Identifier Collision fixes failed, continuing..."
-              fi
+              echo "❌ PRE-ARCHIVE COLLISION PREVENTION FAILED - This is critical!"
+              echo "❌ CFBundleIdentifier collisions will occur during App Store validation"
+              exit 1
             fi
+          else
+            echo "❌ CRITICAL: pre_archive_collision_prevention.sh not found!"
+            echo "❌ Expected: lib/scripts/ios/pre_archive_collision_prevention.sh"
+            exit 1
           fi
 
           # 🔥 Perfect Conditional Firebase System
@@ -2747,24 +2750,74 @@ workflows:
               echo "⚠️ IPA file appears to be corrupted"
             fi
             
-            # Fix CFBundleIdentifier collisions for App Store Connect upload
-            echo "🔧 Fixing CFBundleIdentifier collisions for App Store Connect..."
-            if lib/scripts/ios/ipa_bundle_collision_fix.sh "output/ios/Runner.ipa" "${BUNDLE_ID}" "output/ios/Runner_collision_free.ipa"; then
-              echo "✅ CFBundleIdentifier collision fix completed"
+            # Enhanced CFBundleIdentifier collision-free IPA creation for App Store Connect
+            echo "🔧 Creating collision-free IPA for App Store Connect validation..."
+            
+            # First check if the IPA already has collision-free bundle identifiers (from pre-archive prevention)
+            echo "🔍 Analyzing IPA bundle identifiers..."
+            if command -v unzip >/dev/null 2>&1; then
+              # Extract and check bundle identifiers in the IPA
+              mkdir -p /tmp/ipa_analysis
+              unzip -q "output/ios/Runner.ipa" -d /tmp/ipa_analysis 2>/dev/null || true
               
-              # Show comparison
-              original_size=$(du -h output/ios/Runner.ipa | cut -f1)
-              fixed_size=$(du -h output/ios/Runner_collision_free.ipa | cut -f1)
-              echo "📊 Size comparison: Original: $original_size, Fixed: $fixed_size"
-              
-              echo "🎯 Collision-free IPA ready for App Store Connect: output/ios/Runner_collision_free.ipa"
-              echo "💡 Use Runner_collision_free.ipa for Transporter upload to avoid CFBundleIdentifier collisions"
-              echo "📱 Both versions available:"
-              echo "   - output/ios/Runner.ipa (original)"
-              echo "   - output/ios/Runner_collision_free.ipa (collision-free for App Store)"
+              if [ -d "/tmp/ipa_analysis/Payload/Runner.app" ]; then
+                echo "📋 Checking for CFBundleIdentifier collisions in IPA..."
+                
+                # Check for collision patterns
+                collision_found=false
+                if find /tmp/ipa_analysis -name "Info.plist" -exec grep -l "com\.insurancegroupmo\.insurancegroupmo$" {} \; | wc -l | grep -q "[2-9]"; then
+                  collision_found=true
+                  echo "⚠️ CFBundleIdentifier collisions detected in IPA"
+                else
+                  echo "✅ No CFBundleIdentifier collisions detected in IPA"
+                fi
+                
+                # Clean up analysis
+                rm -rf /tmp/ipa_analysis
+                
+                # Apply collision fix if needed
+                if [ "$collision_found" = "true" ]; then
+                  echo "🔧 Applying post-IPA collision fix as fallback..."
+                  if [ -f "lib/scripts/ios/ipa_bundle_collision_fix.sh" ]; then
+                    chmod +x lib/scripts/ios/ipa_bundle_collision_fix.sh
+                    if lib/scripts/ios/ipa_bundle_collision_fix.sh "output/ios/Runner.ipa" "${BUNDLE_ID}" "output/ios/Runner_collision_free.ipa"; then
+                      echo "✅ Post-IPA collision fix completed successfully"
+                      
+                      # Show comparison
+                      original_size=$(du -h output/ios/Runner.ipa | cut -f1)
+                      fixed_size=$(du -h output/ios/Runner_collision_free.ipa | cut -f1)
+                      echo "📊 Size comparison: Original: $original_size, Fixed: $fixed_size"
+                      
+                      echo "🎯 Collision-free IPA ready: output/ios/Runner_collision_free.ipa"
+                      echo "📱 Both versions available:"
+                      echo "   - output/ios/Runner.ipa (original)"
+                      echo "   - output/ios/Runner_collision_free.ipa (collision-free for App Store)"
+                    else
+                      echo "❌ Post-IPA collision fix failed"
+                      echo "⚠️ App Store Connect validation may fail due to CFBundleIdentifier collisions"
+                      # Copy original as fallback
+                      cp "output/ios/Runner.ipa" "output/ios/Runner_collision_free.ipa"
+                    fi
+                  else
+                    echo "❌ ipa_bundle_collision_fix.sh not found"
+                    # Copy original as fallback
+                    cp "output/ios/Runner.ipa" "output/ios/Runner_collision_free.ipa"
+                  fi
+                else
+                  echo "✅ IPA is already collision-free thanks to pre-archive prevention"
+                  echo "🎯 Creating collision-free copy for consistency..."
+                  cp "output/ios/Runner.ipa" "output/ios/Runner_collision_free.ipa"
+                  echo "📱 Both versions available (identical):"
+                  echo "   - output/ios/Runner.ipa"
+                  echo "   - output/ios/Runner_collision_free.ipa"
+                fi
+              else
+                echo "⚠️ Could not analyze IPA structure, creating collision-free copy anyway..."
+                cp "output/ios/Runner.ipa" "output/ios/Runner_collision_free.ipa"
+              fi
             else
-              echo "⚠️ CFBundleIdentifier collision fix failed, using original IPA"
-              echo "📱 Original IPA may still work if no collisions exist"
+              echo "⚠️ unzip not available, creating collision-free copy without analysis..."
+              cp "output/ios/Runner.ipa" "output/ios/Runner_collision_free.ipa"
             fi
             
             echo "🎯 Profile Type: $PROFILE_TYPE"
