@@ -115,7 +115,7 @@ scripts:
       echo "IS_NOTIFICATION: $IS_NOTIFICATION"
       echo "IS_CONTACT: $IS_CONTACT"
       echo "IS_BIOMETRIC: $IS_BIOMETRIC"
-      echo "IS_CALENDAR: $IS_CALENDAR
+      echo "IS_CALENDAR: $IS_CALENDAR"
 
       echo "*********** Publish Configuration ***********" 
       echo "EMAIL_ID: $EMAIL_ID"
@@ -297,7 +297,6 @@ scripts:
 
         echo "✅ App name changed and version set successfully"
 
-
   - &Update_SDK_Version
     name: Updating SDK Version for Android & iOS (Conditional)
     script: |
@@ -381,7 +380,6 @@ scripts:
         echo "❌ iOS project file not found at $IOS_PROJECT_FILE"
         exit 1
       fi
-
 
   - &Update_App_Version
     name: Update Version Info (Android & iOS)
@@ -746,513 +744,48 @@ workflows:
         OUTPUT_DIR: "output/ios"
 
     scripts:
-      - *debug_env
-      - *change_proj_name
-      - *update_package_names
-      - *change_app_name
-      - *Update_SDK_Version
-      - *Update_App_Version
-      - *get_logo
-      - *get_splash
-      - *set_launcher_icons
-
-      - name: "🆔 NUCLEAR CFBundleIdentifier Collision Elimination (Error ID: 202240a2)"
-        script: |
-          echo "🆔 NUCLEAR CFBundleIdentifier COLLISION ELIMINATION"
-          echo "🎯 Target Error ID: 202240a2-1b58-4c02-87c2-d7886c462b6c"
-          echo "🔬 Strategy: NUCLEAR Multi-Layer Elimination & Prevention"
-          echo "📱 Bundle ID: ${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}"
-          echo "⚠️  NUCLEAR MODE: Breaking all rules to ensure upload success"
-          echo ""
-
-          set -euo pipefail
-          trap 'echo "❌ Nuclear collision elimination failed at line $LINENO"' ERR
-
-          PROJECT_ROOT=$(pwd)
-          MAIN_BUNDLE_ID="${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}"
-          ERROR_ID="202240a2"
-          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-          NUCLEAR_SUFFIX="nuc${ERROR_ID:0:8}.${TIMESTAMP}.$$"
-
-          echo "🔍 PHASE 1: Deep Project Analysis"
-
-          # Analyze current bundle ID usage
-          echo "📊 Analyzing current CFBundleIdentifier usage..."
-          PBXPROJ_FILE="ios/Runner.xcodeproj/project.pbxproj"
-
-          if [ -f "$PBXPROJ_FILE" ]; then
-            BUNDLE_COUNT=$(grep -c "PRODUCT_BUNDLE_IDENTIFIER.*${MAIN_BUNDLE_ID}" "$PBXPROJ_FILE" || echo "0")
-            echo "   Main bundle ID occurrences: $BUNDLE_COUNT"
-            
-            # Show all current bundle identifiers
-            echo "   Current bundle identifiers found:"
-            grep "PRODUCT_BUNDLE_IDENTIFIER" "$PBXPROJ_FILE" | sed 's/.*= /   - /' | sed 's/;.*//' | sort -u
-          fi
-
-          echo ""
-          echo "🛡️ PHASE 2: NUCLEAR Collision Elimination Strategy"
-
-          # NUCLEAR Strategy: Maximum aggression approach
-          echo "   🚨 NUCLEAR SUFFIX: $NUCLEAR_SUFFIX"
-          echo "   🛡️ Main app bundle ID: $MAIN_BUNDLE_ID (ABSOLUTELY PROTECTED)"
-          echo "   💥 ALL external frameworks will be NUCLEAR ISOLATED"
-          echo "   ⚠️ Tests will use: $MAIN_BUNDLE_ID.nuclear.tests.$NUCLEAR_SUFFIX"
-          echo "   ⚠️ Extensions will use: $MAIN_BUNDLE_ID.nuclear.ext.$NUCLEAR_SUFFIX.*"
-
-          # Create NUCLEAR collision elimination script
-          cat > nuclear_collision_eliminator_${ERROR_ID}.sh << 'NUCLEAR_SCRIPT'
-            #!/bin/bash
-            set -e
-            
-            PROJECT_ROOT="$1"
-            MAIN_BUNDLE_ID="$2" 
-            NUCLEAR_SUFFIX="$3"
-            
-            echo "💥 Executing NUCLEAR collision elimination..."
-            echo "🚨 WARNING: NUCLEAR MODE - Maximum bundle ID modification"
-            
-            # Multiple backups for nuclear operation
-            cp "$PROJECT_ROOT/ios/Runner.xcodeproj/project.pbxproj" \
-               "$PROJECT_ROOT/ios/Runner.xcodeproj/project.pbxproj.nuclear_backup_${NUCLEAR_SUFFIX}"
-            cp "$PROJECT_ROOT/ios/Runner.xcodeproj/project.pbxproj" \
-               "$PROJECT_ROOT/ios/Runner.xcodeproj/project.pbxproj.pre_nuclear_$(date +%s)"
-            
-            echo "✅ Nuclear operation backups created"
-            
-            # NUCLEAR bundle ID management using Ruby
-            ruby << 'NUCLEAR_RUBY_SCRIPT'
-            require 'fileutils'
-            
-            project_root = ARGV[0]
-            main_bundle_id = ARGV[1]
-            nuclear_suffix = ARGV[2]
-            
-            puts "💥 NUCLEAR COLLISION ELIMINATION IN PROGRESS..."
-            puts "🎯 Target: #{main_bundle_id}"
-            puts "🚨 Nuclear Suffix: #{nuclear_suffix}"
-            
-            pbxproj_path = File.join(project_root, 'ios', 'Runner.xcodeproj', 'project.pbxproj')
-            
-            if File.exist?(pbxproj_path)
-              content = File.read(pbxproj_path)
-              original_content = content.dup
-              
-              # Count all bundle ID occurrences
-              all_bundle_ids = content.scan(/PRODUCT_BUNDLE_IDENTIFIER = ([^;]+);/).flatten
-              puts "   📊 Total bundle IDs found: #{all_bundle_ids.length}"
-              
-              # Count main bundle ID occurrences
-              main_occurrences = all_bundle_ids.count(main_bundle_id)
-              puts "   📊 Main bundle ID occurrences: #{main_occurrences}"
-              
-              if main_occurrences > 3
-                puts "   🚨 COLLISION DETECTED! #{main_occurrences} occurrences > 3"
-                puts "   💥 ACTIVATING NUCLEAR ELIMINATION PROTOCOL"
-              end
-              
-              # NUCLEAR STRATEGY: Aggressive bundle ID isolation
-              line_number = 0
-              main_bundle_kept = 0
-              max_main_bundles = 3  # Debug, Release, Profile
-              
-              # Process line by line for precise control
-              new_lines = []
-              content.split("\n").each do |line|
-                line_number += 1
-                
-                if line =~ /PRODUCT_BUNDLE_IDENTIFIER = #{Regexp.escape(main_bundle_id)};/
-                  if main_bundle_kept < max_main_bundles
-                    # Keep original main bundle ID for first 3 occurrences
-                    new_lines << line
-                    main_bundle_kept += 1
-                    puts "   ✅ Kept main bundle ID (#{main_bundle_kept}/#{max_main_bundles}): Line #{line_number}"
-                  else
-                    # NUCLEAR MODIFICATION: All excess occurrences get unique IDs
-                    nuclear_id = "#{main_bundle_id}.nuclear.excess.#{nuclear_suffix}.#{line_number}"
-                    new_line = line.gsub(/PRODUCT_BUNDLE_IDENTIFIER = #{Regexp.escape(main_bundle_id)};/, 
-                                       "PRODUCT_BUNDLE_IDENTIFIER = #{nuclear_id};")
-                    new_lines << new_line
-                    puts "   💥 NUCLEAR MODIFIED (#{main_bundle_kept + 1}): Line #{line_number} -> #{nuclear_id}"
-                  end
-                elsif line =~ /PRODUCT_BUNDLE_IDENTIFIER = ([^;]+);/
-                  bundle_id = $1
-                  if bundle_id.include?(main_bundle_id) && bundle_id != main_bundle_id
-                    # This is already a modified bundle ID, make it even more unique
-                    if bundle_id.include?('.tests') || bundle_id.downcase.include?('test')
-                      nuclear_id = "#{main_bundle_id}.nuclear.tests.#{nuclear_suffix}"
-                      new_line = line.gsub(/PRODUCT_BUNDLE_IDENTIFIER = #{Regexp.escape(bundle_id)};/, 
-                                         "PRODUCT_BUNDLE_IDENTIFIER = #{nuclear_id};")
-                      new_lines << new_line
-                      puts "   🧪 NUCLEAR TEST TARGET: #{bundle_id} -> #{nuclear_id}"
-                    else
-                      # External framework or extension
-                      framework_name = bundle_id.split('.').last || 'unknown'
-                      nuclear_id = "#{main_bundle_id}.nuclear.ext.#{nuclear_suffix}.#{framework_name}"
-                      new_line = line.gsub(/PRODUCT_BUNDLE_IDENTIFIER = #{Regexp.escape(bundle_id)};/, 
-                                         "PRODUCT_BUNDLE_IDENTIFIER = #{nuclear_id};")
-                      new_lines << new_line
-                      puts "   🔧 NUCLEAR FRAMEWORK: #{bundle_id} -> #{nuclear_id}"
-                    end
-                  else
-                    # Other bundle ID not related to main bundle
-                    new_lines << line
-                  end
-                else
-                  # Non-bundle ID line
-                  new_lines << line
-                end
-              end
-              
-              # Write the nuclear-modified content
-              File.write(pbxproj_path, new_lines.join("\n"))
-              puts "💥 NUCLEAR MODIFICATIONS APPLIED"
-              
-              # Verify nuclear results
-              final_content = File.read(pbxproj_path)
-              final_bundle_ids = final_content.scan(/PRODUCT_BUNDLE_IDENTIFIER = ([^;]+);/).flatten
-              final_main_count = final_bundle_ids.count(main_bundle_id)
-              
-              puts "   📊 NUCLEAR RESULTS:"
-              puts "   ✅ Final main bundle ID count: #{final_main_count}"
-              puts "   ✅ Total bundle IDs after nuclear: #{final_bundle_ids.length}"
-              puts "   ✅ Unique bundle IDs: #{final_bundle_ids.uniq.length}"
-              
-              if final_main_count == 3
-                puts "   🎉 NUCLEAR SUCCESS: Main bundle ID optimized to 3 occurrences"
-              elsif final_main_count < 3
-                puts "   ⚠️ WARNING: Main bundle ID count below optimal (#{final_main_count} < 3)"
-              else
-                puts "   🚨 CRITICAL: Nuclear operation incomplete (#{final_main_count} > 3)"
-                exit 1
-              end
-              
-              # Generate nuclear report
-              nuclear_report = [
-                "NUCLEAR COLLISION ELIMINATION REPORT",
-                "====================================",
-                "Error ID: 202240a2-1b58-4c02-87c2-d7886c462b6c",
-                "Nuclear Suffix: #{nuclear_suffix}",
-                "Original Main Bundle Count: #{main_occurrences}",
-                "Final Main Bundle Count: #{final_main_count}",
-                "Total Bundle IDs: #{final_bundle_ids.length}",
-                "Unique Bundle IDs: #{final_bundle_ids.uniq.length}",
-                "",
-                "NUCLEAR MODIFICATIONS:",
-                "- Main bundle ID: PROTECTED (#{final_main_count} occurrences)",
-                "- Excess occurrences: NUCLEAR ELIMINATED",
-                "- Test targets: NUCLEAR ISOLATED",
-                "- External frameworks: NUCLEAR ISOLATED",
-                "",
-                "STATUS: NUCLEAR SUCCESS ✅"
-              ]
-              
-              File.write("nuclear_elimination_report_#{nuclear_suffix}.txt", nuclear_report.join("\n"))
-              puts "   📄 Nuclear report: nuclear_elimination_report_#{nuclear_suffix}.txt"
-              
-            else
-              puts "❌ Project file not found: #{pbxproj_path}"
-              exit 1
-            end
-            NUCLEAR_RUBY_SCRIPT
-            
-            echo "💥 NUCLEAR collision elimination completed"
-            NUCLEAR_SCRIPT
-
-          chmod +x nuclear_collision_eliminator_${ERROR_ID}.sh
-          ./nuclear_collision_eliminator_${ERROR_ID}.sh "$PROJECT_ROOT" "$MAIN_BUNDLE_ID" "$NUCLEAR_SUFFIX"
-
-          echo ""
-          echo "🔒 PHASE 3: Nuclear Validation & Verification"
-
-          # Verify the nuclear changes
-          if [ -f "$PBXPROJ_FILE" ]; then
-            # Count exact main bundle ID occurrences (not including subdomains)
-            NEW_BUNDLE_COUNT=$(grep "PRODUCT_BUNDLE_IDENTIFIER = ${MAIN_BUNDLE_ID};" "$PBXPROJ_FILE" | wc -l | tr -d ' ')
-            TOTAL_BUNDLE_COUNT=$(grep -c "PRODUCT_BUNDLE_IDENTIFIER" "$PBXPROJ_FILE" || echo "0")
-            NUCLEAR_BUNDLE_COUNT=$(grep -c "nuclear" "$PBXPROJ_FILE" || echo "0")
-            
-            echo "   💥 Main bundle ID count: $NEW_BUNDLE_COUNT (target: 3 for Debug/Release/Profile)"
-            echo "   📊 Total bundle identifiers: $TOTAL_BUNDLE_COUNT"
-            echo "   ☢️ Nuclear-modified bundles: $NUCLEAR_BUNDLE_COUNT"
-            echo "   🚨 Nuclear suffix applied: $NUCLEAR_SUFFIX"
-            
-            if [ "$NEW_BUNDLE_COUNT" -eq 3 ]; then
-              echo "✅ NUCLEAR COLLISION ELIMINATION SUCCESSFUL!"
-              echo "📱 Main app bundle ID properly configured"
-              echo "☢️ ALL external frameworks NUCLEAR ISOLATED"
-              echo "🎯 Error ID 202240a2-1b58-4c02-87c2-d7886c462b6c ELIMINATED"
-              echo "🚨 NUCLEAR SUCCESS: Upload should now succeed"
-            elif [ "$NEW_BUNDLE_COUNT" -lt 3 ]; then
-              echo "⚠️ Warning: Bundle ID count is $NEW_BUNDLE_COUNT (below target 3)"
-              echo "   This may indicate over-aggressive nuclear modification"
-            else
-              echo "🚨 CRITICAL: Nuclear elimination incomplete - $NEW_BUNDLE_COUNT still > 3"
-              echo "   Activating emergency nuclear protocols..."
-              
-              # Emergency nuclear fix
-              python3 << EMERGENCY_NUCLEAR
-              import re
-              pbxproj_path = "ios/Runner.xcodeproj/project.pbxproj"
-              main_bundle_id = "$MAIN_BUNDLE_ID"
-              nuclear_suffix = "$NUCLEAR_SUFFIX"
-              
-              with open(pbxproj_path, 'r') as f:
-                  content = f.read()
-              
-              # Find all exact matches
-              exact_matches = list(re.finditer(rf'PRODUCT_BUNDLE_IDENTIFIER = {re.escape(main_bundle_id)};', content))
-              print(f"🚨 Emergency nuclear: Found {len(exact_matches)} exact matches")
-              
-              if len(exact_matches) > 3:
-                  # Nuclear emergency: modify all but first 3
-                  new_content = content
-                  for i, match in enumerate(exact_matches[3:], 3):
-                      emergency_id = f"{main_bundle_id}.emergency.nuclear.{nuclear_suffix}.{i}"
-                      old_line = match.group(0)
-                      new_line = f"PRODUCT_BUNDLE_IDENTIFIER = {emergency_id};"
-                      new_content = new_content.replace(old_line, new_line, 1)
-                      print(f"   🚨 Emergency fix {i}: -> {emergency_id}")
-                  
-                  with open(pbxproj_path, 'w') as f:
-                      f.write(new_content)
-                  
-                  print("✅ Emergency nuclear fix completed")
-              EMERGENCY_NUCLEAR
-              
-              # Re-verify after emergency fix
-              FINAL_COUNT=$(grep "PRODUCT_BUNDLE_IDENTIFIER = ${MAIN_BUNDLE_ID};" "$PBXPROJ_FILE" | wc -l | tr -d ' ')
-              echo "   ✅ Final count after emergency nuclear: $FINAL_COUNT"
-            fi
-          fi
-
-          echo ""
-          echo "📋 PHASE 4: Nuclear Documentation"
-
-          # Create nuclear elimination report
-          mkdir -p output/ios/
-          cat > output/ios/nuclear_elimination_report_${ERROR_ID}.txt << NUCLEAR_REPORT_EOF
-            NUCLEAR CFBundleIdentifier Collision Elimination Report
-            ======================================================
-            Error ID: 202240a2-1b58-4c02-87c2-d7886c462b6c
-            Strategy: NUCLEAR Multi-Layer Elimination
-            Timestamp: $TIMESTAMP
-            Nuclear Suffix: $NUCLEAR_SUFFIX
-            
-            Main Bundle ID: $MAIN_BUNDLE_ID
-            Final Count: $NEW_BUNDLE_COUNT
-            Total Bundle IDs: $TOTAL_BUNDLE_COUNT
-            Nuclear Modified: $NUCLEAR_BUNDLE_COUNT
-            
-            NUCLEAR MODIFICATIONS APPLIED:
-            - Main app bundle ID: ABSOLUTELY PROTECTED (unchanged)
-            - Excess occurrences: NUCLEAR ELIMINATED
-            - Test targets: NUCLEAR ISOLATED with unique suffixes
-            - External frameworks: NUCLEAR ISOLATED with unique suffixes
-            - Emergency protocols: ACTIVATED if needed
-            
-            NUCLEAR STATUS: ACTIVE ☢️
-            App Store Upload Status: CLEARED FOR UPLOAD ✅
-            Error Prevention: 202240a2-1b58-4c02-87c2-d7886c462b6c ELIMINATED
-            
-            WARNING: This nuclear approach breaks conventional rules to ensure upload success.
-            All bundle IDs except main app have been aggressively modified for collision elimination.
-            NUCLEAR_REPORT_EOF
-
-          echo "✅ Nuclear report created: output/ios/nuclear_elimination_report_${ERROR_ID}.txt"
-          echo ""
-          echo "💥 NUCLEAR COLLISION ELIMINATION COMPLETED!"
-          echo "☢️ ALL RULES BROKEN TO ENSURE UPLOAD SUCCESS"
-          echo "🚀 Ready to proceed with iOS build process"
-
-      - name: 🔬 Pre-Build Bundle ID Validation & Final Safety Check
-        script: |
-          echo "🔬 PRE-BUILD BUNDLE ID VALIDATION & FINAL SAFETY CHECK"
-          echo "🎯 Final validation before iOS build process"
-          echo ""
-
-          set -euo pipefail
-
-          MAIN_BUNDLE_ID="${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}"
-          PBXPROJ_FILE="ios/Runner.xcodeproj/project.pbxproj"
-
-          echo "🔍 Final Bundle ID Analysis:"
-
-          if [ -f "$PBXPROJ_FILE" ]; then
-            # Count exact main bundle ID matches (not including subdomains)
-            EXACT_MAIN_COUNT=$(grep "PRODUCT_BUNDLE_IDENTIFIER = ${MAIN_BUNDLE_ID};" "$PBXPROJ_FILE" | wc -l | tr -d ' ')
-            
-            # Count all bundle IDs
-            TOTAL_BUNDLE_IDS=$(grep -c "PRODUCT_BUNDLE_IDENTIFIER" "$PBXPROJ_FILE")
-            
-            # Find all unique bundle IDs
-            echo "   📊 Bundle ID Summary:"
-            echo "   - Exact main bundle ID count: $EXACT_MAIN_COUNT"
-            echo "   - Total bundle identifiers: $TOTAL_BUNDLE_IDS"
-            echo ""
-            echo "   📋 All Bundle Identifiers:"
-            grep "PRODUCT_BUNDLE_IDENTIFIER" "$PBXPROJ_FILE" | sed 's/.*= /   ✓ /' | sed 's/;.*//' | sort -u
-            
-            echo ""
-            echo "🛡️ Collision Risk Assessment:"
-            
-            # Check for potential duplicates
-            DUPLICATES=$(grep "PRODUCT_BUNDLE_IDENTIFIER" "$PBXPROJ_FILE" | sed 's/.*= //' | sed 's/;.*//' | sort | uniq -d)
-            
-            if [ -z "$DUPLICATES" ]; then
-              echo "   ✅ NO DUPLICATES DETECTED"
-              echo "   ✅ All bundle identifiers are unique"
-              
-              if [ "$EXACT_MAIN_COUNT" -eq 3 ]; then
-                echo "   ✅ Main bundle ID count is optimal (3)"
-                echo "   ✅ COLLISION RISK: MINIMAL"
-                echo ""
-                echo "🎉 VALIDATION PASSED - READY FOR BUILD!"
-                
-                # Create final validation report
-                mkdir -p output/ios/
-                cat > output/ios/final_validation_report.txt << VALIDATION_EOF
-                Bundle ID Final Validation Report
-                =================================
-                Validation Status: PASSED ✅
-                Main Bundle ID: $MAIN_BUNDLE_ID
-                Exact Count: $EXACT_MAIN_COUNT (Optimal: 3)
-                Total Bundle IDs: $TOTAL_BUNDLE_IDS
-                Duplicates Found: None
-                Collision Risk: MINIMAL
-                
-                Target Error ID: d8ecd068-0b8a-4c24-9120-bc7ea4b038ff
-                Prevention Status: ACTIVE
-                Build Clearance: APPROVED
-                
-                All bundle identifiers verified as unique.
-                Proceeding with iOS build process is SAFE.
-                VALIDATION_EOF
-                echo "   📄 Final validation report: output/ios/final_validation_report.txt"
-                
-              else
-                echo "   ⚠️ Main bundle ID count: $EXACT_MAIN_COUNT (expected: 3)"
-                echo "   ⚠️ COLLISION RISK: MODERATE - Proceeding with caution"
-              fi
-              
-            else
-              echo "   ❌ DUPLICATE BUNDLE IDS DETECTED:"
-              echo "$DUPLICATES" | sed 's/^/   ❌ /'
-              echo "   🚨 COLLISION RISK: HIGH"
-              echo ""
-              echo "🔧 Applying emergency collision fix..."
-              
-              # Emergency fix for any remaining duplicates
-              python3 << 'PYTHON_FIX'
-          import re
-          import os
-
-          pbxproj_path = "ios/Runner.xcodeproj/project.pbxproj"
-          main_bundle_id = os.environ.get('BUNDLE_ID', 'com.insurancegroupmo.insurancegroupmo')
-
-          if os.path.exists(pbxproj_path):
-              with open(pbxproj_path, 'r') as f:
-                  content = f.read()
-              
-              # Find all bundle ID lines
-              bundle_lines = re.findall(r'PRODUCT_BUNDLE_IDENTIFIER = ([^;]+);', content)
-              duplicates = {}
-              
-              for bundle_id in bundle_lines:
-                  duplicates[bundle_id] = duplicates.get(bundle_id, 0) + 1
-              
-              print(f"🔍 Emergency fix analysis:")
-              for bundle_id, count in duplicates.items():
-                  if count > 3 and bundle_id == main_bundle_id:
-                      print(f"   ⚠️ {bundle_id}: {count} occurrences (fixing...)")
-                      
-                      # Emergency unique suffix
-                      import time
-                      emergency_suffix = f"emrg{int(time.time()) % 10000}"
-                      
-                      # Replace excess occurrences with unique identifiers
-                      pattern = rf'PRODUCT_BUNDLE_IDENTIFIER = {re.escape(bundle_id)};'
-                      matches = list(re.finditer(pattern, content))
-                      
-                      if len(matches) > 3:
-                          # Keep first 3, modify the rest
-                          for i, match in enumerate(matches[3:], 3):
-                              new_id = f"{bundle_id}.excess.{emergency_suffix}.{i}"
-                              content = content[:match.start()] + f"PRODUCT_BUNDLE_IDENTIFIER = {new_id};" + content[match.end():]
-                          
-                          with open(pbxproj_path, 'w') as f:
-                              f.write(content)
-                          
-                          print(f"   ✅ Emergency fix applied with suffix: {emergency_suffix}")
-                  else:
-                      print(f"   ✅ {bundle_id}: {count} occurrences (OK)")
-
-                        
-                        echo "   ✅ Emergency collision fix completed"
-                      fi
-                      
-                    else
-                      echo "   ❌ Project file not found: $PBXPROJ_FILE"
-                      exit 1
-                    fi
-
-                    echo ""
-                    echo "🚀 PRE-BUILD VALIDATION COMPLETED"
-                    echo "📱 Bundle ID configuration verified"
-                    echo "🛡️ Collision prevention measures active"
-                    echo "✅ Ready to proceed with iOS Universal Build"
-
       - name: 🚀 iOS Universal Build
         script: |
           echo "🚀 Starting iOS Universal Build (New-Rules Pattern)"
           chmod +x lib/scripts/ios/main.sh lib/scripts/utils/*.sh
           ./lib/scripts/ios/main.sh
 
-      - name: ☢️ POST-BUILD Nuclear IPA Collision Elimination
-        script: |
-          echo "☢️ POST-BUILD Nuclear IPA Collision Elimination (New-Rules Pattern)"
-          if [ -f "lib/scripts/ios/nuclear_cfbundleidentifier_collision_fix.sh" ]; then
-            chmod +x lib/scripts/ios/nuclear_cfbundleidentifier_collision_fix.sh
-            ./lib/scripts/ios/nuclear_cfbundleidentifier_collision_fix.sh
-          else
-            echo "⚠️ Nuclear collision script not found - skipping"
-          fi
-
     artifacts:
-    # 📱 IPA Files (Primary artifacts)
-    - output/ios/*.ipa
-    - output/ios/*_collision_free.ipa # Collision-free IPA for App Store
-    - output/ios/*_AppStoreConnect_Fixed.ipa # App Store Connect compatible IPA
-    - output/ios/*_Nuclear_AppStore_Fixed.ipa # NUCLEAR App Store Connect backup IPA
-    - output/ios/*_Nuclear_AppStore_*.ipa # NUCLEAR IPA Error ID 202240a2 - UPLOAD READY
-    - build/ios/ipa/*.ipa
-    - ios/build/*.ipa
-    - "*.ipa"
+      # 📱 IPA Files (Primary artifacts)
+      - output/ios/*.ipa
+      - output/ios/*_collision_free.ipa # Collision-free IPA for App Store
+      - output/ios/*_AppStoreConnect_Fixed.ipa # App Store Connect compatible IPA
+      - output/ios/*_Nuclear_AppStore_Fixed.ipa # NUCLEAR App Store Connect backup IPA
+      - output/ios/*_Nuclear_AppStore_*.ipa # NUCLEAR IPA Error ID 202240a2 - UPLOAD READY
+      - build/ios/ipa/*.ipa
+      - ios/build/*.ipa
+      - "*.ipa"
 
-    # 📦 Archive Files (When IPA export fails)
-    - output/ios/*.xcarchive
-    - build/ios/archive/*.xcarchive
-    - ios/build/*.xcarchive
-    - "*.xcarchive"
+      # 📦 Archive Files (When IPA export fails)
+      - output/ios/*.xcarchive
+      - build/ios/archive/*.xcarchive
+      - ios/build/*.xcarchive
+      - "*.xcarchive"
 
-    # 📋 Build Documentation
-    - output/ios/ARTIFACTS_SUMMARY.txt
-    - output/ios/TROUBLESHOOTING_GUIDE.txt
-    - output/ios/PERMISSIONS_SUMMARY.txt
-    - ios/ExportOptions.plist
+      # 📋 Build Documentation
+      - output/ios/ARTIFACTS_SUMMARY.txt
+      - output/ios/TROUBLESHOOTING_GUIDE.txt
+      - output/ios/PERMISSIONS_SUMMARY.txt
+      - ios/ExportOptions.plist
 
-    # ☢️ Nuclear Collision Elimination Reports (Error ID: 202240a2)
-    - output/ios/nuclear_elimination_report_*.txt
-    - output/ios/nuclear_ipa_modification_report_*.txt
-    - nuclear_elimination_report_*.txt
-    - nuclear_ipa_workspace_*/nuclear_analysis_results.txt
+      # ☢️ Nuclear Collision Elimination Reports (Error ID: 202240a2)
+      - output/ios/nuclear_elimination_report_*.txt
+      - output/ios/nuclear_ipa_modification_report_*.txt
+      - nuclear_elimination_report_*.txt
+      - nuclear_ipa_workspace_*/nuclear_analysis_results.txt
 
-    # 📊 Build Logs
-    - build/ios/logs/
-    - output/ios/logs/
+      # 📊 Build Logs
+      - build/ios/logs/
+      - output/ios/logs/
 
-    # 🔧 Additional Build Artifacts
-    - output/ios/
-    - build/ios/
+      # 🔧 Additional Build Artifacts
+      - output/ios/
+      - build/ios/
 
   ios-workflow2:
     name: iOS Workflow 2
@@ -1395,45 +928,6 @@ workflows:
           echo "🚀 Starting iOS Workflow 2 Build (New-Rules Pattern)"
           chmod +x lib/scripts/ios-workflow2/main.sh lib/scripts/utils/*.sh
           ./lib/scripts/ios-workflow2/main.sh
-
-
-
-          echo "✅ Start Exporting:"
-          echo "🔍 Archive path: $CM_BUILD_DIR/Runner.xcarchive"
-          echo "🔍 Export path: $CM_BUILD_DIR/ios_output"
-
-          # Make the export fix script executable and run it
-          chmod +x lib/scripts/utils/fix_ios_export.sh
-          ./lib/scripts/utils/fix_ios_export.sh
-
-          echo "Contents of output directory:"
-          ls -lh "$CM_BUILD_DIR/ios_output" || echo "Directory not found"
-
-            if [[ -f "$CM_BUILD_DIR/ios_output/Runner.ipa" ]]; then
-          echo "✅ IPA generated at: $CM_BUILD_DIR/ios_output/Runner.ipa"
-            echo "📊 IPA file size: $(du -h "$CM_BUILD_DIR/ios_output/Runner.ipa" | cut -f1)"
-            else
-            echo "❌ IPA file was not generated!"
-            echo "🔍 Checking for any generated files:"
-            find "$CM_BUILD_DIR/ios_output" -type f 2>/dev/null || echo "No files found"
-            exit 1
-            fi
-
-      - name: Upload to TestFlight
-        script: |
-          echo "📥 Loading environment from $CM_ENV"
-          set -a
-          source "$CM_ENV"
-          set +a
-               echo "✅ PROFILE_UUID=$PROFILE_UUID"
-               echo "✅ PROFILE_NAME=$PROFILE_NAME"
-          echo "✅ CODE_SIGN_IDENTITY=$CODE_SIGN_IDENTITY"
-
-          xcrun altool --upload-app \
-            --type ios \
-            --file build/ios_output/Runner.ipa \
-            --apiKey "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
-            --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID"
     artifacts:
       - build/ios_output/Runner.ipa
       - build/ios/ipa/*.ipa
