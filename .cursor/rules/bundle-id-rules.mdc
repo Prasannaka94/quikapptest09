@@ -1,0 +1,33 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+Development Rules & Best Practices
+1. Establish a Clear Naming Convention 📝
+Base Identifier: Define a base identifier for your app, typically in reverse domain name notation (e.g., com.yourcompany.appname).
+
+Suffix for Components: For any additional bundles, append a unique suffix to the base identifier. This makes them distinct yet related.
+
+App: com.yourcompany.appname
+
+Widget Extension: com.yourcompany.appname.widget
+
+Notification Service: com.yourcompany.appname.notificationservice
+
+2. Manage Xcode Targets Correctly 🎯
+Check Each Target: When you add a new target to your Xcode project, immediately go to its Build Settings and search for Product Bundle Identifier. Ensure it has a unique identifier assigned.
+
+Avoid Duplication: Do not duplicate targets without immediately changing the new target's bundle identifier.
+
+3. Handle Dependencies and Frameworks Carefully 📦
+Do Not Embed System Frameworks: Never embed standard iOS system frameworks (like UIKit or Foundation). They should only be linked.
+
+Check Third-Party Frameworks: When adding third-party frameworks or dependencies (via CocoaPods, Swift Package Manager, or manually), verify they don't share the same bundle identifier as your app or another dependency.
+
+Use "Do Not Embed" When Appropriate: In your project's "Frameworks, Libraries, and Embedded Content" section, set frameworks to "Do Not Embed" if they will be linked by another part of your app that is already being embedded. This is a common source of duplication.
+
+4. Regular Audits ✅
+Inspect the App Bundle: Before archiving and uploading, you can inspect the contents of your .app file (Show Package Contents). Look through the Frameworks and PlugIns folders to see what bundles are included and manually check their Info.plist files for identifier conflicts.
+
+Clean Build Folder: Regularly clean your build folder in Xcode (Product > Clean Build Folder). This can resolve issues where outdated or cached build artifacts cause false collision errors.
