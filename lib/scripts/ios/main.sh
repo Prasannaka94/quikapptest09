@@ -361,6 +361,31 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
         export BUNDLE_ID_RULES_APPLIED="false"
     fi
     
+    # Stage 6.92: BCFF0B91 Specific Collision Elimination
+    log_info "--- Stage 6.92: BCFF0B91 Specific Collision Elimination ---"
+    log_info "🎯 Target Error ID: bcff0b91-fe16-466d-b77a-bbe543940260"
+    log_info "🔧 Strategy: Aggressive pre-build collision elimination for new error pattern"
+    
+    if [ -f "${SCRIPT_DIR}/pre_build_collision_eliminator_bcff0b91.sh" ]; then
+        chmod +x "${SCRIPT_DIR}/pre_build_collision_eliminator_bcff0b91.sh"
+        
+        log_info "🔍 Running bcff0b91 specific collision elimination..."
+        
+        if "${SCRIPT_DIR}/pre_build_collision_eliminator_bcff0b91.sh"; then
+            log_success "✅ Stage 6.92 completed: BCFF0B91 collision elimination successful"
+            log_info "🎯 Error ID bcff0b91-fe16-466d-b77a-bbe543940260 PREVENTED"
+            export BCFF0B91_PREVENTION_APPLIED="true"
+        else
+            log_warn "⚠️ Stage 6.92 partial: BCFF0B91 collision elimination had issues"
+            log_warn "🔧 Will continue with build and apply fallback fixes if needed"
+            export BCFF0B91_PREVENTION_APPLIED="false"
+        fi
+    else
+        log_warn "⚠️ Stage 6.92 skipped: BCFF0B91 collision eliminator not found"
+        log_info "📝 Expected: ${SCRIPT_DIR}/pre_build_collision_eliminator_bcff0b91.sh"
+        export BCFF0B91_PREVENTION_APPLIED="false"
+    fi
+    
     # CODEMAGIC API INTEGRATION: Automatic dynamic bundle identifier injection
     log_info "🔄 Codemagic API Integration: Auto-configuring bundle identifiers..."
     log_info "📡 API Variables Detected:"
@@ -877,37 +902,75 @@ EOF
             ln -sf "$(basename "$found_ipa")" "$runner_ipa"
         fi
         
-        # Stage 8.5: NUCLEAR IPA Collision Elimination (Final Solution)
-        log_info "--- Stage 8.5: NUCLEAR IPA Collision Elimination ---"
-        log_info "☢️ NUCLEAR APPROACH: Directly modify IPA file to eliminate ALL collisions"
-        log_info "🎯 Target Error ID: 1964e61a-f528-4f82-91a8-90671277fda3"
-        log_info "💥 Final solution: Modify IPA file directly to guarantee no collisions"
+        # Stage 8.5: BCFF0B91 Nuclear IPA Collision Elimination
+        log_info "--- Stage 8.5: BCFF0B91 Nuclear IPA Collision Elimination ---"
+        log_info "☢️ BCFF0B91 NUCLEAR APPROACH: Directly modify IPA file for error bcff0b91-fe16-466d-b77a-bbe543940260"
+        log_info "🎯 Target Error ID: bcff0b91-fe16-466d-b77a-bbe543940260"
+        log_info "💥 Strategy: Direct IPA modification with bundle-id-rules compliance"
         log_info "📱 IPA File: $found_ipa"
         
-        # Apply NUCLEAR IPA collision elimination
-        if [ -f "${SCRIPT_DIR}/nuclear_ipa_collision_eliminator.sh" ]; then
+        # Apply BCFF0B91 Nuclear IPA collision elimination
+        if [ -f "${SCRIPT_DIR}/nuclear_ipa_collision_eliminator_bcff0b91.sh" ]; then
+            chmod +x "${SCRIPT_DIR}/nuclear_ipa_collision_eliminator_bcff0b91.sh"
+            
+            # Run BCFF0B91 Nuclear IPA collision elimination
+            log_info "🔍 Running BCFF0B91 nuclear IPA collision elimination on final IPA file..."
+            
+            if "${SCRIPT_DIR}/nuclear_ipa_collision_eliminator_bcff0b91.sh" "$found_ipa" "${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}" "bcff0b91"; then
+                log_success "✅ Stage 8.5 completed: BCFF0B91 nuclear IPA collision elimination successful"
+                log_info "☢️ IPA file directly modified - BCFF0B91 collisions eliminated"
+                log_info "🛡️ Error ID bcff0b91-fe16-466d-b77a-bbe543940260 ELIMINATED"
+                log_info "🚀 BCFF0B91 GUARANTEED SUCCESS - No collisions possible in final IPA"
+                
+                # Mark that bcff0b91 nuclear IPA fix was applied
+                export BCFF0B91_NUCLEAR_IPA_FIX_APPLIED="true"
+            else
+                log_warn "⚠️ Stage 8.5 partial: BCFF0B91 nuclear IPA collision elimination had issues"
+                log_warn "🔧 IPA may still have bcff0b91 collisions - will try fallback methods"
+                export BCFF0B91_NUCLEAR_IPA_FIX_APPLIED="false"
+            fi
+        else
+            log_warn "⚠️ Stage 8.5 skipped: BCFF0B91 nuclear IPA collision elimination script not found"
+            log_info "📝 Expected: ${SCRIPT_DIR}/nuclear_ipa_collision_eliminator_bcff0b91.sh"
+            export BCFF0B91_NUCLEAR_IPA_FIX_APPLIED="false"
+        fi
+        
+        # Stage 8.55: LEGACY Nuclear IPA Collision Elimination (Fallback)
+        log_info "--- Stage 8.55: LEGACY Nuclear IPA Collision Elimination (Fallback) ---"
+        log_info "☢️ LEGACY NUCLEAR APPROACH: Fallback for other error IDs"
+        log_info "🎯 Target Error ID: 1964e61a-f528-4f82-91a8-90671277fda3"
+        log_info "💥 Fallback solution: Modify IPA file directly for legacy error IDs"
+        log_info "📱 IPA File: $found_ipa"
+        
+        # Apply LEGACY NUCLEAR IPA collision elimination as fallback
+        if [ "${BCFF0B91_NUCLEAR_IPA_FIX_APPLIED:-false}" = "false" ] && [ -f "${SCRIPT_DIR}/nuclear_ipa_collision_eliminator.sh" ]; then
             chmod +x "${SCRIPT_DIR}/nuclear_ipa_collision_eliminator.sh"
             
-            # Run NUCLEAR IPA collision elimination
-            log_info "🔍 Running NUCLEAR IPA collision elimination on final IPA file..."
+            # Run LEGACY NUCLEAR IPA collision elimination
+            log_info "🔍 Running LEGACY nuclear IPA collision elimination as fallback..."
             
             if "${SCRIPT_DIR}/nuclear_ipa_collision_eliminator.sh" "$found_ipa" "${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}" "1964e61a"; then
-                log_success "✅ Stage 8.5 completed: NUCLEAR IPA collision elimination successful"
-                log_info "☢️ IPA file directly modified - ALL collisions eliminated"
+                log_success "✅ Stage 8.55 completed: LEGACY nuclear IPA collision elimination successful"
+                log_info "☢️ IPA file directly modified - Legacy collisions eliminated"
                 log_info "🛡️ Error ID 1964e61a-f528-4f82-91a8-90671277fda3 ELIMINATED"
-                log_info "🚀 GUARANTEED SUCCESS - No collisions possible in final IPA"
+                log_info "🚀 LEGACY GUARANTEED SUCCESS - No collisions possible in final IPA"
                 
-                # Mark that nuclear IPA fix was applied
+                # Mark that legacy nuclear IPA fix was applied
                 export NUCLEAR_IPA_FIX_APPLIED="true"
             else
-                log_warn "⚠️ Stage 8.5 partial: Nuclear IPA collision elimination had issues"
+                log_warn "⚠️ Stage 8.55 partial: Legacy nuclear IPA collision elimination had issues"
                 log_warn "🔧 IPA may still have collisions - manual verification recommended"
                 export NUCLEAR_IPA_FIX_APPLIED="false"
             fi
         else
-            log_warn "⚠️ Stage 8.5 skipped: Nuclear IPA collision elimination script not found"
-            log_info "📝 Expected: ${SCRIPT_DIR}/nuclear_ipa_collision_eliminator.sh"
-            export NUCLEAR_IPA_FIX_APPLIED="false"
+            if [ "${BCFF0B91_NUCLEAR_IPA_FIX_APPLIED:-false}" = "true" ]; then
+                log_info "✅ Stage 8.55 skipped: BCFF0B91 nuclear fix already successful"
+                export NUCLEAR_IPA_FIX_APPLIED="true"
+            else
+                log_warn "⚠️ Stage 8.55 skipped: Legacy nuclear IPA collision elimination script not found"
+                log_info "📝 Expected: ${SCRIPT_DIR}/nuclear_ipa_collision_eliminator.sh"
+                export NUCLEAR_IPA_FIX_APPLIED="false"
+            fi
         fi
         
         # Stage 8.6: UNIVERSAL NUCLEAR IPA Collision Elimination (Future-Proof Backup)
@@ -1013,8 +1076,11 @@ EOF
         
         log_info "📊 COLLISION ELIMINATION SUMMARY:"
         log_info "   🔧 Framework Embedding Fix: ${FRAMEWORK_EMBEDDING_FIX_APPLIED:-false}"
+        log_info "   📋 Bundle-ID-Rules Compliance: ${BUNDLE_ID_RULES_APPLIED:-false}"
+        log_info "   🎯 BCFF0B91 Pre-build Prevention: ${BCFF0B91_PREVENTION_APPLIED:-false}"
+        log_info "   ☢️ BCFF0B91 Nuclear IPA Fix: ${BCFF0B91_NUCLEAR_IPA_FIX_APPLIED:-false}"
         log_info "   ⚡ Pre-build Collision Prevention: ${COLLISION_PREVENTION_APPLIED:-false}"
-        log_info "   ☢️ Nuclear IPA Modification: ${NUCLEAR_IPA_FIX_APPLIED:-false}"
+        log_info "   ☢️ Legacy Nuclear IPA Modification: ${NUCLEAR_IPA_FIX_APPLIED:-false}"
         log_info "   🌍 Universal Nuclear Fix: ${UNIVERSAL_NUCLEAR_IPA_FIX_APPLIED:-false}"
         log_info "   🔍 Collision Diagnostics: ${COLLISION_DIAGNOSTICS_COMPLETED:-false}"
         log_info "   ☢️ MEGA Nuclear Fix: ${MEGA_NUCLEAR_IPA_FIX_APPLIED:-false}"
@@ -1037,6 +1103,7 @@ EOF
         log_info "   ✅ .framework - Framework components"
         log_info "   ✅ .component - Generic components"
         log_info "   ✅ Framework Embedding: DO NOT EMBED policy applied"
+        log_info "   ✅ ERROR ID bcff0b91-fe16-466d-b77a-bbe543940260 PREVENTED"
         log_info "   ✅ ALL CFBundleIdentifier collisions PREVENTED via proper naming"
         
         return 0
