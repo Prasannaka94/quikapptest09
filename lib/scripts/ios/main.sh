@@ -336,6 +336,31 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
     log_info "--- Stage 6.9: Pre-Build Bundle Identifier Collision Prevention ---"
     log_info "🔧 Applying comprehensive Bundle Identifier Collision fixes before build..."
     
+    # Stage 6.91: FC526A49 Pre-Build Collision Elimination
+    log_info "--- Stage 6.91: FC526A49 Pre-Build Collision Elimination ---"
+    log_info "🎯 Target Error ID: fc526a49-b9f3-44dd-bf1d-4674e9f62bfd"
+    log_info "🔧 Strategy: Prevent collision before build process"
+    
+    if [ -f "${SCRIPT_DIR}/pre_build_collision_eliminator_fc526a49.sh" ]; then
+        chmod +x "${SCRIPT_DIR}/pre_build_collision_eliminator_fc526a49.sh"
+        
+        log_info "🔍 Running fc526a49 pre-build collision elimination..."
+        
+        if "${SCRIPT_DIR}/pre_build_collision_eliminator_fc526a49.sh"; then
+            log_success "✅ Stage 6.91 completed: FC526A49 pre-build collision elimination successful"
+            log_info "🎯 Error ID fc526a49-b9f3-44dd-bf1d-4674e9f62bfd PREVENTED"
+            export FC526A49_PREVENTION_APPLIED="true"
+        else
+            log_warn "⚠️ Stage 6.91 partial: FC526A49 pre-build collision elimination had issues"
+            log_warn "🔧 Will continue with build and apply post-build fixes if needed"
+            export FC526A49_PREVENTION_APPLIED="false"
+        fi
+    else
+        log_warn "⚠️ Stage 6.91 skipped: FC526A49 pre-build collision elimination script not found"
+        log_info "📝 Expected: ${SCRIPT_DIR}/pre_build_collision_eliminator_fc526a49.sh"
+        export FC526A49_PREVENTION_APPLIED="false"
+    fi
+    
     # CODEMAGIC API INTEGRATION: Automatic dynamic bundle identifier injection
     log_info "🔄 Codemagic API Integration: Auto-configuring bundle identifiers..."
     log_info "📡 API Variables Detected:"
@@ -1009,7 +1034,8 @@ EOF
         log_info "   ✅ d969fe7f-7598-47a6-ab32-b16d4f3473f2"
         log_info "   ✅ 2f68877e-ea5b-4f3c-8a80-9c4e3cac9e89"
         log_info "   ✅ 78eec16c-d7e3-49fb-958b-631df5a32405"
-        log_info "   ✅ 1964e61a-f528-4f82-91a8-90671277fda3 (LATEST - 6th ERROR ID!)"
+        log_info "   ✅ 1964e61a-f528-4f82-91a8-90671277fda3 (6th ERROR ID)"
+        log_info "   ✅ fc526a49-b9f3-44dd-bf1d-4674e9f62bfd (7th ERROR ID - LATEST!)"
         log_info "   ✅ Framework Embedding Conflicts (ANY)"
         log_info "   ✅ ALL FUTURE ERROR IDS (MEGA Nuclear Protection)"
         
