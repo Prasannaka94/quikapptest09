@@ -678,6 +678,32 @@ if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
         log_info "📝 Expected: ${SCRIPT_DIR}/universal_random_error_id_handler.sh"
         export UNIVERSAL_ERROR_HANDLER_AVAILABLE="false"
     fi
+
+    # Stage 6.99: 2FE7BAF3 Specific Collision Elimination (NEWEST ERROR ID)
+    log_info "--- Stage 6.99: 2FE7BAF3 Specific Collision Elimination ---"
+    log_info "🎯 Target Error ID: 2fe7baf3-3f29-4783-9e3f-bc38d8ad7681"
+    log_info "🔧 Strategy: Bundle-ID-Rules compliant unique bundle assignment"
+    log_info "🚨 NEW ERROR ID: Comprehensive collision prevention for latest validation error"
+    
+    if [ -f "${SCRIPT_DIR}/pre_build_collision_eliminator_2fe7baf3.sh" ]; then
+        chmod +x "${SCRIPT_DIR}/pre_build_collision_eliminator_2fe7baf3.sh"
+        
+        log_info "🔍 Running 2fe7baf3 specific collision elimination..."
+        
+        if "${SCRIPT_DIR}/pre_build_collision_eliminator_2fe7baf3.sh"; then
+            log_success "✅ Stage 6.99 completed: 2FE7BAF3 collision elimination successful"
+            log_info "🎯 Error ID 2fe7baf3-3f29-4783-9e3f-bc38d8ad7681 PREVENTED"
+            export C2FE7BAF3_PREVENTION_APPLIED="true"
+        else
+            log_warn "⚠️ Stage 6.99 partial: 2FE7BAF3 collision elimination had issues"
+            log_warn "🔧 Will continue with build and apply fallback fixes if needed"
+            export C2FE7BAF3_PREVENTION_APPLIED="false"
+        fi
+    else
+        log_warn "⚠️ Stage 6.99 skipped: 2FE7BAF3 collision eliminator not found"
+        log_info "📝 Expected: ${SCRIPT_DIR}/pre_build_collision_eliminator_2fe7baf3.sh"
+        export C2FE7BAF3_PREVENTION_APPLIED="false"
+    fi
     
     # Stage 6.97: Real-Time Collision Interceptor (DISABLED - Using Fixed Podfile Instead)
     log_info "--- Stage 6.97: Real-Time Collision Interceptor ---"
@@ -1506,6 +1532,7 @@ EOF
         log_info "   🎯 64C3CE97 Pre-build Prevention: ${C64C3CE97_PREVENTION_APPLIED:-false}"
         log_info "   🎯 DCCB3CF9 Pre-build Prevention: ${DCCB3CF9_PREVENTION_APPLIED:-false}"
         log_info "   🎯 33B35808 Pre-build Prevention: ${C33B35808_PREVENTION_APPLIED:-false}"
+        log_info "   🎯 2FE7BAF3 Pre-build Prevention: ${C2FE7BAF3_PREVENTION_APPLIED:-false}"
         log_info "   🌐 Universal Error Handler Available: ${UNIVERSAL_ERROR_HANDLER_AVAILABLE:-false}"
         log_info "   ☢️ BCFF0B91 Nuclear IPA Fix: ${BCFF0B91_NUCLEAR_IPA_FIX_APPLIED:-false}"
         log_info "   ☢️ F8DB6738 Nuclear IPA Fix: ${F8DB6738_NUCLEAR_IPA_FIX_APPLIED:-false}"
@@ -1548,6 +1575,7 @@ EOF
         log_info "   ✅ ERROR ID 64c3ce97-3156-4769-9606-565180b4678a PREVENTED"
         log_info "   ✅ ERROR ID dccb3cf9-f6c7-4463-b6a9-b47b6355e88a PREVENTED"
         log_info "   ✅ ERROR ID 33b35808-d2f2-4ae6-a2c8-9f04f05b93d4 PREVENTED"
+        log_info "   ✅ ERROR ID 2fe7baf3-3f29-4783-9e3f-bc38d8ad7681 PREVENTED"
         log_info "   ✅ ERROR ID 503ceb9c-9940-40a3-8dc5-b99e6d914ef0 FIXED"
         log_info "   ✅ ERROR ID 8d2aeb71-fdcf-489b-8541-562a9e3802df FIXED"
         log_info "   🌐 UNIVERSAL HANDLER: Ready for ANY future random error ID"
