@@ -381,22 +381,22 @@ main() {
     log_info "--- Stage 6.7: Enhanced Push Notification Handler Summary ---"
     log_info "✅ Enhanced push notification handler completed successfully"
     log_info "📊 PUSH_NOTIFY=$PUSH_NOTIFY - Firebase and push notifications properly configured"
-    
+        
     # Apply bundle identifier collision fixes after push notification setup
     log_info "🔧 Applying Bundle Identifier Collision fixes after push notification setup..."
-    if [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh" ]; then
-        chmod +x "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh"
-        if ! "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh"; then
+        if [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh" ]; then
+            chmod +x "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh"
+            if ! "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh"; then
             log_warn "⚠️ Bundle Identifier Collision fixes (v2) failed after push notification setup"
-            # Try v1 as fallback
-            if [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh" ]; then
-                chmod +x "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh"
-                "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh" || log_warn "Bundle Identifier Collision fixes failed"
-            fi
-        else
+                # Try v1 as fallback
+                if [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh" ]; then
+                    chmod +x "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh"
+                    "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh" || log_warn "Bundle Identifier Collision fixes failed"
+                fi
+            else
             log_success "✅ Bundle Identifier Collision fixes applied after push notification setup"
+            fi
         fi
-    fi
     
     # Stage 6.9: Push Notification Configuration Complete
     log_info "--- Stage 6.9: Push Notification Configuration Complete ---"
