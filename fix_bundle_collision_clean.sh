@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Clean CFBundleIdentifier Collision Fix
-# Purpose: Fix the current collision without introducing Unicode characters
+# 🔧 Clean CFBundleIdentifier Collision Fix
+# Purpose: Fix CFBundleIdentifier collisions without introducing Unicode characters
 # Target Error: Validation failed (409) CFBundleIdentifier Collision
 
 set -euo pipefail

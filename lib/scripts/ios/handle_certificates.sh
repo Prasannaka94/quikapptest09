@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 
 # Certificate and Provisioning Profile Handler for iOS Build
 # Purpose: Download, validate, and install certificates and provisioning profiles

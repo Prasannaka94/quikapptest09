@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 
 # Flutter iOS Build Script
 # Purpose: Build the Flutter iOS application and create archive

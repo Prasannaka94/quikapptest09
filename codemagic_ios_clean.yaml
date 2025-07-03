@@ -166,7 +166,9 @@ workflows:
           # Send email notification
           if [ -f "lib/scripts/ios/email_notifications.sh" ]; then
             chmod +x lib/scripts/ios/email_notifications.sh
-            lib/scripts/ios/email_notifications.sh "started" "iOS Build Started" "iOS build for $APP_NAME ($VERSION_NAME) has started with profile type: $PROFILE_TYPE"
+            bash lib/scripts/ios/email_notifications.sh "started" "iOS Build Started" "iOS build for $APP_NAME ($VERSION_NAME) has started with profile type: $PROFILE_TYPE"
+          else
+            echo "⚠️ Email notifications script not found at lib/scripts/ios/email_notifications.sh"
           fi
 
       - name: ☢️ ULTIMATE CFBundleIdentifier Collision Eliminator
@@ -260,7 +262,7 @@ workflows:
           # Send email notification
           if [ -f "lib/scripts/ios/email_notifications.sh" ]; then
             chmod +x lib/scripts/ios/email_notifications.sh
-            lib/scripts/ios/email_notifications.sh "$BUILD_STATUS" "iOS Build $BUILD_STATUS" "$BUILD_MESSAGE"
+            bash lib/scripts/ios/email_notifications.sh "$BUILD_STATUS" "iOS Build $BUILD_STATUS" "$BUILD_MESSAGE"
           else
             echo "⚠️ Email notifications script not found at lib/scripts/ios/email_notifications.sh"
           fi
@@ -272,17 +274,3 @@ workflows:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
       - flutter_drive.log
-
-    publishing:
-      email:
-        recipients:
-          - $EMAIL_ID
-        notify:
-          success: true
-          failure: true
-      app_store_connect:
-        api_key: $APP_STORE_CONNECT_API_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: $IS_TESTFLIGHT
-        submit_to_app_store: false

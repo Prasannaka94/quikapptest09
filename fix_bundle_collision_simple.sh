@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Simple CFBundleIdentifier Collision Fix
-# Purpose: Fix the current collision with clean, simple bundle identifiers
+# 🔧 Simple CFBundleIdentifier Collision Fix
+# Purpose: Simple fix for CFBundleIdentifier collisions
 # Target Error: Validation failed (409) CFBundleIdentifier Collision
 
 set -euo pipefail
@@ -44,23 +44,22 @@ cp "$INFO_PLIST" "${INFO_PLIST}.simple_fix_backup_${TIMESTAMP}"
 echo "✅ Backups created"
 echo ""
 
-# Get all bundle identifier lines
+# Analyze current bundle identifiers
 echo "🔍 Current bundle identifiers:"
 BUNDLE_LINES=$(grep -n "PRODUCT_BUNDLE_IDENTIFIER" "$IOS_PROJECT_FILE")
 echo "$BUNDLE_LINES" | sed 's/^/   /'
 
-# Count total bundle identifiers
-TOTAL_COUNT=$(echo "$BUNDLE_LINES" | wc -l)
-echo "📊 Total bundle identifiers found: $TOTAL_COUNT"
+TOTAL_BUNDLE_IDS=$(echo "$BUNDLE_LINES" | wc -l)
+echo "📊 Total bundle identifiers found: $TOTAL_BUNDLE_IDS"
 echo ""
 
-# Create a simple fix by assigning sequential unique identifiers
+# Apply simple bundle identifier fix
 echo "🔧 Applying simple bundle identifier fix..."
 
 # Create temporary file
 TEMP_PROJECT="${IOS_PROJECT_FILE}.temp_simple_${TIMESTAMP}"
 
-# Read the project file and update bundle identifiers with simple sequential IDs
+# Read the project file and update bundle identifiers
 {
     line_number=0
     target_count=0
@@ -68,25 +67,24 @@ TEMP_PROJECT="${IOS_PROJECT_FILE}.temp_simple_${TIMESTAMP}"
     while IFS= read -r line; do
         line_number=$((line_number + 1))
         
-        # Update bundle identifiers with simple sequential approach
-        if [[ "$line" =~ PRODUCT_BUNDLE_IDENTIFIER[[:space:]]*=[[:space:]]*[^;]* ]]; then
+        # Update bundle identifiers (simplified regex)
+        if [[ "$line" =~ PRODUCT_BUNDLE_IDENTIFIER ]]; then
             target_count=$((target_count + 1))
             
-            # Assign simple, unique identifiers
-            case $target_count in
-                1)
-                    NEW_ID="$BASE_BUNDLE_ID"
-                    echo "   Target $target_count (Main App): $NEW_ID" >&2
-                    ;;
-                2)
-                    NEW_ID="${BASE_BUNDLE_ID}.tests"
-                    echo "   Target $target_count (Tests): $NEW_ID" >&2
-                    ;;
-                *)
-                    NEW_ID="${BASE_BUNDLE_ID}.framework${target_count}"
-                    echo "   Target $target_count (Framework): $NEW_ID" >&2
-                    ;;
-            esac
+            # Assign unique bundle ID based on target count
+            if [ "$target_count" -eq 1 ]; then
+                # First target (main app)
+                NEW_ID="$BASE_BUNDLE_ID"
+                echo "   Target $target_count (Main App): $NEW_ID" >&2
+            elif [ "$target_count" -eq 2 ]; then
+                # Second target (tests)
+                NEW_ID="${BASE_BUNDLE_ID}.tests"
+                echo "   Target $target_count (Tests): $NEW_ID" >&2
+            else
+                # Additional targets (frameworks/extensions)
+                NEW_ID="${BASE_BUNDLE_ID}.framework.${target_count}.${TIMESTAMP}"
+                echo "   Target $target_count (Framework): $NEW_ID" >&2
+            fi
             
             # Replace the bundle identifier
             echo "$line" | sed "s/PRODUCT_BUNDLE_IDENTIFIER = [^;]*;/PRODUCT_BUNDLE_IDENTIFIER = $NEW_ID;/g"
@@ -99,10 +97,10 @@ TEMP_PROJECT="${IOS_PROJECT_FILE}.temp_simple_${TIMESTAMP}"
 # Replace the original file
 mv "$TEMP_PROJECT" "$IOS_PROJECT_FILE"
 
-echo "✅ Project file updated with simple, unique bundle identifiers"
+echo "✅ Project file updated"
 echo ""
 
-# Update Info.plist with main bundle identifier
+# Update Info.plist
 echo "📱 Updating Info.plist..."
 if command -v plutil &> /dev/null; then
     plutil -replace CFBundleIdentifier -string "$BASE_BUNDLE_ID" "$INFO_PLIST"
@@ -145,7 +143,7 @@ if [ -f "$PODFILE" ]; then
     sed -i.tmp '/CFBundleIdentifier.*collision.*prevention/,/^end$/d' "$PODFILE"
     rm -f "${PODFILE}.tmp"
     
-    # Add clean collision prevention
+    # Add simple collision prevention
     cat >> "$PODFILE" << 'EOF'
 
 # CFBundleIdentifier Collision Prevention
@@ -162,7 +160,7 @@ post_install do |installer|
       next if target.name == 'Runner'
       
       # Generate unique bundle ID for each framework/pod
-      unique_bundle_id = "#{main_bundle_id}.pod.#{target.name.downcase.gsub(/[^a-z0-9]/, '')}.#{timestamp}"
+      unique_bundle_id = "#{main_bundle_id}.simple.#{target.name.downcase.gsub(/[^a-z0-9]/, '')}.#{timestamp}"
       
       config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = unique_bundle_id
       
@@ -173,7 +171,7 @@ post_install do |installer|
   puts "All frameworks now have unique bundle identifiers"
 end
 EOF
-    echo "✅ Podfile updated with clean collision prevention"
+    echo "✅ Podfile updated with simple collision prevention"
 else
     echo "⚠️ Podfile not found"
 fi
@@ -186,7 +184,7 @@ echo "🎯 Target Error: Validation failed (409) CFBundleIdentifier Collision"
 echo "🔧 Solution Applied:"
 echo "   ✅ Main app: $BASE_BUNDLE_ID"
 echo "   ✅ Test target: $BASE_BUNDLE_ID.tests"
-echo "   ✅ Framework targets: $BASE_BUNDLE_ID.framework[N]"
+echo "   ✅ Framework targets: $BASE_BUNDLE_ID.framework.[N].$TIMESTAMP"
 echo "   ✅ Podfile collision prevention updated"
 echo "   ✅ Info.plist updated"
 echo "   ✅ NO UNICODE CHARACTERS INTRODUCED"

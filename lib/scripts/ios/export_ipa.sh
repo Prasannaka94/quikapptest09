@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 
 # IPA Export Script for iOS Build (Enhanced Version v3.0)
 # Purpose: Export IPA file from Xcode archive with profile-type-based configuration

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Proper CFBundleIdentifier Collision Fix
-# Purpose: Fix the current collision by assigning unique bundle identifiers to each target
+# 🔧 Proper CFBundleIdentifier Collision Fix
+# Purpose: Fix CFBundleIdentifier collisions with proper target detection
 # Target Error: Validation failed (409) CFBundleIdentifier Collision
 
 set -euo pipefail
@@ -73,8 +73,8 @@ TEMP_PROJECT="${IOS_PROJECT_FILE}.temp_proper_${TIMESTAMP}"
     while IFS= read -r line; do
         line_number=$((line_number + 1))
         
-        # Detect target sections
-        if [[ "$line" =~ [A-Z0-9A-F]{24}[[:space:]]*\/\*[^*]*\*\/[[:space:]]*=[[:space:]]*\{ ]]; then
+        # Detect target sections (simplified regex)
+        if [[ "$line" =~ [A-Z0-9A-F]{24}.*=.*\{ ]]; then
             if [[ "$line" =~ RunnerTests ]]; then
                 current_target="tests"
                 echo "   Detected target: RunnerTests" >&2
@@ -87,8 +87,8 @@ TEMP_PROJECT="${IOS_PROJECT_FILE}.temp_proper_${TIMESTAMP}"
             fi
         fi
         
-        # Update bundle identifiers based on target type
-        if [[ "$line" =~ PRODUCT_BUNDLE_IDENTIFIER[[:space:]]*=[[:space:]]*[^;]* ]]; then
+        # Update bundle identifiers based on target type (simplified regex)
+        if [[ "$line" =~ PRODUCT_BUNDLE_IDENTIFIER ]]; then
             target_count=$((target_count + 1))
             
             case "$current_target" in

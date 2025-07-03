@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 
 # iOS Branding Assets Handler - Enhanced Basic App Information
 # Purpose: Handle all basic app information and branding assets for iOS builds

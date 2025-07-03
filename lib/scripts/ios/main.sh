@@ -1,8 +1,9 @@
-﻿#!/bin/bash
+#!/bin/bash
 
 # Main iOS Build Orchestration Script
 # Purpose: Orchestrate the entire iOS build workflow
 
+set -x
 set -euo pipefail
 
 # Get script directory and source utilities
@@ -20,7 +21,7 @@ send_email() {
     
     if [ "${ENABLE_EMAIL_NOTIFICATIONS:-false}" = "true" ]; then
         log_info "Sending $email_type email for $platform build $build_id"
-        "${SCRIPT_DIR}/email_notifications.sh" "$email_type" "$platform" "$build_id" "$error_message" || log_warn "Failed to send email notification"
+        bash "${SCRIPT_DIR}/email_notifications.sh" "$email_type" "$platform" "$build_id" "$error_message" || log_warn "Failed to send email notification"
     fi
 }
 
@@ -143,7 +144,7 @@ main() {
     # Stage 2: Email Notification - Build Started (only if not already sent)
     if [ "${ENABLE_EMAIL_NOTIFICATIONS:-false}" = "true" ] && [ -z "${EMAIL_BUILD_STARTED_SENT:-}" ]; then
         log_info "--- Stage 2: Sending Build Started Email ---"
-        "${SCRIPT_DIR}/email_notifications.sh" "build_started" "iOS" "${CM_BUILD_ID:-unknown}" || log_warn "Failed to send build started email."
+        bash "${SCRIPT_DIR}/email_notifications.sh" "build_started" "iOS" "${CM_BUILD_ID:-unknown}" || log_warn "Failed to send build started email."
         export EMAIL_BUILD_STARTED_SENT="true"
     elif [ -n "${EMAIL_BUILD_STARTED_SENT:-}" ]; then
         log_info "--- Stage 2: Build Started Email Already Sent (Skipping) ---"

@@ -169,7 +169,9 @@ workflows:
           # Send email notification
           if [ -f "lib/scripts/ios/email_notifications.sh" ]; then
             chmod +x lib/scripts/ios/email_notifications.sh
-            lib/scripts/ios/email_notifications.sh "started" "iOS Build Started" "iOS build for $APP_NAME ($VERSION_NAME) has started with profile type: $PROFILE_TYPE"
+            bash lib/scripts/ios/email_notifications.sh "started" "iOS Build Started" "iOS build for $APP_NAME ($VERSION_NAME) has started with profile type: $PROFILE_TYPE"
+          else
+            echo "⚠️ Email notifications script not found at lib/scripts/ios/email_notifications.sh"
           fi
 
       - name: ☢️ ULTIMATE CFBundleIdentifier Collision Eliminator
@@ -263,7 +265,7 @@ workflows:
           # Send email notification
           if [ -f "lib/scripts/ios/email_notifications.sh" ]; then
             chmod +x lib/scripts/ios/email_notifications.sh
-            lib/scripts/ios/email_notifications.sh "$BUILD_STATUS" "iOS Build $BUILD_STATUS" "$BUILD_MESSAGE"
+            bash lib/scripts/ios/email_notifications.sh "$BUILD_STATUS" "iOS Build $BUILD_STATUS" "$BUILD_MESSAGE"
           else
             echo "⚠️ Email notifications script not found at lib/scripts/ios/email_notifications.sh"
           fi

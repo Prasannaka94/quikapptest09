@@ -1,704 +1,2207 @@
-2025-07-03 00:48:42.074 DEBUG: [ContentDelivery.Uploader.6000004E5480] --- Transporter ---
-ContentDelivery version 2.163.1 (16301)
-Macintosh; macOS 15.5 24F74 (arm64)
-Free disk space: 2.59GB
-2025-07-03 00:48:42.075 DEBUG: [ContentDelivery.Uploader.6000004E5480] Created log file at path '~/Library/Logs/ContentDelivery/com.apple.TransporterApp/com.apple.TransporterApp_Upload_2025-07-03_00-48-42_074.txt'.
-2025-07-03 00:48:42.076 DEBUG: [ContentDelivery.Uploader.6000004E5480] Show Progress: Contacting Apple Services…
-2025-07-03 00:48:42.078 DEBUG: [ContentDelivery.Uploader.6000004E5480] Created NSURLSession with ID=com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38, timeoutIntervalForRequest=900s, timeoutIntervalForResource=604800s
-2025-07-03 00:48:42.079 DEBUG: [ContentDelivery.Uploader.6000004E5480] CDUploader has network connectivity (May use cellular if available).
-2025-07-03 00:48:42.079 DEBUG: [ContentDelivery.Uploader.6000004E5480] CDUploader now has network connectivity.
-2025-07-03 00:48:42.079 DEBUG: [ContentDelivery.Uploader.6000004E5480] 
-=======================================
-REQUEST CREATE CONTAINER (ASSET_UPLOAD) REQUEST:
+🚀 iOS Universal Build
+46s
 
-         URL: https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds
-     timeout: 900 seconds
-      method: POST
- httpHeaders: {
-    Accept = "application/json";
-    "Accept-Language" = "en-IN";
-    "Content-Type" = "application/json";
-    "User-Agent" = "TransporterApp/1.3.2-1394 (Macintosh; macOS 15.5 24F74 (arm64)) ContentDelivery/2.163.1-16301";
-    "X-Apple-App-Info" = "com.apple.gs.itunesconnect.auth";
-    "X-Apple-GS-Token" = "**hidden value**";
-    "X-Apple-I-Client-Time" = "2025-07-02T19:18:42Z";
-    "X-Apple-I-Identity-Id" = "001989-08-f967c34a-d6b5-4405-8a18-e7ad059a13e7";
-    "X-Apple-I-Locale" = "en_IN";
-    "X-Apple-I-MD" = "AAAABQAAABDbRBZM/WBGA4W1fiRtxU2PAAAAAQ==";
-    "X-Apple-I-MD-LU" = 9C96E5696DB247F74314E5C3388D746ABD99F2E5AE296EB1C2FBBA35F71AC629;
-    "X-Apple-I-MD-M" = "u0V8Hn5zDgUGJb+Fm+HqiKsJdcc8RJ2QYgJ+eq/Xjar+d76nYhHx1f5T1vZYBiwJouqlET+4BA/7Gp/U";
-    "X-Apple-I-MD-RINFO" = 50660608;
-    "X-Apple-I-TimeZone" = IST;
-    "X-MMe-Client-Info" = "<MacBookAir10,1> <macOS;15.5;24F74> <com.apple.AuthKit/1 (com.apple.TransporterApp/1394)>";
-    "X-Mme-Device-Id" = "45530C5A-8159-5BDE-B085-C59FE871F8CB";
-    "x-apple-i-device-type" = 1;
-}
-    httpBody: {"data":{"attributes":{"cfBundleShortVersionString":"1.0.1","cfBundleVersion":"31","platform":"IOS"},"relationships":{"app":{"data":{"id":"6748007882","type":"apps"}}},"type":"builds"}}
-========================================
-2025-07-03 00:48:42.683 DEBUG: [ContentDelivery.Uploader.600000B2CF80] Download task 1 sent 185 bytes (185 of 185 bytes sent).
-2025-07-03 00:48:43.138 DEBUG: [ContentDelivery.Uploader.600000B8FE00] Download task 1 did write 4854 bytes.
-2025-07-03 00:48:43.138 DEBUG: [ContentDelivery.Uploader.600000B8FE00] Download task 1 did write file: file:///var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/CFNetworkDownload_3twnBg.tmp
-2025-07-03 00:48:43.139 DEBUG: [ContentDelivery.Uploader.6000004E5480] 
-=======================================
-REQUEST CREATE CONTAINER (ASSET_UPLOAD) RESPONSE:
 
-         URL: https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds
- status code: 201 (created)
- httpHeaders: {
-    "Content-Length" = 4854;
-    "Content-Type" = "application/json";
-    Date = "Wed, 02 Jul 2025 19:18:43 GMT";
-    Location = "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c";
-    Server = "daiquiri/5";
-    "Set-Cookie" = "dqsid=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NTE0ODM5MjIsImp0aSI6ImFzeHhoZEtvOHpwVGhsbzJhdS1DS2cifQ.JvHUtfLCeMVKSYSeTgsyGGynsoc8g-ZiCfHLm6wfFOA; Max-Age=1800; Expires=Wed, 02 Jul 2025 19:48:42 GMT; Path=/; Secure; HTTPOnly";
-    "Strict-Transport-Security" = "max-age=31536000; includeSubDomains";
-    "apple-originating-system" = MZContentDeliveryService;
-    "apple-seq" = "0.0";
-    "apple-timing-app" = 79;
-    "apple-tk" = false;
-    b3 = "f5bc63ac80b220cd9d7d698f41fb3cd4-b5f3b888db29ef23";
-    "x-apple-jingle-correlation-key" = 6W6GHLEAWIQM3HL5NGHUD6Z42Q;
-    "x-apple-request-uuid" = "f5bc63ac-80b2-20cd-9d7d-698f41fb3cd4";
-    "x-b3-spanid" = b5f3b888db29ef23;
-    "x-b3-traceid" = f5bc63ac80b220cd9d7d698f41fb3cd4;
-    "x-daiquiri-instance" = "daiquiri:33624001:pv50p00it-hyhk10063801:7987:25RELEASE80:daiquiri-amp-processing-shared-int-001-pv, daiquiri:18493001:mr85p00it-hyhk03154801:7987:25RELEASE80:daiquiri-amp-all-shared-ext-001-mr";
-    "x-daiquiri-rate-limit-timing-user" = 0;
-    "x-daiquiri-rate-limit-user" = "user-hour-lim:3600;user-hour-rem:3594;";
-}
-    httpBody: {
-  "data" : {
-    "type" : "builds",
-    "id" : "60bff64f-d74c-4596-96e5-e539dde0460c",
-    "attributes" : {
-      "version" : "31",
-      "uploadedDate" : null,
-      "processingState" : null,
-      "processingErrors" : null,
-      "buildProcessingState" : null
-    },
-    "relationships" : {
-      "app" : {
-        "links" : {
-          "self" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c/relationships/app",
-          "related" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c/app",
-          "include" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c?include=app"
-        }
-      },
-      "buildDeliveryFiles" : {
-        "links" : {
-          "self" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c/relationships/buildDeliveryFiles",
-          "related" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c/buildDeliveryFiles",
-          "include" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c?include=buildDeliveryFiles"
-        }
-      },
-      "deliveryNotifications" : {
-        "links" : {
-          "self" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c/relationships/deliveryNotifications",
-          "related" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c/deliveryNotifications",
-          "include" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c?include=deliveryNotifications"
-        }
-      },
-      "buildAssetDescription" : {
-        "links" : {
-          "self" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c/relationships/buildAssetDescription",
-          "related" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c/buildAssetDescription",
-          "include" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c?include=buildAssetDescription"
-        }
-      },
-      "buildAsset" : {
-        "links" : {
-          "self" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c/relationships/buildAsset",
-          "related" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c/buildAsset",
-          "include" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c?include=buildAsset"
-        }
-      },
-      "buildAssetSpi" : {
-        "links" : {
-          "self" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c/relationships/buildAssetSpi",
-          "related" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c/buildAssetSpi",
-          "include" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c?include=buildAssetSpi"
-        }
-      }
-    },
-    "links" : {
-      "self" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c"
-    }
-  },
-  "links" : {
-    "self" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds"
-  }
-}
-=======================================
-2025-07-03 00:48:43.140 DEBUG: [ContentDelivery.Uploader.6000004E5480] Received build ID: 60bff64f-d74c-4596-96e5-e539dde0460c
-2025-07-03 00:48:43.141 DEBUG: [ContentDelivery.Uploader.6000004E5480] Running state machine...
-2025-07-03 00:48:43.141 DEBUG: [ContentDelivery.Uploader.6000004E5480] Running state 'CDUploaderStateBegin'...
-2025-07-03 00:48:43.143 DEBUG: [ContentDelivery.Uploader.6000004E5480] Show Progress: Making copy of ‘Runner_5.ipa’…
-2025-07-03 00:48:43.144 DEBUG: [ContentDelivery.Uploader.6000004E5480] Copied '~/Library/Caches/com.apple.TransporterApp/itmsps/6CB849CF-3A34-4D96-9155-FE65BFE7D35E.itmsp/Runner_5.ipa' to '~/Library/Caches/com.apple.cds/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38/Runner_5.ipa'.
-2025-07-03 00:48:43.146 DEBUG: [ContentDelivery.Uploader.6000004E5480] Uploading file: ~/Library/Caches/com.apple.TransporterApp/itmsps/6CB849CF-3A34-4D96-9155-FE65BFE7D35E.itmsp/Runner_5.ipa
-           File size: 19975591
-            Apple ID: 6748007882
-Short version string: 1.0.1
-      Version string: 31
-            Platform: iOS App
-2025-07-03 00:48:43.146 DEBUG: [ContentDelivery.Uploader.6000004E5480] Show Progress: Preparing to upload ‘Runner_5.ipa’…
-2025-07-03 00:48:43.147 DEBUG: [ContentDelivery.Uploader.6000004E5480] Running state 'CDUploaderStateComputeAssetChecksum'...
-2025-07-03 00:48:43.252 DEBUG: [ContentDelivery.Uploader.6000004E5480] Estimated part size: 5242880
-Part checksums:(
-    dc6fbf3441693257091a87da944312a2,
-    770c2061d9cc8fef2f3b3fd47303c2ad,
-    cb2d248372a804649a1777b45219981f,
-    accf99c9b8de2370b5f758a602584901
-)
-2025-07-03 00:48:43.252 DEBUG: [ContentDelivery.Uploader.6000004E5480] Running state 'CDUploaderStateRequestCreateContainer'...
-2025-07-03 00:48:43.253 DEBUG: [ContentDelivery.Uploader.6000004E5480] Running state 'CDUploaderStateUploadAssetDescription'...
-2025-07-03 00:48:43.253 DEBUG: [ContentDelivery.Uploader.6000004E5480] Show Progress: Analysing package…
-2025-07-03 00:48:43.254 DEBUG: [ContentDelivery.Uploader.6000004E5480] myBundlePath: /Applications/Transporter.app/Contents/Frameworks/ContentDelivery.framework
-2025-07-03 00:48:43.254 DEBUG: [ContentDelivery.Uploader.6000004E5480] Searching for swinfo at: /Applications/Transporter.app/Contents/Frameworks/ContentDeliveryServices.framework/Versions/A/Frameworks/AppStoreService.framework/Versions/A/Support/swinfo
-2025-07-03 00:48:43.254 DEBUG: [ContentDelivery.Uploader.6000004E5480] Calling swinfo at '/Applications/Transporter.app/Contents/Frameworks/ContentDeliveryServices.framework/Versions/A/Frameworks/AppStoreService.framework/Versions/A/Support/swinfo'.
-2025-07-03 00:48:43.255 DEBUG: [ContentDelivery.Uploader.6000004E5480] Executing: /Applications/Transporter.app/Contents/Frameworks/ContentDeliveryServices.framework/Versions/A/Frameworks/AppStoreService.framework/Versions/A/Support/swinfo -f /Users/alakaraj/Library/Caches/com.apple.cds/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38/Runner_5.ipa --extra-args /var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/swinfo-extra-args-FBA69D59-9A41-49CD-85CF-7484083593B1.plist --platform ios -o /var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/asset-description-15F572F4-6D3F-411B-859B-2A73AE7E8803.xml --plistFormat binary --output-spi -temporary /var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T
-2025-07-03 00:48:47.843 DEBUG: [ContentDelivery.Uploader.6000004E5480] Task ‘CDTask’ did terminate in ‘CDSwinfoCommandExecutor’ with exit code 0.
-2025-07-03 00:48:47.844 DEBUG: [ContentDelivery.Uploader.6000004E5480] Finished: '/Applications/Transporter.app/Contents/Frameworks/ContentDeliveryServices.framework/Versions/A/Frameworks/AppStoreService.framework/Versions/A/Support/swinfo -f /Users/alakaraj/Library/Caches/com.apple.cds/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38/Runner_5.ipa --extra-args /var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/swinfo-extra-args-FBA69D59-9A41-49CD-85CF-7484083593B1.plist --platform ios -o /var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/asset-description-15F572F4-6D3F-411B-859B-2A73AE7E8803.xml --plistFormat binary --output-spi -temporary /var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T' with status 0
-2025-07-03 00:48:47.845 DEBUG: [ContentDelivery.Uploader.6000004E5480] *** /Applications/Transporter.app/Contents/Frameworks/ContentDeliveryServices.framework/Versions/A/Frameworks/AppStoreService.framework/Versions/A/Support/swinfo
-stdout: spi-output-file: /var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/DTAppAnalyzerExtractorOutput-78583F9E-9551-4004-8A65-82BEF6D99B0F.zip
 
-2025-07-03 00:48:47.845 DEBUG: [ContentDelivery.Uploader.6000004E5480] dealloc CDSAbstractToolExecutor (CDSwinfoCommandExecutor), _cdTask=/Applications/Transporter.app/Contents/Frameworks/ContentDeliveryServices.framework/Versions/A/Frameworks/AppStoreService.framework/Versions/A/Support/swinfo -f /Users/alakaraj/Library/Caches/com.apple.cds/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38/Runner_5.ipa --extra-args /var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/swinfo-extra-args-FBA69D59-9A41-49CD-85CF-7484083593B1.plist --platform ios -o /var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/asset-description-15F572F4-6D3F-411B-859B-2A73AE7E8803.xml --plistFormat binary --output-spi -temporary /var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T
-2025-07-03 00:48:47.845 DEBUG: [ContentDelivery.Uploader.6000004E5480] Asset description file: /var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/asset-description-15F572F4-6D3F-411B-859B-2A73AE7E8803.xml
-2025-07-03 00:48:47.845 DEBUG: [ContentDelivery.Uploader.6000004E5480] SPI file: /var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/DTAppAnalyzerExtractorOutput-78583F9E-9551-4004-8A65-82BEF6D99B0F.zip
-2025-07-03 00:48:47.848 DEBUG: [ContentDelivery.Uploader.6000004E5480] Creating container for asset description.
-2025-07-03 00:48:47.848 DEBUG: [ContentDelivery.Uploader.6000004E5480] Getting upload instructions for asset description.
-2025-07-03 00:48:47.850 DEBUG: [ContentDelivery.Uploader.6000004E5480] Created NSURLSession with ID=com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38, timeoutIntervalForRequest=900s, timeoutIntervalForResource=604800s
-2025-07-03 00:48:47.850 DEBUG: [ContentDelivery.Uploader.6000004E5480] CDUploader has network connectivity (May use cellular if available).
-2025-07-03 00:48:47.850 DEBUG: [ContentDelivery.Uploader.6000004E5480] 
-=======================================
-RETRIEVE UPLOAD OPERATIONS (UPLOADING ASSET DESCRIPTION) REQUEST:
+Show command
+🚀 Starting iOS Universal Build (New-Rules Pattern)
+./lib/scripts/ios/main.sh: line 1: ﻿#!/bin/bash: No such file or directory
+[2025-07-03 13:55:51] INFO: Starting iOS Build Workflow...
+[2025-07-03 13:55:51] INFO: iOS Build Workflow Starting...
+[2025-07-03 13:55:51] INFO: Loading environment variables...
+[2025-07-03 13:55:51] SUCCESS: Environment variables loaded successfully
+[2025-07-03 13:55:51] INFO: --- Profile Type Validation ---
+2025-07-03 13:55:51 [INFO] 🚀 Starting Profile Type Validation...
+2025-07-03 13:55:51 [INFO] 🔍 Validating profile type configuration...
+2025-07-03 13:55:51 [INFO] 📋 Current Profile Type: app-store
+2025-07-03 13:55:51 [SUCCESS] ✅ Valid profile type: app-store
+2025-07-03 13:55:51 [INFO] 🎯 Final Profile Type: app-store
+2025-07-03 13:55:51 [INFO] 📊 Build Configuration Summary:
+  - Bundle ID: com.twinklub.twinklub
+  - Profile Type: app-store
+  - App Name: Twinklub App
+  - Version: 1.0.6 (66)
+  - Team ID: 9H2AD7NQ49
+2025-07-03 13:55:51 [INFO] 🏪 App Store build configuration:
+  - Distribution method: App Store Connect
+  - Symbols upload: Enabled
+  - Bitcode: Disabled (iOS 14+)
+  - Target: TestFlight/App Store
+2025-07-03 13:55:51 [INFO] 📝 Creating ExportOptions.plist for profile type: app-store
+2025-07-03 13:55:51 [INFO] 📋 ExportOptions.plist created successfully
+2025-07-03 13:55:51 [INFO] Contents:
 
-         URL: https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles
-     timeout: 900 seconds
-      method: POST
- httpHeaders: {
-    Accept = "application/json";
-    "Accept-Language" = "en-IN";
-    "Content-Type" = "application/json";
-    "User-Agent" = "TransporterApp/1.3.2-1394 (Macintosh; macOS 15.5 24F74 (arm64)) ContentDelivery/2.163.1-16301";
-    "X-Apple-App-Info" = "com.apple.gs.itunesconnect.auth";
-    "X-Apple-GS-Token" = "**hidden value**";
-    "X-Apple-I-Client-Time" = "2025-07-02T19:18:47Z";
-    "X-Apple-I-Identity-Id" = "001989-08-f967c34a-d6b5-4405-8a18-e7ad059a13e7";
-    "X-Apple-I-Locale" = "en_IN";
-    "X-Apple-I-MD" = "AAAABQAAABDbRBZM/WBGA4W1fiRtxU2PAAAAAQ==";
-    "X-Apple-I-MD-LU" = 9C96E5696DB247F74314E5C3388D746ABD99F2E5AE296EB1C2FBBA35F71AC629;
-    "X-Apple-I-MD-M" = "u0V8Hn5zDgUGJb+Fm+HqiKsJdcc8RJ2QYgJ+eq/Xjar+d76nYhHx1f5T1vZYBiwJouqlET+4BA/7Gp/U";
-    "X-Apple-I-MD-RINFO" = 50660608;
-    "X-Apple-I-TimeZone" = IST;
-    "X-MMe-Client-Info" = "<MacBookAir10,1> <macOS;15.5;24F74> <com.apple.AuthKit/1 (com.apple.TransporterApp/1394)>";
-    "X-Mme-Device-Id" = "45530C5A-8159-5BDE-B085-C59FE871F8CB";
-    "x-apple-i-device-type" = 1;
-}
-    httpBody: {"data":{"attributes":{"assetType":"ASSET_DESCRIPTION","fileName":"asset-description-15F572F4-6D3F-411B-859B-2A73AE7E8803.xml","fileSize":386466,"sourceFileChecksum":"5d242f60b2cbc1a0c957b4a2928574cd","uti":"public.binary"},"relationships":{"build":{"data":{"id":"60bff64f-d74c-4596-96e5-e539dde0460c","type":"builds"}}},"type":"buildDeliveryFiles"}}
-========================================
-2025-07-03 00:48:48.524 DEBUG: [ContentDelivery.Uploader.600000BC4380] Download task 1 sent 350 bytes (350 of 350 bytes sent).
-2025-07-03 00:48:49.270 DEBUG: [ContentDelivery.Uploader.600000BC4380] Download task 1 did write 2753 bytes.
-2025-07-03 00:48:49.273 DEBUG: [ContentDelivery.Uploader.600000B8FE00] Download task 1 did write file: file:///var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/CFNetworkDownload_RnKeGZ.tmp
-2025-07-03 00:48:49.275 DEBUG: [ContentDelivery.Uploader.6000004E5480] 
-=======================================
-RETRIEVE UPLOAD OPERATIONS (UPLOADING ASSET DESCRIPTION) RESPONSE:
 
-         URL: https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles
- status code: 201 (created)
- httpHeaders: {
-    "Content-Length" = 2753;
-    "Content-Type" = "application/json";
-    Date = "Wed, 02 Jul 2025 19:18:49 GMT";
-    Location = "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/a3f7085b-304e-42ea-bfd9-bc14706c35bf";
-    Server = "daiquiri/5";
-    "Set-Cookie" = "dqsid=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NTE0ODM5MjgsImp0aSI6IkhwVFM0YUtyby0ybGxyME5FQW5DWGcifQ.5mFMGAJuYSp44bNBzHUT_kZg8_K6-NQI5IsX9VddMPg; Max-Age=1800; Expires=Wed, 02 Jul 2025 19:48:48 GMT; Path=/; Secure; HTTPOnly";
-    "Strict-Transport-Security" = "max-age=31536000; includeSubDomains";
-    "apple-originating-system" = MZContentDeliveryService;
-    "apple-seq" = "0.0";
-    "apple-timing-app" = 237;
-    "apple-tk" = false;
-    b3 = "f89a25171ca9f709a3f01fd5717ddcdf-c0fc386e89c4357d";
-    "x-apple-jingle-correlation-key" = 7CNCKFY4VH3QTI7QD7KXC7O434;
-    "x-apple-request-uuid" = "f89a2517-1ca9-f709-a3f0-1fd5717ddcdf";
-    "x-b3-spanid" = c0fc386e89c4357d;
-    "x-b3-traceid" = f89a25171ca9f709a3f01fd5717ddcdf;
-    "x-daiquiri-instance" = "daiquiri:13624001:mr85p00it-hyhk04174601:7987:25RELEASE80:daiquiri-amp-processing-shared-int-001-mr, daiquiri:18493001:mr85p00it-hyhk03154801:7987:25RELEASE80:daiquiri-amp-all-shared-ext-001-mr";
-    "x-daiquiri-rate-limit-timing-user" = 0;
-    "x-daiquiri-rate-limit-user" = "user-hour-lim:3600;user-hour-rem:3592;";
-}
-    httpBody: {
-  "data" : {
-    "type" : "buildDeliveryFiles",
-    "id" : "a3f7085b-304e-42ea-bfd9-bc14706c35bf",
-    "attributes" : {
-      "assetType" : "ASSET_DESCRIPTION",
-      "fileSize" : 386466,
-      "fileName" : "asset-description-15F572F4-6D3F-411B-859B-2A73AE7E8803.xml",
-      "sourceFileChecksum" : "5d242f60b2cbc1a0c957b4a2928574cd",
-      "sequentialChecksum" : null,
-      "assetToken" : "PurpleSource221/v4/1e/52/92/1e5292d4-76f2-ad5e-5f39-b10c6f7461ca/270eca1e-5e03-45a6-9242-3a3f3b8a9de9",
-      "uploadOperations" : [ {
-        "method" : "PUT",
-        "url" : "https://northamerica-1.object-storage.apple.com/itmspod12-assets-massilia-200001/PurpleSource221/v4/1e/52/92/1e5292d4-76f2-ad5e-5f39-b10c6f7461ca/ePIpeFsB8nzCeT80zc6GYkcr9zYaZT2doq4L3K8y1RE_U003d-1751483929005?partNumber=1&uploadId=61afdce0-5779-11f0-8653-5253dec10ba3&apple-asset-repo-correlation-key=7CNCKFY4VH3QTI7QD7KXC7O434&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250702T191849Z&X-Amz-SignedHeaders=host&X-Amz-Credential=MKIAP7F9QNTEY48OTE7F%2F20250702%2Fnorthamerica-1%2Fs3%2Faws4_request&X-Amz-Expires=604800&X-Amz-Signature=538f86f73172819a01278b9ecc0078419758f521b68c05f102b67f959b7b1c64",
-        "length" : 386466,
-        "offset" : 0,
-        "requestHeaders" : [ {
-          "name" : "Content-Type",
-          "value" : "application/octet-stream"
-        } ],
-        "expiration" : "2025-07-09T12:18:49.161-07:00",
-        "partNumber" : 1,
-        "entityTag" : null
-      } ],
-      "uti" : "public.binary",
-      "assetDeliveryState" : {
-        "errors" : [ ],
-        "warnings" : [ ],
-        "state" : "AWAITING_UPLOAD"
-      }
-    },
-    "relationships" : {
-      "build" : {
-        "links" : {
-          "self" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/a3f7085b-304e-42ea-bfd9-bc14706c35bf/relationships/build",
-          "related" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/a3f7085b-304e-42ea-bfd9-bc14706c35bf/build",
-          "include" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/a3f7085b-304e-42ea-bfd9-bc14706c35bf?include=build"
-        }
-      }
-    },
-    "links" : {
-      "self" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/a3f7085b-304e-42ea-bfd9-bc14706c35bf"
-    }
-  },
-  "links" : {
-    "self" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles"
-  }
-}
-=======================================
-2025-07-03 00:48:49.276 DEBUG: [ContentDelivery.Uploader.6000004E5480] Show Progress: Sending analysis to App Store Connect…
-2025-07-03 00:48:49.276 DEBUG: [ContentDelivery.Uploader.6000004E5480] 
-=======================================
-UPLOADING ASSET DESCRIPTION
-=======================================
-2025-07-03 00:48:49.278 DEBUG: [ContentDelivery.Uploader.6000004E5480] Created the temporary directory '/var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/com.apple.cds.vbtx/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38'.
-2025-07-03 00:48:49.281 DEBUG: [ContentDelivery.Uploader.6000004E5480] Part 1 still needs to be uploaded (386466 bytes).
-2025-07-03 00:48:49.282 DEBUG: [ContentDelivery.Uploader.6000004E5480] Part 1 will expire on 2025-07-10T00:48:49.161000+05:30.
-2025-07-03 00:48:49.286 DEBUG: [ContentDelivery.Uploader.6000004E5480] Wrote part 1 to temp file '/var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/com.apple.cds.vbtx/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38/Part-1.tmp'.
-2025-07-03 00:48:49.287 DEBUG: [ContentDelivery.Uploader.6000004E5480] Adding upload task for part 1.
-2025-07-03 00:48:49.288 DEBUG: [ContentDelivery.Uploader.6000004E5480] Waiting for 1 upload task to finish.
-2025-07-03 00:48:49.995 DEBUG: [ContentDelivery.Uploader.600000BC4380] PROGRESS - PART 1 (386466) - 'asset-description-15F572F4-6D3F-411B-859B-2A73AE7E8803.xml' 100.00% (386466/386466)
-2025-07-03 00:48:51.887 DEBUG: [ContentDelivery.Uploader.600000BC4380] COMPLETED - PART 1 - asset-description-15F572F4-6D3F-411B-859B-2A73AE7E8803.xml - eTag: "5D242F60B2CBC1A0C957B4A2928574CD"
-2025-07-03 00:48:51.888  INFO: [ContentDelivery.Uploader.600000BC4380] Uploading part 1 COMPLETE.
-2025-07-03 00:48:51.890 DEBUG: [ContentDelivery.Uploader.600000BC4380] Removed temporary part file '/private/var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/com.apple.cds.vbtx/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38/Part-1.tmp'.
-2025-07-03 00:48:51.891 DEBUG: [ContentDelivery.Uploader.600000BC4380] Saving uploader state (CDUploaderStateUploadAssetDescription) for identifier 'com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38'.
-2025-07-03 00:48:51.894 DEBUG: [ContentDelivery.Uploader.600000BC4380] Wrote state to '~/Library/Application Support/com.apple.TransporterApp/CDUploads/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38.plist'.
-2025-07-03 00:48:51.894 DEBUG: [ContentDelivery.Uploader.600000BC4380] All parts have been uploaded.
-2025-07-03 00:48:51.895 DEBUG: [ContentDelivery.Uploader.6000004E5480] Time to transfer: 0.707 seconds
-2025-07-03 00:48:51.896 DEBUG: [ContentDelivery.Uploader.6000004E5480] Removed temporary directory '/private/var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/com.apple.cds.vbtx/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38'.
-2025-07-03 00:48:51.896 DEBUG: [ContentDelivery.Uploader.6000004E5480] Show Progress: Waiting for App Store Connect analysis response…
-2025-07-03 00:48:51.896 DEBUG: [ContentDelivery.Uploader.6000004E5480] 
-=======================================
-CHANGE UPLOAD STATE TO COMPLETE (UPLOADING ASSET DESCRIPTION)
-=======================================
-2025-07-03 00:48:51.899 DEBUG: [ContentDelivery.Uploader.6000004E5480] 
-=======================================
-CHANGE UPLOAD STATE TO COMPLETE (UPLOADING ASSET DESCRIPTION) REQUEST:
+<plist version="1.0">
+<dict>
+  <key>method</key>
+  <string>app-store-connect</string>
+  <key>teamID</key>
+  <string>9H2AD7NQ49</string>
+  <key>uploadBitcode</key>
+  <false/>
+  <key>uploadSymbols</key>
+  <true/>
+  <key>compileBitcode</key>
+  <false/>
+  <key>signingStyle</key>
+  <string>automatic</string>
+  <key>stripSwiftSymbols</key>
+  <true/>
+  <key>thinning</key>
+  <string><none></string>
+  <key>distributionBundleIdentifier</key>
+  <string>com.twinklub.twinklub</string>
+  <key>generateAppStoreInformation</key>
+  <false/>
+  <key>manageVersionAndBuildNumber</key>
+  <false/>
+</dict>
+</plist>
+2025-07-03 13:55:51 [SUCCESS] ✅ Profile type validation completed
+[2025-07-03 13:55:51] SUCCESS: ✅ Profile type validation completed successfully
+[2025-07-03 13:55:51] INFO: --- Stage 0: Unicode Character Cleaning (CRITICAL - MUST BE FIRST) ---
+[2025-07-03 13:55:51] INFO: 🧹 Removing Unicode characters that cause CocoaPods parsing errors
+[2025-07-03 13:55:51] INFO: 🎯 Target: project.pbxproj, Podfile, and other iOS configuration files
+[2025-07-03 13:55:51] INFO: 🧹 Cleaning Unicode characters from iOS project files...
+[2025-07-03 13:55:51] INFO: === Unicode Character Cleaning Process ===
+[2025-07-03 13:55:51] INFO: Processing: ios/Runner.xcodeproj/project.pbxproj
+[2025-07-03 13:55:51] INFO: 🔧 Cleaning specific Unicode patterns in: ios/Runner.xcodeproj/project.pbxproj
+[2025-07-03 13:55:51] SUCCESS: ✅ Specific Unicode patterns cleaned from ios/Runner.xcodeproj/project.pbxproj
+[2025-07-03 13:55:51] INFO: 🔍 Checking for Unicode characters in: ios/Runner.xcodeproj/project.pbxproj
+[2025-07-03 13:55:51] INFO: ✅ No Unicode characters found in ios/Runner.xcodeproj/project.pbxproj
+[2025-07-03 13:55:51] INFO: Processing: ios/Podfile
+[2025-07-03 13:55:51] INFO: 🔧 Cleaning specific Unicode patterns in: ios/Podfile
+[2025-07-03 13:55:51] SUCCESS: ✅ Specific Unicode patterns cleaned from ios/Podfile
+[2025-07-03 13:55:51] INFO: 🔍 Checking for Unicode characters in: ios/Podfile
+[2025-07-03 13:55:51] INFO: ✅ No Unicode characters found in ios/Podfile
+[2025-07-03 13:55:51] WARNING: ⚠️ File not found: ios/Podfile.lock
+[2025-07-03 13:55:51] INFO: === Unicode Cleaning Summary ===
+[2025-07-03 13:55:51] INFO: ✅ Successfully cleaned: 2 files
+[2025-07-03 13:55:51] SUCCESS: 🎉 All files cleaned successfully!
+[2025-07-03 13:55:51] INFO: --- Stage 0.5: Dynamic Bundle ID Injection ---
+[2025-07-03 13:55:51] INFO: 🎯 Injecting dynamic bundle identifiers from environment variables
+[2025-07-03 13:55:51] INFO: 💡 Using BUNDLE_ID from Codemagic API variables
+[2025-07-03 13:55:51] INFO: 🎯 Dynamic Bundle ID Injection for iOS Project
+[2025-07-03 13:55:51] INFO: 🚀 Starting Dynamic Bundle ID Injection
+[2025-07-03 13:55:51] INFO: 🔍 Validating environment variables...
+[2025-07-03 13:55:51] INFO: ✅ BUNDLE_ID environment variable found: com.twinklub.twinklub
+[2025-07-03 13:55:51] SUCCESS: ✅ All recommended environment variables are set
+[2025-07-03 13:55:51] INFO: 📦 Backup created: ios/Runner.xcodeproj/project.pbxproj.dynamic_backup_1751550951
+[2025-07-03 13:55:51] INFO: 🎯 Base bundle ID from environment: com.twinklub.twinklub
+[2025-07-03 13:55:51] INFO: 🔧 Injecting dynamic bundle identifiers...
+[2025-07-03 13:55:51] SUCCESS: ✅ Dynamic bundle identifiers injected successfully
+[2025-07-03 13:55:51] INFO: 🔍 Verifying bundle identifier injection...
+[2025-07-03 13:55:51] INFO: 📊 Bundle ID Distribution:
+[2025-07-03 13:55:51] INFO:    Main App (com.twinklub.twinklub): 3 targets
+[2025-07-03 13:55:51] INFO:    Tests (com.twinklub.twinklub.tests): 3 targets
+[2025-07-03 13:55:51] INFO:    Extensions (com.twinklub.twinklub.extension): 00 targets
+[2025-07-03 13:55:51] INFO:    Widgets (com.twinklub.twinklub.widget): 00 targets
+[2025-07-03 13:55:51] WARNING: ⚠️ Found 12 remaining hardcoded bundle identifiers
+[2025-07-03 13:55:51] INFO: 🔍 Remaining hardcoded bundle IDs:
+    Target 1 (Main App): com.twinklub.twinklub
+				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub;
+    Target 2 (Main App): com.twinklub.twinklub
+				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub.tests;
+    Target 3 (Main App): com.twinklub.twinklub
+				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub.tests;
+    Target 4 (Main App): com.twinklub.twinklub
+				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub.tests;
+    Target 5 (Main App): com.twinklub.twinklub
+				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub;
+    Target 6 (Main App): com.twinklub.twinklub
+				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub;
+[2025-07-03 13:55:51] INFO: === Dynamic Bundle ID Injection Summary ===
+[2025-07-03 13:55:51] INFO: ✅ Base Bundle ID: com.twinklub.twinklub
+[2025-07-03 13:55:51] INFO: ✅ Test Bundle ID: com.twinklub.twinklub.tests
+[2025-07-03 13:55:51] INFO: ✅ Extension Bundle ID: com.twinklub.twinklub.extension
+[2025-07-03 13:55:51] INFO: ✅ Widget Bundle ID: com.twinklub.twinklub.widget
+[2025-07-03 13:55:51] INFO: ✅ Total targets updated: 6
+[2025-07-03 13:55:51] SUCCESS: 🎉 Dynamic bundle ID injection completed successfully
+[2025-07-03 13:55:51] INFO: --- Stage 1: Enhanced Branding Assets Setup (FIRST STAGE) ---
+[2025-07-03 13:55:51] INFO: 🚀 This is the FIRST script in the iOS workflow
+[2025-07-03 13:55:51] INFO: 📋 Handling all basic app information: WORKFLOW_ID, APP_ID, VERSION_NAME, VERSION_CODE, APP_NAME, ORG_NAME, BUNDLE_ID, WEB_URL, LOGO_URL, SPLASH_URL, SPLASH_BG_URL, BOTTOMMENU_ITEMS
+./lib/scripts/ios/branding_assets.sh: line 1: ﻿#!/bin/bash: No such file or directory
+[2025-07-03 13:55:52] INFO: 🚀 Starting Enhanced iOS Branding Assets Setup (FIRST STAGE)...
+[2025-07-03 13:55:52] INFO: 🚀 Enhanced iOS Branding Assets Setup Starting (FIRST STAGE)...
+[2025-07-03 13:55:52] INFO: --- Step 1: Validating Basic App Information ---
+[2025-07-03 13:55:52] INFO: 📋 Validating Basic App Information...
+[2025-07-03 13:55:52] SUCCESS: ✅ Basic App Information Validation Passed
+[2025-07-03 13:55:52] INFO: 📊 App Information Summary:
+[2025-07-03 13:55:52] INFO:    WORKFLOW_ID: ios-workflow
+[2025-07-03 13:55:52] INFO:    APP_ID: 1002
+[2025-07-03 13:55:52] INFO:    VERSION_NAME: 1.0.6
+[2025-07-03 13:55:52] INFO:    VERSION_CODE: 66
+[2025-07-03 13:55:52] INFO:    APP_NAME: Twinklub App
+[2025-07-03 13:55:52] INFO:    ORG_NAME: JPR Garments
+[2025-07-03 13:55:52] INFO:    BUNDLE_ID: com.twinklub.twinklub
+[2025-07-03 13:55:52] INFO:    WEB_URL: https://twinklub.com/
+[2025-07-03 13:55:52] INFO:    LOGO_URL: https://raw.githubusercontent.com/prasanna91/QuikApp/main/twinklub_png_logo.png
+[2025-07-03 13:55:52] INFO:    SPLASH_URL: https://raw.githubusercontent.com/prasanna91/QuikApp/main/twinklub_png_logo.png
+[2025-07-03 13:55:52] INFO:    SPLASH_BG_URL: <not set>
+[2025-07-03 13:55:52] INFO:    BOTTOMMENU_ITEMS: [{"label":"Home","icon":{"type":"preset","name":"home_outlined"},"url":"https://twinklub.com/"},{"label":"New Arraivals","icon":{"type":"custom","icon_url":"https://raw.githubusercontent.com/prasanna91/QuikApp/main/card.svg","icon_size":"24"},"url":"https://www.twinklub.com/collections/new-arrivals"},{"label":"Collections","icon":{"type":"custom","icon_url":"https://raw.githubusercontent.com/prasanna91/QuikApp/main/about.svg","icon_size":"24"},"url":"https://www.twinklub.com/collections/all"},{"label":"Contact","icon":{"type":"custom","icon_url":"https://raw.githubusercontent.com/prasanna91/QuikApp/main/contact.svg","icon_size":"24"},"url":"https://www.twinklub.com/account"}]
+[2025-07-03 13:55:52] INFO: --- Step 2: Updating App Configuration Files ---
+[2025-07-03 13:55:52] INFO: 🔧 Updating App Configuration Files...
+[2025-07-03 13:55:52] INFO: 📝 Updating pubspec.yaml with basic app information...
+[2025-07-03 13:55:52] SUCCESS: ✅ pubspec.yaml updated with basic app information
+[2025-07-03 13:55:52] INFO: 📱 Updating iOS Info.plist with basic app information...
+[2025-07-03 13:55:52] SUCCESS: ✅ iOS Info.plist updated using plutil
+[2025-07-03 13:55:52] INFO: 📦 Updating iOS project file with bundle identifier...
+[2025-07-03 13:55:52] SUCCESS: ✅ iOS project file updated with bundle identifier
+[2025-07-03 13:55:52] SUCCESS: 🎉 App configuration files updated successfully
+[2025-07-03 13:55:52] INFO: --- Step 3: Updating Bundle ID and App Name ---
+[2025-07-03 13:55:52] INFO: 🔧 Updating Bundle ID and App Name with CFBundleIdentifier Collision Prevention...
+[2025-07-03 13:55:52] INFO: 📱 Updating iOS bundle identifier to: com.twinklub.twinklub
+[2025-07-03 13:55:52] INFO: 🛡️ Applying CFBundleIdentifier collision prevention using change_app_package_name...
+.
+Failed to update packages.
+[2025-07-03 13:56:08] INFO: 📦 Installing change_app_package_name package...
+"change_app_package_name" is already in "dev_dependencies". Will try to update the constraint.
+Resolving dependencies...
+Downloading packages...
+  _flutterfire_internals 1.3.56 (1.3.58 available)
+  characters 1.4.0 (1.4.1 available)
+  firebase_core 3.14.0 (3.15.1 available)
+  firebase_core_platform_interface 5.4.0 (6.0.0 available)
+  firebase_core_web 2.23.0 (2.24.1 available)
+  firebase_messaging 15.2.7 (15.2.9 available)
+  firebase_messaging_platform_interface 4.6.7 (4.6.9 available)
+  firebase_messaging_web 3.10.7 (3.10.9 available)
+  flutter_launcher_icons 0.13.1 (0.14.4 available)
+  flutter_lints 4.0.0 (6.0.0 available)
+  flutter_local_notifications 17.2.4 (19.3.0 available)
+  flutter_local_notifications_linux 4.0.1 (6.0.0 available)
+  flutter_local_notifications_platform_interface 7.2.0 (9.1.0 available)
+  js 0.6.7 (0.7.2 available)
+  leak_tracker 10.0.9 (11.0.1 available)
+  leak_tracker_flutter_testing 3.0.9 (3.0.10 available)
+  leak_tracker_testing 3.0.1 (3.0.2 available)
+  lints 4.0.0 (6.0.0 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  meta 1.16.0 (1.17.0 available)
+  permission_handler 11.4.0 (12.0.1 available)
+  permission_handler_android 12.1.0 (13.0.1 available)
+  petitparser 6.1.0 (7.0.0 available)
+  posix 6.0.2 (6.0.3 available)
+  speech_to_text 6.6.0 (7.1.0 available)
+  test_api 0.7.4 (0.7.6 available)
+  timezone 0.9.4 (0.10.1 available)
+  vector_math 2.1.4 (2.2.0 available)
+  vm_service 15.0.0 (15.0.2 available)
+  xml 6.5.0 (6.6.0 available)
+Got dependencies!
+30 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+[2025-07-03 13:56:10] INFO: 🔄 Updating bundle ID using change_app_package_name...
+[2025-07-03 13:56:10] INFO: 📋 Using change_app_package_name configuration:
+   # change_app_package_name configuration
+   # Generated by branding_assets.sh for CFBundleIdentifier collision prevention
+   
+   # iOS Bundle Identifier (dynamic from environment)
+   ios_bundle_identifier: com.twinklub.twinklub
+   
+   # Android Package Name (if needed)
+   android_package_name: com_twinklub_twinklub
+   
+   # App Name (if provided)
+   app_name: Twinklub App
+   
+   # Additional iOS settings for collision prevention
+   ios_settings:
+     # Ensure test targets have unique bundle identifiers
+     test_bundle_identifier: com.twinklub.twinklub.tests
+     # Framework bundle identifiers (if any)
+     framework_bundle_identifier: com.twinklub.twinklub.framework
+     # Extension bundle identifiers (if any)
+     extension_bundle_identifier: com.twinklub.twinklub.extension
+   
+   # Validation settings
+   validation:
+     # Ensure bundle ID follows Apple's rules
+     bundle_id_rules_compliant: true
+     # Prevent collisions with existing bundles
+     prevent_collisions: true
+     # Generate unique identifiers for all targets
+     unique_target_identifiers: true
+Invalid argument. Use "--android" or "--ios".
+[2025-07-03 13:56:10] SUCCESS: ✅ Bundle ID updated successfully using change_app_package_name
+[2025-07-03 13:56:10] INFO: 🔍 Verifying bundle identifier changes...
+[2025-07-03 13:56:10] INFO: 📊 Bundle identifier verification:
+[2025-07-03 13:56:10] INFO:    Main app configurations: 6
+[2025-07-03 13:56:10] INFO:    Test configurations: 0
+0
+./lib/scripts/ios/branding_assets.sh: line 495: [: 0
+0: integer expression expected
+[2025-07-03 13:56:10] WARNING: ⚠️ Bundle identifier configuration may need attention
+[2025-07-03 13:56:10] INFO: 🔄 Running fallback fix scripts...
+[2025-07-03 13:56:10] INFO: 🔄 Running fallback fix scripts for bundle ID: com.twinklub.twinklub
+[2025-07-03 13:56:10] INFO: 📋 Running fix_bundle_collision_clean.sh...
+🔧 Clean CFBundleIdentifier Collision Fix
+=========================================
+🎯 Target Error: Validation failed (409) CFBundleIdentifier Collision
+💥 Current Issue: All targets using 'com.insurancegroupmo.insurancegroupmo'
 
-         URL: https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/a3f7085b-304e-42ea-bfd9-bc14706c35bf
-     timeout: 900 seconds
-      method: PATCH
- httpHeaders: {
-    Accept = "application/json";
-    "Accept-Language" = "en-IN";
-    "Content-Type" = "application/json";
-    "User-Agent" = "TransporterApp/1.3.2-1394 (Macintosh; macOS 15.5 24F74 (arm64)) ContentDelivery/2.163.1-16301";
-    "X-Apple-App-Info" = "com.apple.gs.itunesconnect.auth";
-    "X-Apple-GS-Token" = "**hidden value**";
-    "X-Apple-I-Client-Time" = "2025-07-02T19:18:51Z";
-    "X-Apple-I-Identity-Id" = "001989-08-f967c34a-d6b5-4405-8a18-e7ad059a13e7";
-    "X-Apple-I-Locale" = "en_IN";
-    "X-Apple-I-MD" = "AAAABQAAABDbRBZM/WBGA4W1fiRtxU2PAAAAAQ==";
-    "X-Apple-I-MD-LU" = 9C96E5696DB247F74314E5C3388D746ABD99F2E5AE296EB1C2FBBA35F71AC629;
-    "X-Apple-I-MD-M" = "u0V8Hn5zDgUGJb+Fm+HqiKsJdcc8RJ2QYgJ+eq/Xjar+d76nYhHx1f5T1vZYBiwJouqlET+4BA/7Gp/U";
-    "X-Apple-I-MD-RINFO" = 50660608;
-    "X-Apple-I-TimeZone" = IST;
-    "X-MMe-Client-Info" = "<MacBookAir10,1> <macOS;15.5;24F74> <com.apple.AuthKit/1 (com.apple.TransporterApp/1394)>";
-    "X-Mme-Device-Id" = "45530C5A-8159-5BDE-B085-C59FE871F8CB";
-    "x-apple-i-device-type" = 1;
-}
-    httpBody: {"data":{"attributes":{"uploaded":true},"id":"a3f7085b-304e-42ea-bfd9-bc14706c35bf","type":"buildDeliveryFiles"}}
-========================================
-2025-07-03 00:48:51.901 DEBUG: [ContentDelivery.Uploader.600000BC4380] Download task 3 sent 113 bytes (113 of 113 bytes sent).
-2025-07-03 00:49:06.326 DEBUG: [ContentDelivery.Uploader.60000044EB00] Download task 3 did write 370 bytes.
-2025-07-03 00:49:06.327 DEBUG: [ContentDelivery.Uploader.60000044EB00] Download task 3 did write file: file:///var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/CFNetworkDownload_L8pieB.tmp
-2025-07-03 00:49:06.328 DEBUG: [ContentDelivery.Uploader.6000004E5480] 
-=======================================
-CHANGE UPLOAD STATE TO COMPLETE (UPLOADING ASSET DESCRIPTION) RESPONSE:
+📁 Project Root: /Users/builder/clone
+📱 New Bundle ID: com.twinklub.twinklub
+⏰ Timestamp: 1751550970
 
-         URL: https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/a3f7085b-304e-42ea-bfd9-bc14706c35bf
- status code: 409 (conflict)
- httpHeaders: {
-    "Content-Length" = 370;
-    "Content-Type" = "application/json";
-    Date = "Wed, 02 Jul 2025 19:19:05 GMT";
-    Server = "daiquiri/5";
-    "Set-Cookie" = "dqsid=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NTE0ODM5MjgsImp0aSI6IkhwVFM0YUtyby0ybGxyME5FQW5DWGcifQ.5mFMGAJuYSp44bNBzHUT_kZg8_K6-NQI5IsX9VddMPg; Max-Age=1800; Expires=Wed, 02 Jul 2025 19:48:52 GMT; Path=/; Secure; HTTPOnly";
-    "Strict-Transport-Security" = "max-age=31536000; includeSubDomains";
-    "apple-originating-system" = MZContentDeliveryService;
-    "apple-seq" = "0.0";
-    "apple-timing-app" = 13863;
-    "apple-tk" = false;
-    b3 = "b6a07d75c74f562db888847bb7003fd8-f39219e5e26bae9c";
-    "x-apple-jingle-correlation-key" = W2QH25OHJ5LC3OEIQR53OAB73A;
-    "x-apple-request-uuid" = "b6a07d75-c74f-562d-b888-847bb7003fd8";
-    "x-b3-spanid" = f39219e5e26bae9c;
-    "x-b3-traceid" = b6a07d75c74f562db888847bb7003fd8;
-    "x-daiquiri-instance" = "daiquiri:13624001:mr85p00it-hyhk04174601:7987:25RELEASE80:daiquiri-amp-processing-shared-int-001-mr, daiquiri:18493001:mr85p00it-hyhk03154801:7987:25RELEASE80:daiquiri-amp-all-shared-ext-001-mr";
-    "x-daiquiri-rate-limit-timing-user" = 0;
-    "x-daiquiri-rate-limit-user" = "user-hour-lim:3600;user-hour-rem:3591;";
-}
-    httpBody: {
-  "errors" : [ {
-    "id" : "2fe7baf3-3f29-4783-9e3f-bc38d8ad7681",
-    "status" : "409",
-    "code" : "STATE_ERROR.VALIDATION_ERROR",
-    "title" : "Validation failed",
-    "detail" : "CFBundleIdentifier Collision. There is more than one bundle with the CFBundleIdentifier value 'com.insurancegroupmo.insurancegroupmo' under the iOS application 'Runner.app'."
-  } ]
-}
-=======================================
-2025-07-03 00:49:06.329 ERROR: [ContentDelivery.Uploader.6000004E5480] Validation failed (409) CFBundleIdentifier Collision. There is more than one bundle with the CFBundleIdentifier value 'com.insurancegroupmo.insurancegroupmo' under the iOS application 'Runner.app'. (ID: 2fe7baf3-3f29-4783-9e3f-bc38d8ad7681)
-2025-07-03 00:49:06.330 DEBUG: [ContentDelivery.Uploader.6000004E5480] Error Domain=ContentDelivery Code=409 "Validation failed" UserInfo={NSLocalizedFailureReason=CFBundleIdentifier Collision. There is more than one bundle with the CFBundleIdentifier value 'com.insurancegroupmo.insurancegroupmo' under the iOS application 'Runner.app'. (ID: 2fe7baf3-3f29-4783-9e3f-bc38d8ad7681), NSUnderlyingError=0x600001d157a0 {Error Domain=IrisAPI Code=-19241 "Validation failed" UserInfo={status=409, detail=CFBundleIdentifier Collision. There is more than one bundle with the CFBundleIdentifier value 'com.insurancegroupmo.insurancegroupmo' under the iOS application 'Runner.app'., id=2fe7baf3-3f29-4783-9e3f-bc38d8ad7681, code=STATE_ERROR.VALIDATION_ERROR, title=Validation failed, NSLocalizedFailureReason=CFBundleIdentifier Collision. There is more than one bundle with the CFBundleIdentifier value 'com.insurancegroupmo.insurancegroupmo' under the iOS application 'Runner.app'., NSLocalizedDescription=Validation failed}}, iris-code=STATE_ERROR.VALIDATION_ERROR, NSLocalizedDescription=Validation failed}
-2025-07-03 00:49:06.330 DEBUG: [ContentDelivery.Uploader.6000004E5480] swinfo errors: (
-    "Error Domain=ContentDelivery Code=409 \"Validation failed\" UserInfo={NSLocalizedFailureReason=CFBundleIdentifier Collision. There is more than one bundle with the CFBundleIdentifier value 'com.insurancegroupmo.insurancegroupmo' under the iOS application 'Runner.app'. (ID: 2fe7baf3-3f29-4783-9e3f-bc38d8ad7681), NSUnderlyingError=0x600001d157a0 {Error Domain=IrisAPI Code=-19241 \"Validation failed\" UserInfo={status=409, detail=CFBundleIdentifier Collision. There is more than one bundle with the CFBundleIdentifier value 'com.insurancegroupmo.insurancegroupmo' under the iOS application 'Runner.app'., id=2fe7baf3-3f29-4783-9e3f-bc38d8ad7681, code=STATE_ERROR.VALIDATION_ERROR, title=Validation failed, NSLocalizedFailureReason=CFBundleIdentifier Collision. There is more than one bundle with the CFBundleIdentifier value 'com.insurancegroupmo.insurancegroupmo' under the iOS application 'Runner.app'., NSLocalizedDescription=Validation failed}}, iris-code=STATE_ERROR.VALIDATION_ERROR, NSLocalizedDescription=Validation failed}"
-)
-2025-07-03 00:49:06.332 DEBUG: [ContentDelivery.Uploader.6000004E5480] Saving uploader state (CDUploaderStateUploadAssetDescription) for identifier 'com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38'.
-2025-07-03 00:49:06.334 DEBUG: [ContentDelivery.Uploader.6000004E5480] Wrote state to '~/Library/Application Support/com.apple.TransporterApp/CDUploads/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38.plist'.
-2025-07-03 00:49:06.361 DEBUG: [ContentDelivery.Uploader.6000004E5480] Creating container for SPI analysis.
-2025-07-03 00:49:06.361 DEBUG: [ContentDelivery.Uploader.6000004E5480] Getting upload instructions for SPI analysis.
-2025-07-03 00:49:06.365 DEBUG: [ContentDelivery.Uploader.6000004E5480] 
-=======================================
-RETRIEVE UPLOAD OPERATIONS (UPLOADING SPI ANALYSIS) REQUEST:
+✅ Required files found
 
-         URL: https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles
-     timeout: 900 seconds
-      method: POST
- httpHeaders: {
-    Accept = "application/json";
-    "Accept-Language" = "en-IN";
-    "Content-Type" = "application/json";
-    "User-Agent" = "TransporterApp/1.3.2-1394 (Macintosh; macOS 15.5 24F74 (arm64)) ContentDelivery/2.163.1-16301";
-    "X-Apple-App-Info" = "com.apple.gs.itunesconnect.auth";
-    "X-Apple-GS-Token" = "**hidden value**";
-    "X-Apple-I-Client-Time" = "2025-07-02T19:19:06Z";
-    "X-Apple-I-Identity-Id" = "001989-08-f967c34a-d6b5-4405-8a18-e7ad059a13e7";
-    "X-Apple-I-Locale" = "en_IN";
-    "X-Apple-I-MD" = "AAAABQAAABB5PP8d+cjXIrjBGt8hiEyCAAAAAQ==";
-    "X-Apple-I-MD-LU" = 9C96E5696DB247F74314E5C3388D746ABD99F2E5AE296EB1C2FBBA35F71AC629;
-    "X-Apple-I-MD-M" = "u0V8Hn5zDgUGJb+Fm+HqiKsJdcc8RJ2QYgJ+eq/Xjar+d76nYhHx1f5T1vZYBiwJouqlET+4BA/7Gp/U";
-    "X-Apple-I-MD-RINFO" = 50660608;
-    "X-Apple-I-TimeZone" = IST;
-    "X-MMe-Client-Info" = "<MacBookAir10,1> <macOS;15.5;24F74> <com.apple.AuthKit/1 (com.apple.TransporterApp/1394)>";
-    "X-Mme-Device-Id" = "45530C5A-8159-5BDE-B085-C59FE871F8CB";
-    "x-apple-i-device-type" = 1;
-}
-    httpBody: {"data":{"attributes":{"assetType":"ASSET_SPI","fileName":"DTAppAnalyzerExtractorOutput-78583F9E-9551-4004-8A65-82BEF6D99B0F.zip","fileSize":5343105,"sourceFileChecksum":"08bf34fc6a5bb28b77d27ecfc5182d4c","uti":"com.pkware.zip-archive"},"relationships":{"build":{"data":{"id":"60bff64f-d74c-4596-96e5-e539dde0460c","type":"builds"}}},"type":"buildDeliveryFiles"}}
-========================================
-2025-07-03 00:49:06.366 DEBUG: [ContentDelivery.Uploader.60000044EB00] Download task 4 sent 363 bytes (363 of 363 bytes sent).
-2025-07-03 00:49:06.940 DEBUG: [ContentDelivery.Uploader.600000BF1140] Download task 4 did write 3716 bytes.
-2025-07-03 00:49:06.941 DEBUG: [ContentDelivery.Uploader.600000BF1140] Download task 4 did write file: file:///var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/CFNetworkDownload_OP8PFX.tmp
-2025-07-03 00:49:06.942 DEBUG: [ContentDelivery.Uploader.6000004E5480] 
-=======================================
-RETRIEVE UPLOAD OPERATIONS (UPLOADING SPI ANALYSIS) RESPONSE:
+💾 Creating backups...
+✅ Backups created
 
-         URL: https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles
- status code: 201 (created)
- httpHeaders: {
-    "Content-Length" = 3716;
-    "Content-Type" = "application/json";
-    Date = "Wed, 02 Jul 2025 19:19:06 GMT";
-    Location = "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/da4e9a96-bfeb-40a9-83a1-1d8ad82ad083";
-    Server = "daiquiri/5";
-    "Set-Cookie" = "dqsid=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NTE0ODM5MjgsImp0aSI6IkhwVFM0YUtyby0ybGxyME5FQW5DWGcifQ.5mFMGAJuYSp44bNBzHUT_kZg8_K6-NQI5IsX9VddMPg; Max-Age=1800; Expires=Wed, 02 Jul 2025 19:49:06 GMT; Path=/; Secure; HTTPOnly";
-    "Strict-Transport-Security" = "max-age=31536000; includeSubDomains";
-    "apple-originating-system" = MZContentDeliveryService;
-    "apple-seq" = "0.0";
-    "apple-timing-app" = 247;
-    "apple-tk" = false;
-    b3 = "c4185375cc94b1670db300cc75c4481f-1c5e275e13518262";
-    "x-apple-jingle-correlation-key" = YQMFG5OMSSYWODNTADGHLRCID4;
-    "x-apple-request-uuid" = "c4185375-cc94-b167-0db3-00cc75c4481f";
-    "x-b3-spanid" = 1c5e275e13518262;
-    "x-b3-traceid" = c4185375cc94b1670db300cc75c4481f;
-    "x-daiquiri-instance" = "daiquiri:13624001:mr85p00it-hyhk04174601:7987:25RELEASE80:daiquiri-amp-processing-shared-int-001-mr, daiquiri:18493001:mr85p00it-hyhk03154801:7987:25RELEASE80:daiquiri-amp-all-shared-ext-001-mr";
-    "x-daiquiri-rate-limit-timing-user" = 0;
-    "x-daiquiri-rate-limit-user" = "user-hour-lim:3600;user-hour-rem:3590;";
-}
-    httpBody: {
-  "data" : {
-    "type" : "buildDeliveryFiles",
-    "id" : "da4e9a96-bfeb-40a9-83a1-1d8ad82ad083",
-    "attributes" : {
-      "assetType" : "ASSET_SPI",
-      "fileSize" : 5343105,
-      "fileName" : "DTAppAnalyzerExtractorOutput-78583F9E-9551-4004-8A65-82BEF6D99B0F.zip",
-      "sourceFileChecksum" : "08bf34fc6a5bb28b77d27ecfc5182d4c",
-      "sequentialChecksum" : null,
-      "assetToken" : "PurpleSource221/v4/1e/52/92/1e5292d4-76f2-ad5e-5f39-b10c6f7461ca/f0398ffe-3386-4037-9532-5033acb1b05c",
-      "uploadOperations" : [ {
-        "method" : "PUT",
-        "url" : "https://northamerica-1.object-storage.apple.com/itmspod12-assets-massilia-200001/PurpleSource221/v4/1e/52/92/1e5292d4-76f2-ad5e-5f39-b10c6f7461ca/tt2xRyJktqBCbeOSgFm079BDgw16ycYb7mFJgIotUZ4_U003d-1751483946583?partNumber=1&uploadId=6c2a3490-5779-11f0-9e09-7694c0b90441&apple-asset-repo-correlation-key=YQMFG5OMSSYWODNTADGHLRCID4&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250702T191906Z&X-Amz-SignedHeaders=host&X-Amz-Credential=MKIAP7F9QNTEY48OTE7F%2F20250702%2Fnorthamerica-1%2Fs3%2Faws4_request&X-Amz-Expires=604800&X-Amz-Signature=a4c03d8137ebfe022288c507d29ec86b647b2bc67b5ce539febaeeb253f01cb6",
-        "length" : 5242880,
-        "offset" : 0,
-        "requestHeaders" : [ {
-          "name" : "Content-Type",
-          "value" : "application/octet-stream"
-        } ],
-        "expiration" : "2025-07-09T12:19:06.738-07:00",
-        "partNumber" : 1,
-        "entityTag" : null
-      }, {
-        "method" : "PUT",
-        "url" : "https://northamerica-1.object-storage.apple.com/itmspod12-assets-massilia-200001/PurpleSource221/v4/1e/52/92/1e5292d4-76f2-ad5e-5f39-b10c6f7461ca/tt2xRyJktqBCbeOSgFm079BDgw16ycYb7mFJgIotUZ4_U003d-1751483946583?partNumber=2&uploadId=6c2a3490-5779-11f0-9e09-7694c0b90441&apple-asset-repo-correlation-key=YQMFG5OMSSYWODNTADGHLRCID4&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250702T191906Z&X-Amz-SignedHeaders=host&X-Amz-Credential=MKIAP7F9QNTEY48OTE7F%2F20250702%2Fnorthamerica-1%2Fs3%2Faws4_request&X-Amz-Expires=604800&X-Amz-Signature=be88a91757688e3c4bed968237489ad98a9a7f28e1bd4756aea240160bef5f92",
-        "length" : 100225,
-        "offset" : 5242880,
-        "requestHeaders" : [ {
-          "name" : "Content-Type",
-          "value" : "application/octet-stream"
-        } ],
-        "expiration" : "2025-07-09T12:19:06.738-07:00",
-        "partNumber" : 2,
-        "entityTag" : null
-      } ],
-      "uti" : "com.pkware.zip-archive",
-      "assetDeliveryState" : {
-        "errors" : [ ],
-        "warnings" : [ ],
-        "state" : "AWAITING_UPLOAD"
-      }
-    },
-    "relationships" : {
-      "build" : {
-        "links" : {
-          "self" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/da4e9a96-bfeb-40a9-83a1-1d8ad82ad083/relationships/build",
-          "related" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/da4e9a96-bfeb-40a9-83a1-1d8ad82ad083/build",
-          "include" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/da4e9a96-bfeb-40a9-83a1-1d8ad82ad083?include=build"
-        }
-      }
-    },
-    "links" : {
-      "self" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/da4e9a96-bfeb-40a9-83a1-1d8ad82ad083"
-    }
-  },
-  "links" : {
-    "self" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles"
-  }
-}
-=======================================
-2025-07-03 00:49:06.943 DEBUG: [ContentDelivery.Uploader.6000004E5480] Show Progress: Sending SPI analysis to App Store Connect…
-2025-07-03 00:49:06.943 DEBUG: [ContentDelivery.Uploader.6000004E5480] 
-=======================================
-UPLOADING SPI ANALYSIS
-=======================================
-2025-07-03 00:49:06.944 DEBUG: [ContentDelivery.Uploader.6000004E5480] Created the temporary directory '/var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/com.apple.cds.vbtx/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38'.
-2025-07-03 00:49:06.947 DEBUG: [ContentDelivery.Uploader.6000004E5480] Part 1 still needs to be uploaded (5242880 bytes).
-2025-07-03 00:49:06.947 DEBUG: [ContentDelivery.Uploader.6000004E5480] Part 1 will expire on 2025-07-10T00:49:06.738000+05:30.
-2025-07-03 00:49:06.948 DEBUG: [ContentDelivery.Uploader.6000004E5480] Part 2 still needs to be uploaded (100225 bytes).
-2025-07-03 00:49:06.948 DEBUG: [ContentDelivery.Uploader.6000004E5480] Part 2 will expire on 2025-07-10T00:49:06.738000+05:30.
-2025-07-03 00:49:06.977 DEBUG: [ContentDelivery.Uploader.6000004E5480] Wrote part 1 to temp file '/var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/com.apple.cds.vbtx/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38/Part-1.tmp'.
-2025-07-03 00:49:06.977 DEBUG: [ContentDelivery.Uploader.6000004E5480] Adding upload task for part 1.
-2025-07-03 00:49:06.979 DEBUG: [ContentDelivery.Uploader.6000004E5480] Wrote part 2 to temp file '/var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/com.apple.cds.vbtx/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38/Part-2.tmp'.
-2025-07-03 00:49:06.979 DEBUG: [ContentDelivery.Uploader.6000004E5480] Adding upload task for part 2.
-2025-07-03 00:49:06.980 DEBUG: [ContentDelivery.Uploader.6000004E5480] Waiting for 2 upload tasks to finish.
-2025-07-03 00:49:07.088 DEBUG: [ContentDelivery.Uploader.600000BF1140] PROGRESS - PART 1 (2097152) - 'DTAppAnalyzerExtractorOutput-78583F9E-9551-4004-8A65-82BEF6D99B0F.zip' 40.00% (2097152/5242880)
-2025-07-03 00:49:07.358 DEBUG: [ContentDelivery.Uploader.600000B8F780] PROGRESS - PART 1 (1048576) - 'DTAppAnalyzerExtractorOutput-78583F9E-9551-4004-8A65-82BEF6D99B0F.zip' 60.00% (3145728/5242880)
-2025-07-03 00:49:07.599 DEBUG: [ContentDelivery.Uploader.600000B8F780] PROGRESS - PART 2 (100225) - 'DTAppAnalyzerExtractorOutput-78583F9E-9551-4004-8A65-82BEF6D99B0F.zip' 100.00% (100225/100225)
-2025-07-03 00:49:07.641 DEBUG: [ContentDelivery.Uploader.600000B8F780] PROGRESS - PART 1 (1048576) - 'DTAppAnalyzerExtractorOutput-78583F9E-9551-4004-8A65-82BEF6D99B0F.zip' 80.00% (4194304/5242880)
-2025-07-03 00:49:07.848 DEBUG: [ContentDelivery.Uploader.600000BF1140] PROGRESS - PART 1 (1048576) - 'DTAppAnalyzerExtractorOutput-78583F9E-9551-4004-8A65-82BEF6D99B0F.zip' 100.00% (5242880/5242880)
-2025-07-03 00:49:08.931 DEBUG: [ContentDelivery.Uploader.60000044EB00] COMPLETED - PART 1 - DTAppAnalyzerExtractorOutput-78583F9E-9551-4004-8A65-82BEF6D99B0F.zip - eTag: "7DDB90897269BDAB7DABCE1815FB6D1A"
-2025-07-03 00:49:08.933  INFO: [ContentDelivery.Uploader.60000044EB00] Uploading part 1 COMPLETE.
-2025-07-03 00:49:08.935 DEBUG: [ContentDelivery.Uploader.60000044EB00] Removed temporary part file '/private/var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/com.apple.cds.vbtx/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38/Part-1.tmp'.
-2025-07-03 00:49:08.936 DEBUG: [ContentDelivery.Uploader.60000044EB00] Saving uploader state (CDUploaderStateUploadAssetDescription) for identifier 'com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38'.
-2025-07-03 00:49:08.939 DEBUG: [ContentDelivery.Uploader.60000044EB00] Wrote state to '~/Library/Application Support/com.apple.TransporterApp/CDUploads/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38.plist'.
-2025-07-03 00:49:08.939 DEBUG: [ContentDelivery.Uploader.60000044EB00] There is one part remaining to upload.
-2025-07-03 00:49:09.600 DEBUG: [ContentDelivery.Uploader.600000BF1140] COMPLETED - PART 2 - DTAppAnalyzerExtractorOutput-78583F9E-9551-4004-8A65-82BEF6D99B0F.zip - eTag: "8F243D543D7FE228F5B4DFE181722889"
-2025-07-03 00:49:09.602  INFO: [ContentDelivery.Uploader.600000BF1140] Uploading part 2 COMPLETE.
-2025-07-03 00:49:09.603 DEBUG: [ContentDelivery.Uploader.600000BF1140] Removed temporary part file '/private/var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/com.apple.cds.vbtx/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38/Part-2.tmp'.
-2025-07-03 00:49:09.604 DEBUG: [ContentDelivery.Uploader.600000BF1140] Saving uploader state (CDUploaderStateUploadAssetDescription) for identifier 'com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38'.
-2025-07-03 00:49:09.606 DEBUG: [ContentDelivery.Uploader.600000BF1140] Wrote state to '~/Library/Application Support/com.apple.TransporterApp/CDUploads/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38.plist'.
-2025-07-03 00:49:09.607 DEBUG: [ContentDelivery.Uploader.600000BF1140] All parts have been uploaded.
-2025-07-03 00:49:09.607 DEBUG: [ContentDelivery.Uploader.6000004E5480] Time to transfer: 0.868 seconds
-2025-07-03 00:49:09.608 DEBUG: [ContentDelivery.Uploader.6000004E5480] Removed temporary directory '/private/var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/com.apple.cds.vbtx/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38'.
-2025-07-03 00:49:09.608 DEBUG: [ContentDelivery.Uploader.6000004E5480] Show Progress: Waiting for App Store Connect SPI analysis response…
-2025-07-03 00:49:09.608 DEBUG: [ContentDelivery.Uploader.6000004E5480] 
-=======================================
-CHANGE UPLOAD STATE TO COMPLETE (UPLOADING SPI ANALYSIS)
-=======================================
-2025-07-03 00:49:09.612 DEBUG: [ContentDelivery.Uploader.6000004E5480] 
-=======================================
-CHANGE UPLOAD STATE TO COMPLETE (UPLOADING SPI ANALYSIS) REQUEST:
+🔍 Analyzing current bundle identifiers...
+📊 Current bundle identifier distribution:
+      6 com.twinklub.twinklub
+⚠️ Collisions detected: 5 duplicate entries
 
-         URL: https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/da4e9a96-bfeb-40a9-83a1-1d8ad82ad083
-     timeout: 900 seconds
-      method: PATCH
- httpHeaders: {
-    Accept = "application/json";
-    "Accept-Language" = "en-IN";
-    "Content-Type" = "application/json";
-    "User-Agent" = "TransporterApp/1.3.2-1394 (Macintosh; macOS 15.5 24F74 (arm64)) ContentDelivery/2.163.1-16301";
-    "X-Apple-App-Info" = "com.apple.gs.itunesconnect.auth";
-    "X-Apple-GS-Token" = "**hidden value**";
-    "X-Apple-I-Client-Time" = "2025-07-02T19:19:09Z";
-    "X-Apple-I-Identity-Id" = "001989-08-f967c34a-d6b5-4405-8a18-e7ad059a13e7";
-    "X-Apple-I-Locale" = "en_IN";
-    "X-Apple-I-MD" = "AAAABQAAABB5PP8d+cjXIrjBGt8hiEyCAAAAAQ==";
-    "X-Apple-I-MD-LU" = 9C96E5696DB247F74314E5C3388D746ABD99F2E5AE296EB1C2FBBA35F71AC629;
-    "X-Apple-I-MD-M" = "u0V8Hn5zDgUGJb+Fm+HqiKsJdcc8RJ2QYgJ+eq/Xjar+d76nYhHx1f5T1vZYBiwJouqlET+4BA/7Gp/U";
-    "X-Apple-I-MD-RINFO" = 50660608;
-    "X-Apple-I-TimeZone" = IST;
-    "X-MMe-Client-Info" = "<MacBookAir10,1> <macOS;15.5;24F74> <com.apple.AuthKit/1 (com.apple.TransporterApp/1394)>";
-    "X-Mme-Device-Id" = "45530C5A-8159-5BDE-B085-C59FE871F8CB";
-    "x-apple-i-device-type" = 1;
-}
-    httpBody: {"data":{"attributes":{"uploaded":true},"id":"da4e9a96-bfeb-40a9-83a1-1d8ad82ad083","type":"buildDeliveryFiles"}}
-========================================
-2025-07-03 00:49:09.614 DEBUG: [ContentDelivery.Uploader.60000044EB00] Download task 7 sent 113 bytes (113 of 113 bytes sent).
-2025-07-03 00:49:19.677 DEBUG: [ContentDelivery.Uploader.600000A32A80] Download task 7 did write 1855 bytes.
-2025-07-03 00:49:19.678 DEBUG: [ContentDelivery.Uploader.600000A32A80] Download task 7 did write file: file:///var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/CFNetworkDownload_tLwRFw.tmp
-2025-07-03 00:49:19.679 DEBUG: [ContentDelivery.Uploader.6000004E5480] 
-=======================================
-CHANGE UPLOAD STATE TO COMPLETE (UPLOADING SPI ANALYSIS) RESPONSE:
+🔧 Fixing bundle identifiers in project file...
+fix_bundle_collision_clean.sh: line 76: syntax error in conditional expression: unexpected token `;'
+[2025-07-03 13:56:10] WARNING: ⚠️ fix_bundle_collision_clean.sh failed, trying next script...
+[2025-07-03 13:56:10] INFO: 📋 Running fix_bundle_collision_proper.sh...
+🔧 Proper CFBundleIdentifier Collision Fix
+==========================================
+🎯 Target Error: Validation failed (409) CFBundleIdentifier Collision
 
-         URL: https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/da4e9a96-bfeb-40a9-83a1-1d8ad82ad083
- status code: 200 (no error)
- httpHeaders: {
-    "Content-Length" = 1855;
-    "Content-Type" = "application/json";
-    Date = "Wed, 02 Jul 2025 19:19:19 GMT";
-    Server = "daiquiri/5";
-    "Set-Cookie" = "dqsid=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NTE0ODM5MjgsImp0aSI6IkhwVFM0YUtyby0ybGxyME5FQW5DWGcifQ.5mFMGAJuYSp44bNBzHUT_kZg8_K6-NQI5IsX9VddMPg; Max-Age=1800; Expires=Wed, 02 Jul 2025 19:49:09 GMT; Path=/; Secure; HTTPOnly";
-    "Strict-Transport-Security" = "max-age=31536000; includeSubDomains";
-    "apple-originating-system" = MZContentDeliveryService;
-    "apple-seq" = "0.0";
-    "apple-timing-app" = 9720;
-    "apple-tk" = false;
-    b3 = "5f3963b927bd82c68b18714b328904f8-3adcf4bad7fe451d";
-    "x-apple-jingle-correlation-key" = L44WHOJHXWBMNCYYOFFTFCIE7A;
-    "x-apple-request-uuid" = "5f3963b9-27bd-82c6-8b18-714b328904f8";
-    "x-b3-spanid" = 3adcf4bad7fe451d;
-    "x-b3-traceid" = 5f3963b927bd82c68b18714b328904f8;
-    "x-daiquiri-instance" = "daiquiri:33624001:pv50p00it-hyhk10063801:7987:25RELEASE80:daiquiri-amp-processing-shared-int-001-pv, daiquiri:18493001:mr85p00it-hyhk03154801:7987:25RELEASE80:daiquiri-amp-all-shared-ext-001-mr";
-    "x-daiquiri-rate-limit-timing-user" = 0;
-    "x-daiquiri-rate-limit-user" = "user-hour-lim:3600;user-hour-rem:3593;";
-}
-    httpBody: {
-  "data" : {
-    "type" : "buildDeliveryFiles",
-    "id" : "da4e9a96-bfeb-40a9-83a1-1d8ad82ad083",
-    "attributes" : {
-      "assetType" : "ASSET_SPI",
-      "fileSize" : 5343105,
-      "fileName" : "DTAppAnalyzerExtractorOutput-78583F9E-9551-4004-8A65-82BEF6D99B0F.zip",
-      "sourceFileChecksum" : "08bf34fc6a5bb28b77d27ecfc5182d4c",
-      "sequentialChecksum" : null,
-      "assetToken" : "PurpleSource221/v4/1e/52/92/1e5292d4-76f2-ad5e-5f39-b10c6f7461ca/f0398ffe-3386-4037-9532-5033acb1b05c",
-      "uploadOperations" : null,
-      "uti" : "com.pkware.zip-archive",
-      "assetDeliveryState" : {
-        "errors" : [ ],
-        "warnings" : [ ],
-        "state" : "COMPLETE"
-      }
-    },
-    "relationships" : {
-      "build" : {
-        "links" : {
-          "self" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/da4e9a96-bfeb-40a9-83a1-1d8ad82ad083/relationships/build",
-          "related" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/da4e9a96-bfeb-40a9-83a1-1d8ad82ad083/build",
-          "include" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/da4e9a96-bfeb-40a9-83a1-1d8ad82ad083?include=build"
-        }
-      }
-    },
-    "links" : {
-      "self" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/da4e9a96-bfeb-40a9-83a1-1d8ad82ad083"
-    }
-  },
-  "links" : {
-    "self" : "https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/buildDeliveryFiles/da4e9a96-bfeb-40a9-83a1-1d8ad82ad083"
-  }
-}
-=======================================
-2025-07-03 00:49:19.680 DEBUG: [ContentDelivery.Uploader.6000004E5480] 
-========================================
-Set ASSET_SPI status to COMPLETE
-=======================================
-2025-07-03 00:49:19.685 DEBUG: [ContentDelivery.Uploader.6000004E5480] 
-================
-DELETE CONTAINER
-================
-2025-07-03 00:49:19.689 DEBUG: [ContentDelivery.Uploader.6000004E5480] 
-=======================================
-DELETE BUILD ID REQUEST:
+📁 Project Root: /Users/builder/clone
+📱 Base Bundle ID: com.twinklub.twinklub
+⏰ Timestamp: 1751550970
 
-         URL: https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c
-     timeout: 900 seconds
-      method: DELETE
- httpHeaders: {
-    Accept = "application/json";
-    "Accept-Language" = "en-IN";
-    "Content-Type" = "application/json";
-    "User-Agent" = "TransporterApp/1.3.2-1394 (Macintosh; macOS 15.5 24F74 (arm64)) ContentDelivery/2.163.1-16301";
-    "X-Apple-App-Info" = "com.apple.gs.itunesconnect.auth";
-    "X-Apple-GS-Token" = "**hidden value**";
-    "X-Apple-I-Client-Time" = "2025-07-02T19:19:19Z";
-    "X-Apple-I-Identity-Id" = "001989-08-f967c34a-d6b5-4405-8a18-e7ad059a13e7";
-    "X-Apple-I-Locale" = "en_IN";
-    "X-Apple-I-MD" = "AAAABQAAABB5PP8d+cjXIrjBGt8hiEyCAAAAAQ==";
-    "X-Apple-I-MD-LU" = 9C96E5696DB247F74314E5C3388D746ABD99F2E5AE296EB1C2FBBA35F71AC629;
-    "X-Apple-I-MD-M" = "u0V8Hn5zDgUGJb+Fm+HqiKsJdcc8RJ2QYgJ+eq/Xjar+d76nYhHx1f5T1vZYBiwJouqlET+4BA/7Gp/U";
-    "X-Apple-I-MD-RINFO" = 50660608;
-    "X-Apple-I-TimeZone" = IST;
-    "X-MMe-Client-Info" = "<MacBookAir10,1> <macOS;15.5;24F74> <com.apple.AuthKit/1 (com.apple.TransporterApp/1394)>";
-    "X-Mme-Device-Id" = "45530C5A-8159-5BDE-B085-C59FE871F8CB";
-    "x-apple-i-device-type" = 1;
-}
-    httpBody: 
-========================================
-2025-07-03 00:49:19.972 DEBUG: [ContentDelivery.Uploader.600000A32A80] Download task 8 did write file: file:///var/folders/5f/9k2f991x0x9cv4x9yjhk8zl00000gn/T/CFNetworkDownload_CYzdvC.tmp
-2025-07-03 00:49:19.974 DEBUG: [ContentDelivery.Uploader.6000004E5480] 
-=======================================
-DELETE BUILD ID RESPONSE:
+✅ Required files found
 
-         URL: https://contentdelivery.itunes.apple.com/MZContentDeliveryService/iris/provider/a99a2ebd-ed3e-4117-9f97-f195823774a7/v1/builds/60bff64f-d74c-4596-96e5-e539dde0460c
- status code: 204 (no content)
- httpHeaders: {
-    Date = "Wed, 02 Jul 2025 19:19:19 GMT";
-    Server = "daiquiri/5";
-    "Set-Cookie" = "dqsid=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NTE0ODM5MjgsImp0aSI6IkhwVFM0YUtyby0ybGxyME5FQW5DWGcifQ.5mFMGAJuYSp44bNBzHUT_kZg8_K6-NQI5IsX9VddMPg; Max-Age=1800; Expires=Wed, 02 Jul 2025 19:49:19 GMT; Path=/; Secure; HTTPOnly";
-    "Strict-Transport-Security" = "max-age=31536000; includeSubDomains";
-    "apple-originating-system" = MZContentDeliveryService;
-    "apple-seq" = "0.0";
-    "apple-timing-app" = 31;
-    "apple-tk" = false;
-    b3 = "06355df55be05fdc10fc80dd7461b256-d71563d815f5ae33";
-    "x-apple-jingle-correlation-key" = AY2V35K34BP5YEH4QDOXIYNSKY;
-    "x-apple-request-uuid" = "06355df5-5be0-5fdc-10fc-80dd7461b256";
-    "x-b3-spanid" = d71563d815f5ae33;
-    "x-b3-traceid" = 06355df55be05fdc10fc80dd7461b256;
-    "x-daiquiri-instance" = "daiquiri:33624001:pv50p00it-hyhk10063801:7987:25RELEASE80:daiquiri-amp-processing-shared-int-001-pv, daiquiri:18493001:mr85p00it-hyhk03154801:7987:25RELEASE80:daiquiri-amp-all-shared-ext-001-mr";
-    "x-daiquiri-rate-limit-timing-user" = 0;
-    "x-daiquiri-rate-limit-user" = "user-hour-lim:3600;user-hour-rem:3592;";
+💾 Creating backups...
+✅ Backups created
+
+🔍 Analyzing project structure...
+📋 Found target sections:
+   11:		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
+   12:		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+   13:		4356B4F9B9BCDD31AA16A7E7 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B92C2510871CDAD16AB55C8 /* Pods_RunnerTests.framework */; };
+   18:		A0E23534F39E6A753E5D315E /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 611522878A188D0D95050079 /* Pods_Runner.framework */; };
+   32:		9705A1C41CF9048500538489 /* Embed Frameworks */ = {
+   47:		19ED36ED7269C52BB184D8E3 /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
+   48:		3187AB16924AA9A505EB66B9 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
+   49:		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
+   50:		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+   51:		39D53DDF951F3FF1C4FF7FC6 /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
+   52:		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+   53:		47D9D2EA08A2550D189CB77D /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
+   54:		611522878A188D0D95050079 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+   55:		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
+   58:		7B92C2510871CDAD16AB55C8 /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+   61:		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
+   66:		9F2F166515CF40E66D183FFE /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
+   67:		BDD8337CEE040C1C3FE699BC /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
+   71:		97C146EB1CF9000F007C117D /* Frameworks */ = {
+   79:		B9FCC6F1731BD428E844D9CA /* Frameworks */ = {
+   90:		331C8082294A63A400263BE5 /* RunnerTests */ = {
+   130:		97C146F01CF9000F007C117D /* Runner */ = {
+   145:		9F804EDDEB0C494FC983C757 /* Frameworks */ = {
+   171:		331C8080294A63A400263BE5 /* RunnerTests */ = {
+   190:		97C146ED1CF9000F007C117D /* Runner */ = {
+   318:		3AC7465F4FD0FC724B4350CB /* [CP] Embed Pods Frameworks */ = {
+   722:		331C8087294A63A400263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */ = {
+   732:		97C146E91CF9000F007C117D /* Build configuration list for PBXProject "Runner" */ = {
+   742:		97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */ = {
+
+🔍 Current bundle identifiers with context:
+   500:				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub;
+   518:				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub;
+   537:				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub;
+   554:				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub;
+   687:				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub;
+   711:				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub;
+
+🔧 Applying proper bundle identifier fix...
+fix_bundle_collision_proper.sh: line 91: syntax error in conditional expression: unexpected token `;'
+[2025-07-03 13:56:10] WARNING: ⚠️ fix_bundle_collision_proper.sh failed, trying next script...
+[2025-07-03 13:56:10] INFO: 📋 Running fix_bundle_collision_simple.sh...
+🔧 Simple CFBundleIdentifier Collision Fix
+==========================================
+🎯 Target Error: Validation failed (409) CFBundleIdentifier Collision
+
+📁 Project Root: /Users/builder/clone
+📱 Base Bundle ID: com.twinklub.twinklub
+⏰ Timestamp: 1751550970
+
+✅ Required files found
+
+💾 Creating backups...
+✅ Backups created
+
+🔍 Current bundle identifiers:
+   500:				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub;
+   518:				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub;
+   537:				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub;
+   554:				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub;
+   687:				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub;
+   711:				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub;
+📊 Total bundle identifiers found:        6
+
+🔧 Applying simple bundle identifier fix...
+fix_bundle_collision_simple.sh: line 72: syntax error in conditional expression: unexpected token `;'
+[2025-07-03 13:56:10] WARNING: ⚠️ fix_bundle_collision_simple.sh failed
+[2025-07-03 13:56:10] INFO: 🔍 Verifying fallback fix results...
+[2025-07-03 13:56:10] INFO: 🔍 Verifying bundle identifier fix for: com.twinklub.twinklub
+[2025-07-03 13:56:10] INFO: 📊 Bundle identifier distribution:
+      6 com.twinklub.twinklub
+[2025-07-03 13:56:10] WARNING: ⚠️ Still have 5 collisions
+[2025-07-03 13:56:10] SUCCESS: ✅ Info.plist bundle identifier updated correctly
+[2025-07-03 13:56:10] SUCCESS: ✅ Info.plist bundle identifier updated correctly
+[2025-07-03 13:56:10] INFO: 🛡️ Applying additional collision prevention measures...
+[2025-07-03 13:56:10] INFO: 📦 Updating Podfile for collision prevention...
+[2025-07-03 13:56:10] INFO: ✅ Podfile already has collision prevention
+[2025-07-03 13:56:10] INFO: 📝 Updating app name to: Twinklub App
+[2025-07-03 13:56:10] SUCCESS: iOS app name updated to: Twinklub App
+[2025-07-03 13:56:10] INFO: 🔄 Updating app name using Flutter rename...
+[2025-07-03 13:56:11] WARNING: Flutter rename failed, manual update completed
+[2025-07-03 13:56:11] INFO: 🔄 Updating pubspec.yaml name to: twinklub_app
+[2025-07-03 13:56:11] SUCCESS: pubspec.yaml name updated to: twinklub_app
+[2025-07-03 13:56:11] SUCCESS: Bundle ID and App Name update completed
+[2025-07-03 13:56:11] INFO: --- Step 4: Updating Version in pubspec.yaml ---
+[2025-07-03 13:56:11] INFO: 📝 Updating App Version from Environment Variables...
+[2025-07-03 13:56:11] INFO: 🔍 Environment Variables Check:
+[2025-07-03 13:56:11] INFO:    VERSION_NAME: 1.0.6
+[2025-07-03 13:56:11] INFO:    VERSION_CODE: 66
+[2025-07-03 13:56:11] INFO: 📋 Current pubspec.yaml version: 1.0.6+66
+[2025-07-03 13:56:11] SUCCESS: ✅ Updated pubspec.yaml version
+[2025-07-03 13:56:11] INFO:    From: 1.0.6+66
+[2025-07-03 13:56:11] INFO:    To:   1.0.6+66
+[2025-07-03 13:56:11] SUCCESS: ✅ Version update verified in pubspec.yaml
+[2025-07-03 13:56:11] INFO: 📱 Updating iOS Info.plist version...
+[2025-07-03 13:56:11] SUCCESS: ✅ iOS Info.plist updated using plutil
+[2025-07-03 13:56:11] INFO: 📋 iOS Version Updated:
+[2025-07-03 13:56:11] INFO:    CFBundleShortVersionString: 1.0.6
+[2025-07-03 13:56:11] INFO:    CFBundleVersion: 66
+[2025-07-03 13:56:11] SUCCESS: 🎉 Version update completed successfully!
+[2025-07-03 13:56:11] INFO: --- Step 5: Handling Bottom Menu Items ---
+[2025-07-03 13:56:11] INFO: 📱 Handling Bottom Menu Items with Custom Icons...
+[2025-07-03 13:56:11] INFO: ✅ IS_BOTTOMMENU is true, processing bottom menu items...
+[2025-07-03 13:56:11] INFO: 📋 Detected JSON format for BOTTOMMENU_ITEMS
+[2025-07-03 13:56:11] INFO: 🔧 Using jq for JSON parsing
+[2025-07-03 13:56:11] INFO: 📋 Processing 4 JSON menu items...
+[2025-07-03 13:56:11] INFO: 📥 Processing menu item 1: Home (type: default)
+[2025-07-03 13:56:11] INFO: 📋 Skipping non-custom item: Home (type: default)
+[2025-07-03 13:56:11] INFO: 📥 Processing menu item 2: New Arraivals (type: default)
+[2025-07-03 13:56:11] INFO: 📋 Skipping non-custom item: New Arraivals (type: default)
+[2025-07-03 13:56:11] INFO: 📥 Processing menu item 3: Collections (type: default)
+[2025-07-03 13:56:11] INFO: 📋 Skipping non-custom item: Collections (type: default)
+[2025-07-03 13:56:11] INFO: 📥 Processing menu item 4: Contact (type: default)
+[2025-07-03 13:56:11] INFO: 📋 Skipping non-custom item: Contact (type: default)
+[2025-07-03 13:56:11] SUCCESS: ✅ Bottom menu configuration saved to: assets/icons/menu_config.json
+[2025-07-03 13:56:11] INFO: 📋 Menu items configured: 4 items
+[2025-07-03 13:56:11] INFO: 🎨 Custom icons processed: 0 items
+[2025-07-03 13:56:11] INFO: --- Step 6: Setting up Asset Directories ---
+[2025-07-03 13:56:11] INFO: --- Step 7: Setting up Logo Assets ---
+[2025-07-03 13:56:11] INFO: 📥 Downloading logo from https://raw.githubusercontent.com/prasanna91/QuikApp/main/twinklub_png_logo.png
+[2025-07-03 13:56:11] INFO: 📍 Target location: assets/images/logo.png (for Stage 4.5 app icon generation)
+[2025-07-03 13:56:11] INFO: 📥 Downloading logo from: https://raw.githubusercontent.com/prasanna91/QuikApp/main/twinklub_png_logo.png
+[2025-07-03 13:56:11] INFO: Download attempt 1/5 for logo
+[2025-07-03 13:56:11] SUCCESS: logo downloaded successfully
+[2025-07-03 13:56:11] SUCCESS: ✅ Logo downloaded successfully to: assets/images/logo.png
+[2025-07-03 13:56:11] INFO: 📋 Downloaded logo properties: assets/images/logo.png: ISO Media, AVIF Image
+[2025-07-03 13:56:11] INFO: --- Step 8: Setting up Splash Screen Assets ---
+[2025-07-03 13:56:11] INFO: 📥 Downloading splash from https://raw.githubusercontent.com/prasanna91/QuikApp/main/twinklub_png_logo.png
+[2025-07-03 13:56:11] INFO: 📥 Downloading splash from: https://raw.githubusercontent.com/prasanna91/QuikApp/main/twinklub_png_logo.png
+[2025-07-03 13:56:11] INFO: Download attempt 1/5 for splash
+[2025-07-03 13:56:11] SUCCESS: splash downloaded successfully
+[2025-07-03 13:56:11] INFO: 📋 SPLASH_BG_URL is null, empty, or not provided, skipping splash background
+[2025-07-03 13:56:11] INFO: --- Step 10: Copying Assets to iOS ---
+[2025-07-03 13:56:11] SUCCESS: Logo copied to iOS AppIcon
+[2025-07-03 13:56:11] SUCCESS: Splash copied to iOS LaunchImage
+[2025-07-03 13:56:11] SUCCESS: 🎉 Enhanced iOS Branding Assets Setup completed successfully!
+[2025-07-03 13:56:11] INFO: 📊 Enhanced Branding Summary:
+[2025-07-03 13:56:11] INFO:    WORKFLOW_ID: ios-workflow
+[2025-07-03 13:56:11] INFO:    APP_ID: 1002
+[2025-07-03 13:56:11] INFO:    VERSION_NAME: 1.0.6
+[2025-07-03 13:56:11] INFO:    VERSION_CODE: 66
+[2025-07-03 13:56:11] INFO:    APP_NAME: Twinklub App
+[2025-07-03 13:56:11] INFO:    ORG_NAME: JPR Garments
+[2025-07-03 13:56:11] INFO:    BUNDLE_ID: com.twinklub.twinklub
+[2025-07-03 13:56:11] INFO:    WEB_URL: https://twinklub.com/
+[2025-07-03 13:56:11] INFO: 🛡️ CFBundleIdentifier Collision Prevention:
+[2025-07-03 13:56:11] INFO:    ✅ Bundle-ID-Rules compliance applied
+[2025-07-03 13:56:11] INFO:    ✅ Unique bundle IDs for all target types
+[2025-07-03 13:56:11] INFO:    ✅ Test targets: com.twinklub.twinklub.tests
+[2025-07-03 13:56:11] INFO:    ✅ Extensions: com.twinklub.twinklub.extension
+[2025-07-03 13:56:11] INFO:    ✅ Frameworks: com.twinklub.twinklub.framework
+[2025-07-03 13:56:11] INFO:    🛡️ ALL CFBundleIdentifier collision errors PREVENTED
+[2025-07-03 13:56:11] INFO:    Version (Environment): 1.0.6 (build 66)
+[2025-07-03 13:56:11] INFO:    Version (pubspec.yaml): 1.0.6+66
+[2025-07-03 13:56:11] SUCCESS:    ✅ Version successfully updated from environment variables
+[2025-07-03 13:56:11] INFO:    Logo: downloadedhttps://raw.githubusercontent.com/prasanna91/QuikApp/main/twinklub_png_logo.png
+[2025-07-03 13:56:11] INFO:    Splash: downloadedhttps://raw.githubusercontent.com/prasanna91/QuikApp/main/twinklub_png_logo.png
+[2025-07-03 13:56:11] INFO:    Splash Background: <not set>
+[2025-07-03 13:56:11] INFO:    📋 Asset Download Logic:
+[2025-07-03 13:56:11] INFO:       - Skips download if URL is null, empty, or not provided
+[2025-07-03 13:56:11] INFO:       - Creates fallback assets when URLs are unavailable
+[2025-07-03 13:56:11] INFO:       - Uses logo as splash when SPLASH_URL is not available
+[2025-07-03 13:56:11] INFO:    Bottom Menu Items: Enabled with custom icons
+[2025-07-03 13:56:11] INFO:      - JSON format: 4 items
+[2025-07-03 13:56:11] INFO:        📋 Home (default)
+[2025-07-03 13:56:11] INFO:        📋 New Arraivals (default)
+[2025-07-03 13:56:11] INFO:        📋 Collections (default)
+[2025-07-03 13:56:11] INFO:        📋 Contact (default)
+[2025-07-03 13:56:11] INFO: 📋 Environment Variables Used:
+[2025-07-03 13:56:11] INFO:    WORKFLOW_ID: ios-workflow
+[2025-07-03 13:56:11] INFO:    APP_ID: 1002
+[2025-07-03 13:56:11] INFO:    VERSION_NAME: 1.0.6
+[2025-07-03 13:56:11] INFO:    VERSION_CODE: 66
+[2025-07-03 13:56:11] INFO:    APP_NAME: Twinklub App
+[2025-07-03 13:56:11] INFO:    ORG_NAME: JPR Garments
+[2025-07-03 13:56:11] INFO:    BUNDLE_ID: com.twinklub.twinklub
+[2025-07-03 13:56:11] INFO:    WEB_URL: https://twinklub.com/
+[2025-07-03 13:56:11] INFO:    LOGO_URL: https://raw.githubusercontent.com/prasanna91/QuikApp/main/twinklub_png_logo.png
+[2025-07-03 13:56:11] INFO:    SPLASH_URL: https://raw.githubusercontent.com/prasanna91/QuikApp/main/twinklub_png_logo.png
+[2025-07-03 13:56:11] INFO:    SPLASH_BG_URL: <not set>
+[2025-07-03 13:56:11] INFO:    IS_BOTTOMMENU: true
+[2025-07-03 13:56:11] INFO:    BOTTOMMENU_ITEMS: [{"label":"Home","icon":{"type":"preset","name":"home_outlined"},"url":"https://twinklub.com/"},{"label":"New Arraivals","icon":{"type":"custom","icon_url":"https://raw.githubusercontent.com/prasanna91/QuikApp/main/card.svg","icon_size":"24"},"url":"https://www.twinklub.com/collections/new-arrivals"},{"label":"Collections","icon":{"type":"custom","icon_url":"https://raw.githubusercontent.com/prasanna91/QuikApp/main/about.svg","icon_size":"24"},"url":"https://www.twinklub.com/collections/all"},{"label":"Contact","icon":{"type":"custom","icon_url":"https://raw.githubusercontent.com/prasanna91/QuikApp/main/contact.svg","icon_size":"24"},"url":"https://www.twinklub.com/account"}]
+[2025-07-03 13:56:11] INFO: --- Stage 1.5: Environment Variable Validation ---
+[2025-07-03 13:56:11] INFO: 🔍 Starting Environment Variable Validation for iOS Workflow...
+[2025-07-03 13:56:11] INFO: 🚀 Starting comprehensive environment variable validation...
+[2025-07-03 13:56:11] INFO: 🔍 Validating app configuration...
+[2025-07-03 13:56:11] SUCCESS: ✅ APP_ID: Set
+[2025-07-03 13:56:11] SUCCESS: ✅ VERSION_NAME: Set
+[2025-07-03 13:56:11] SUCCESS: ✅ VERSION_CODE: Set
+[2025-07-03 13:56:11] SUCCESS: ✅ APP_NAME: Set
+[2025-07-03 13:56:11] SUCCESS: ✅ ORG_NAME: Set
+[2025-07-03 13:56:11] SUCCESS: ✅ BUNDLE_ID: Set
+[2025-07-03 13:56:11] SUCCESS: ✅ PKG_NAME: Set
+[2025-07-03 13:56:11] SUCCESS: ✅ WEB_URL: URL format valid
+[2025-07-03 13:56:11] SUCCESS: ✅ LOGO_URL: URL format valid
+[2025-07-03 13:56:11] SUCCESS: ✅ SPLASH_URL: URL format valid
+[2025-07-03 13:56:11] INFO: ⏭️ SPLASH_BG_URL: Not set (optional)
+[2025-07-03 13:56:11] SUCCESS: ✅ PROFILE_TYPE: Set
+[2025-07-03 13:56:11] SUCCESS: ✅ PROFILE_URL: URL format valid
+[2025-07-03 13:56:11] SUCCESS: ✅ PROFILE_TYPE: app-store
+[2025-07-03 13:56:11] SUCCESS: ✅ CERT_P12_URL: URL format valid
+[2025-07-03 13:56:11] SUCCESS: ✅ CERT_PASSWORD: Set
+[2025-07-03 13:56:11] WARNING: ⚠️ CERT_CER_URL: May not be a valid URL format
+[2025-07-03 13:56:11] WARNING: ⚠️ CERT_KEY_URL: May not be a valid URL format
+[2025-07-03 13:56:11] SUCCESS: ✅ CERT_PASSWORD: Set
+[2025-07-03 13:56:11] WARNING: ⚠️ Both P12 and CER+KEY configurations found
+[2025-07-03 13:56:11] WARNING:    P12 configuration will be used (CERT_P12_URL takes precedence)
+[2025-07-03 13:56:11] INFO: 🔍 Validating App Store Connect configuration for app-store profile...
+[2025-07-03 13:56:11] SUCCESS: ✅ APP_STORE_CONNECT_KEY_IDENTIFIER: Set
+[2025-07-03 13:56:11] SUCCESS: ✅ APP_STORE_CONNECT_API_KEY: URL format valid
+[2025-07-03 13:56:11] SUCCESS: ✅ APP_STORE_CONNECT_ISSUER_ID: Set
+[2025-07-03 13:56:11] SUCCESS: ✅ APPLE_ID: Set
+[2025-07-03 13:56:11] SUCCESS: ✅ APPLE_ID_PASSWORD: Set
+[2025-07-03 13:56:11] INFO: 🔍 Validating Firebase configuration for push notifications...
+[2025-07-03 13:56:11] SUCCESS: ✅ FIREBASE_CONFIG_IOS: URL format valid
+[2025-07-03 13:56:11] SUCCESS: ✅ FIREBASE_CONFIG_ANDROID: URL format valid
+[2025-07-03 13:56:11] SUCCESS: ✅ APPLE_TEAM_ID: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ APNS_KEY_ID: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ APNS_AUTH_KEY_URL: URL format valid
+[2025-07-03 13:56:12] INFO: 🔍 Validating Android configuration...
+[2025-07-03 13:56:12] SUCCESS: ✅ KEY_STORE_URL: URL format valid
+[2025-07-03 13:56:12] SUCCESS: ✅ CM_KEYSTORE_PASSWORD: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ CM_KEY_ALIAS: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ CM_KEY_PASSWORD: Set
+[2025-07-03 13:56:12] INFO: 🔍 Validating feature flags...
+[2025-07-03 13:56:12] SUCCESS: ✅ PUSH_NOTIFY: true
+[2025-07-03 13:56:12] SUCCESS: ✅ IS_CHATBOT: true
+[2025-07-03 13:56:12] SUCCESS: ✅ IS_DOMAIN_URL: true
+[2025-07-03 13:56:12] SUCCESS: ✅ IS_SPLASH: true
+[2025-07-03 13:56:12] SUCCESS: ✅ IS_PULLDOWN: true
+[2025-07-03 13:56:12] SUCCESS: ✅ IS_BOTTOMMENU: true
+[2025-07-03 13:56:12] SUCCESS: ✅ IS_LOAD_IND: true
+[2025-07-03 13:56:12] SUCCESS: ✅ IS_TESTFLIGHT: false
+[2025-07-03 13:56:12] SUCCESS: ✅ ENABLE_EMAIL_NOTIFICATIONS: true
+[2025-07-03 13:56:12] SUCCESS: ✅ IS_CAMERA: false
+[2025-07-03 13:56:12] SUCCESS: ✅ IS_LOCATION: false
+[2025-07-03 13:56:12] SUCCESS: ✅ IS_MIC: true
+[2025-07-03 13:56:12] SUCCESS: ✅ IS_NOTIFICATION: true
+[2025-07-03 13:56:12] SUCCESS: ✅ IS_CONTACT: false
+[2025-07-03 13:56:12] SUCCESS: ✅ IS_BIOMETRIC: false
+[2025-07-03 13:56:12] SUCCESS: ✅ IS_CALENDAR: false
+[2025-07-03 13:56:12] SUCCESS: ✅ IS_STORAGE: true
+[2025-07-03 13:56:12] INFO: 🔍 Validating UI configuration...
+[2025-07-03 13:56:12] SUCCESS: ✅ SPLASH_BG_COLOR: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ SPLASH_TAGLINE: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ SPLASH_TAGLINE_COLOR: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ SPLASH_ANIMATION: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ SPLASH_DURATION: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ BOTTOMMENU_ITEMS: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ BOTTOMMENU_BG_COLOR: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ BOTTOMMENU_ICON_COLOR: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ BOTTOMMENU_TEXT_COLOR: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ BOTTOMMENU_FONT: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ BOTTOMMENU_FONT_SIZE: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ BOTTOMMENU_ACTIVE_TAB_COLOR: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ BOTTOMMENU_ICON_POSITION: Set
+[2025-07-03 13:56:12] INFO: 🔍 Validating email notification configuration...
+[2025-07-03 13:56:12] SUCCESS: ✅ EMAIL_SMTP_SERVER: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ EMAIL_SMTP_PORT: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ EMAIL_SMTP_USER: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ EMAIL_SMTP_PASS: Set
+[2025-07-03 13:56:12] INFO: 🔍 Validating workflow configuration...
+[2025-07-03 13:56:12] SUCCESS: ✅ WORKFLOW_ID: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ USER_NAME: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ EMAIL_ID: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ BRANCH: Set
+[2025-07-03 13:56:12] SUCCESS: ✅ Validation summary created: ENVIRONMENT_VALIDATION_SUMMARY.txt
+[2025-07-03 13:56:12] SUCCESS: ✅ All environment variables validated successfully!
+[2025-07-03 13:56:12] INFO: 📋 Validation summary created: ENVIRONMENT_VALIDATION_SUMMARY.txt
+[2025-07-03 13:56:12] INFO: --- Stage 1.7: Pre-build Setup ---
+[2025-07-03 13:56:12] INFO: Starting iOS Environment Setup...
+[2025-07-03 13:56:12] INFO: iOS Environment Setup Starting...
+[2025-07-03 13:56:12] INFO: Build Environment Information:
+[2025-07-03 13:56:12] INFO:   - Flutter: Flutter 3.32.2 • channel stable • https://github.com/flutter/flutter.git
+[2025-07-03 13:56:12] INFO:   - Xcode: Xcode 16.0
+[2025-07-03 13:56:12] INFO:   - CocoaPods: 1.16.2
+[2025-07-03 13:56:12] INFO:   - Ruby: ruby 3.0.4p208 (2022-04-12 revision 3fa771dded) [arm64-darwin21]
+[2025-07-03 13:56:12] INFO:   - Memory: 12 GB
+[2025-07-03 13:56:12] INFO:   - Profile Type: app-store
+[2025-07-03 13:56:12] INFO:   - Workflow ID: ios-workflow
+[2025-07-03 13:56:12] INFO:   - Bundle ID: com.twinklub.twinklub
+[2025-07-03 13:56:12] INFO:   - App Name: Twinklub App
+[2025-07-03 13:56:12] SUCCESS: Valid profile type: app-store
+[2025-07-03 13:56:12] INFO: Validating required tools...
+[2025-07-03 13:56:12] SUCCESS: All required tools are available
+[2025-07-03 13:56:12] INFO: Cleaning previous build artifacts...
+[2025-07-03 13:56:12] INFO: Removed .dart_tool directory
+[2025-07-03 13:56:12] INFO: Removed output directory
+[2025-07-03 13:56:13] SUCCESS: Build artifacts cleanup completed
+[2025-07-03 13:56:13] INFO: Validating Firebase configuration...
+[2025-07-03 13:56:13] INFO: Push notifications ENABLED - Firebase validation required
+[2025-07-03 13:56:13] SUCCESS: Firebase configuration is valid
+[2025-07-03 13:56:13] INFO: Validating iOS signing configuration...
+[2025-07-03 13:56:13] SUCCESS: P12 certificate URL provided
+[2025-07-03 13:56:13] SUCCESS: iOS signing configuration is valid
+[2025-07-03 13:56:13] INFO: Setting up required directories...
+[2025-07-03 13:56:13] INFO: Created directory: output/ios
+[2025-07-03 13:56:13] INFO: Created directory: ios/certificates
+[2025-07-03 13:56:13] INFO: Created directory: build/ios/logs
+[2025-07-03 13:56:13] SUCCESS: Directory setup completed
+[2025-07-03 13:56:13] INFO: Setting build environment variables...
+[2025-07-03 13:56:13] INFO: Build Environment Variables:
+[2025-07-03 13:56:13] INFO:    OUTPUT_DIR: output/ios
+[2025-07-03 13:56:13] INFO:    PROJECT_ROOT: /Users/builder/clone
+[2025-07-03 13:56:13] INFO:    CM_BUILD_DIR: /Users/builder/clone
+[2025-07-03 13:56:13] INFO:    PROFILE_TYPE: app-store
+[2025-07-03 13:56:13] INFO:    XCODE_FAST_BUILD: true
+[2025-07-03 13:56:13] SUCCESS: Build environment configured
+[2025-07-03 13:56:13] INFO: Checking for required build scripts...
+[2025-07-03 13:56:13] SUCCESS: All required build scripts are present
+[2025-07-03 13:56:13] SUCCESS: iOS Environment Setup completed successfully!
+[2025-07-03 13:56:13] INFO: --- Stage 2: Sending Build Started Email ---
+./lib/scripts/ios/main.sh: line 146: ./lib/scripts/ios/email_notifications.sh: cannot execute binary file
+[2025-07-03 13:56:13] WARNING: Failed to send build started email.
+[2025-07-03 13:56:13] INFO: --- Stage 3: Comprehensive Certificate Validation and Setup ---
+[2025-07-03 13:56:13] INFO: 🔒 Using Enhanced Certificate Validation System
+[2025-07-03 13:56:13] INFO: 🎯 Features: P12 validation, CER+KEY conversion, App Store Connect API validation, 503CEB9C fix
+[2025-07-03 13:56:13] INFO: --- Stage 3.1: 503CEB9C Certificate Signing Fix ---
+[2025-07-03 13:56:13] INFO: 🎯 Target Error ID: 503ceb9c-9940-40a3-8dc5-b99e6d914ef0
+[2025-07-03 13:56:13] INFO: 🔧 Strategy: Ensure proper Apple submission certificate signing
+[2025-07-03 13:56:13] INFO: 🔍 Running 503ceb9c certificate signing fix...
+ℹ️ 🚀 Certificate Signing Fix (503ceb9c) Starting...
+ℹ️ 🎯 Target Error ID: 503ceb9c-9940-40a3-8dc5-b99e6d914ef0
+ℹ️ 🆔 Bundle ID: com.twinklub.twinklub
+ℹ️ 👥 Team ID: 9H2AD7NQ49
+ℹ️ 🔧 Strategy: Fix Apple submission certificate signing
+ℹ️ 🚀 Starting 503ceb9c certificate signing fix...
+ℹ️ 🔍 Validating certificate configuration for 503ceb9c fix...
+✅ ✅ Required certificate variables are present
+ℹ️ 🔐 Setting up keychain for 503ceb9c certificate fix...
+✅ ✅ Keychain setup completed: ios-build-503ceb9c.keychain
+ℹ️ 📜 Installing Apple submission certificate for 503ceb9c fix...
+ℹ️ 🔧 Using P12 certificate method
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100  3365  100  3365    0     0  10144      0 --:--:-- --:--:-- --:--:-- 10166
+1 identity imported.
+✅ ✅ P12 certificate installed successfully
+ℹ️ 📱 Installing provisioning profile for 503ceb9c fix...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100 13532  100 13532    0     0  37271      0 --:--:-- --:--:-- --:--:-- 37278
+❌ Failed to extract provisioning profile UUID
+❌ ❌ Provisioning profile installation failed
+[2025-07-03 13:56:14] WARNING: ⚠️ Stage 3.1 partial: 503CEB9C certificate signing fix had issues
+[2025-07-03 13:56:14] WARNING: 🔧 Will continue with comprehensive validation as fallback
+[2025-07-03 13:56:14] INFO: --- Stage 3.2: Certificate Signing Fix (8D2AEB71) ---
+[2025-07-03 13:56:14] INFO: 🔐 TARGET: Nuclear-fixed IPA Apple submission certificate signing
+[2025-07-03 13:56:14] INFO: 🎯 Error ID: 8d2aeb71-fdcf-489b-8541-562a9e3802df
+[2025-07-03 13:56:14] INFO: 🔧 Strategy: Ensure nuclear-fixed IPAs are properly signed
+[2025-07-03 13:56:14] INFO: 🔍 Running 8d2aeb71 certificate signing fix...
+[8D2AEB71 CERT] === 8D2AEB71 Certificate Signing Fix ===
+[8D2AEB71 CERT] 🎯 Target Error ID: 8d2aeb71-fdcf-489b-8541-562a9e3802df
+[8D2AEB71 CERT] 🔐 Focus: Apple submission certificate signing for nuclear-fixed IPAs
+[8D2AEB71 CERT] 📱 Bundle ID: com.twinklub.twinklub
+[8D2AEB71 CERT] --- Stage 1: Enhanced Certificate Validation (8d2aeb71) ---
+[8D2AEB71 CERT] 🔍 Verifying Apple submission certificates...
+[8D2AEB71 ERROR] ❌ Keychain ios-build.keychain not found
+[8D2AEB71 ERROR] 🔧 Run comprehensive certificate validation first
+[2025-07-03 13:56:14] WARNING: ⚠️ Stage 3.2 partial: 8D2AEB71 certificate signing fix had issues
+[2025-07-03 13:56:14] WARNING: 🔧 Will continue with build and apply manual signing if needed
+[2025-07-03 13:56:14] INFO: --- Stage 3.3: 822B41A6 Certificate Signing Fix ---
+[2025-07-03 13:56:14] INFO: 🔐 TARGET: Missing or invalid signature Apple submission certificate
+[2025-07-03 13:56:14] INFO: 🎯 Error ID: 822b41a6-8771-40c5-b6f5-df38db7abf2c
+[2025-07-03 13:56:14] INFO: 🔧 Strategy: Ensure proper Apple submission certificate signing
+[2025-07-03 13:56:14] INFO: ⚠️  Issue: Bundle not signed using Apple submission certificate
+[2025-07-03 13:56:14] INFO: 🔍 Running 822b41a6 certificate signing fix...
+[2025-07-03 13:56:14] INFO: 🔐 822B41A6 Certificate Signing Fix Starting...
+[2025-07-03 13:56:14] INFO: 🎯 Target Error ID: 822b41a6-8771-40c5-b6f5-df38db7abf2c
+[2025-07-03 13:56:14] INFO: ⚠️  Issue: Missing or invalid signature for Apple submission certificate
+[2025-07-03 13:56:14] INFO: 🔧 Strategy: Ensure proper Apple Distribution certificate configuration
+[2025-07-03 13:56:14] INFO: 🚀 Starting 822B41A6 certificate signing fix...
+[2025-07-03 13:56:14] INFO: 🔍 Validating Apple submission certificate configuration...
+[2025-07-03 13:56:14] WARNING: ⚠️ Build keychain not found: ios-build.keychain
+[2025-07-03 13:56:14] ERROR: ❌ Apple submission certificate validation failed
+[2025-07-03 13:56:14] INFO: 💡 Ensure proper Apple Distribution certificate is installed
+[2025-07-03 13:56:14] ERROR: Script exited with error code: 1
+[2025-07-03 13:56:14] INFO: Sending build_failed email for iOS build 68668b8c16bd48d7ce99e616
+2025-07-03 13:56:14,390 - INFO - === QuikApp Email System Debug Info ===
+2025-07-03 13:56:14,390 - INFO - Python version: 3.8.13 (default, Aug 12 2022, 16:48:03) 
+[Clang 13.1.6 (clang-1316.0.21.2.5)]
+2025-07-03 13:56:14,390 - INFO - Arguments received: ['lib/scripts/utils/send_email.py', 'build_failed', 'iOS', '68668b8c16bd48d7ce99e616', 'Script failed with exit code 1']
+2025-07-03 13:56:14,390 - INFO - Environment variables:
+2025-07-03 13:56:14,390 - INFO -   EMAIL_SMTP_SERVER: smtp.gmail.com
+2025-07-03 13:56:14,390 - INFO -   EMAIL_SMTP_PORT: 587
+2025-07-03 13:56:14,390 - INFO -   EMAIL_SMTP_USER: prasannasrie@gmail.com
+2025-07-03 13:56:14,390 - INFO -   EMAIL_SMTP_PASS: SET
+2025-07-03 13:56:14,390 - INFO -   EMAIL_ID: prasannasrinivasan32@gmail.com
+2025-07-03 13:56:14,390 - INFO -   ENABLE_EMAIL_NOTIFICATIONS: true
+2025-07-03 13:56:14,390 - INFO -   APP_NAME: Twinklub App
+2025-07-03 13:56:14,390 - INFO -   CM_BUILD_ID: 68668b8c16bd48d7ce99e616
+2025-07-03 13:56:14,390 - INFO -   CM_PROJECT_ID: 6864e68e7d85750373d521a1
+2025-07-03 13:56:14,390 - INFO -   FCI_BUILD_ID: 68668b8c16bd48d7ce99e616
+2025-07-03 13:56:14,390 - INFO -   FCI_PROJECT_ID: 6864e68e7d85750373d521a1
+2025-07-03 13:56:14,390 - INFO -   BUILD_NUMBER: 28
+2025-07-03 13:56:14,390 - INFO - =======================================
+2025-07-03 13:56:14,390 - INFO - Processing email: type=build_failed, platform=iOS, build_id=68668b8c16bd48d7ce99e616
+2025-07-03 13:56:14,390 - INFO - Email notifier initialized for Twinklub App v1.0.6
+2025-07-03 13:56:14,390 - INFO - SMTP: smtp.gmail.com:587, User: prasannasrie@gmail.com
+2025-07-03 13:56:14,390 - INFO - Recipient: prasannasrinivasan32@gmail.com
+2025-07-03 13:56:14,390 - INFO - Email notifier initialized successfully
+2025-07-03 13:56:14,390 - INFO - Sending email to prasannasrinivasan32@gmail.com via smtp.gmail.com:587
+2025-07-03 13:56:15,982 - INFO - ✅ Email sent successfully to prasannasrinivasan32@gmail.com
+2025-07-03 13:56:16,016 - INFO - ✅ Email sent successfully
+[2025-07-03 13:56:16] SUCCESS: Email sent successfully
+[2025-07-03 13:56:16] WARNING: ⚠️ Stage 3.3 partial: 822B41A6 certificate signing fix had issues
+[2025-07-03 13:56:16] WARNING: 🔧 Will continue with comprehensive validation as fallback
+[2025-07-03 13:56:16] INFO: --- Stage 3.4: Comprehensive Certificate Validation ---
+[2025-07-03 13:56:16] INFO: 🔒 Running comprehensive certificate validation...
+[2025-07-03 13:56:16] INFO: 🔒 Starting Comprehensive Certificate Validation and Code Signing...
+[2025-07-03 13:56:16] INFO: 🚀 Starting comprehensive certificate validation...
+[2025-07-03 13:56:16] INFO: 🔐 Setting up dedicated keychain for certificate installation...
+[2025-07-03 13:56:16] SUCCESS: ✅ Keychain setup completed
+[2025-07-03 13:56:16] INFO: 📦 P12 file URL provided: https://raw.githubusercontent.com/prasanna91/QuikApp/main/PixawaretsIPhone.p12
+[2025-07-03 13:56:16] INFO: 📥 Downloading from https://raw.githubusercontent.com/prasanna91/QuikApp/main/PixawaretsIPhone.p12 (attempt 1/3)...
+[2025-07-03 13:56:16] SUCCESS: ✅ Download completed: ios/certificates/certificate.p12
+[2025-07-03 13:56:16] SUCCESS: ✅ File validated: ios/certificates/certificate.p12 (3365 bytes)
+[2025-07-03 13:56:16] INFO: 🔐 Using provided CERT_PASSWORD
+[2025-07-03 13:56:16] INFO: 🔍 Validating P12 certificate with password: 'Password@1234'
+[2025-07-03 13:56:16] SUCCESS: ✅ P12 certificate validation passed with provided password
+[2025-07-03 13:56:16] INFO: 📦 Installing P12 certificate...
+1 identity imported.
+[2025-07-03 13:56:16] SUCCESS: ✅ P12 certificate imported successfully
+keychain: "/Users/builder/Library/Keychains/ios-build.keychain-db"
+version: 512
+class: 0x00000010 
+attributes:
+    0x00000000 <uint32>=0x00000010 
+    0x00000001 <blob>="Imported Private Key"
+    0x00000002 <blob>=<NULL>
+    0x00000003 <uint32>=0x00000001 
+    0x00000004 <uint32>=0x00000000 
+    0x00000005 <uint32>=0x00000000 
+    0x00000006 <blob>=0x5769BF769D03AC232763971D9FDA94C789CF337D  "Wi\277v\235\003\254#'c\227\035\237\332\224\307\211\3173}"
+    0x00000007 <blob>=<NULL>
+    0x00000008 <blob>=0x7B38373139316361322D306663392D313164342D383439612D3030303530326235323132327D00  "{87191ca2-0fc9-11d4-849a-000502b52122}\000"
+    0x00000009 <uint32>=0x0000002A  "\000\000\000*"
+    0x0000000A <uint32>=0x00000800 
+    0x0000000B <uint32>=0x00000800 
+    0x0000000C <blob>=0x0000000000000000 
+    0x0000000D <blob>=0x0000000000000000 
+    0x0000000E <uint32>=0x00000001 
+    0x0000000F <uint32>=0x00000001 
+    0x00000010 <uint32>=0x00000001 
+    0x00000011 <uint32>=0x00000000 
+    0x00000012 <uint32>=0x00000001 
+    0x00000013 <uint32>=0x00000001 
+    0x00000014 <uint32>=0x00000001 
+    0x00000015 <uint32>=0x00000001 
+    0x00000016 <uint32>=0x00000001 
+    0x00000017 <uint32>=0x00000001 
+    0x00000018 <uint32>=0x00000001 
+    0x00000019 <uint32>=0x00000001 
+    0x0000001A <uint32>=0x00000001 
+[2025-07-03 13:56:16] SUCCESS: ✅ Key partition list set successfully
+[2025-07-03 13:56:16] SUCCESS: ✅ P12 certificate installed successfully with provided password
+[2025-07-03 13:56:16] INFO: 🔐 Validating App Store Connect API credentials...
+[2025-07-03 13:56:16] INFO:    - Key ID: ZFD9GRMS7R
+[2025-07-03 13:56:16] INFO:    - Issuer ID: a99a2ebd-ed3e-4117-9f97-f195823774a7
+[2025-07-03 13:56:16] INFO:    - API Key Path: https://raw.githubusercontent.com/prasanna91/QuikApp/main/AuthKey_ZFD9GRMS7R.p8
+[2025-07-03 13:56:16] INFO: 📥 Downloading API key from URL...
+[2025-07-03 13:56:16] INFO: 📥 Downloading from https://raw.githubusercontent.com/prasanna91/QuikApp/main/AuthKey_ZFD9GRMS7R.p8 (attempt 1/3)...
+[2025-07-03 13:56:16] SUCCESS: ✅ Download completed: /tmp/AuthKey_ZFD9GRMS7R.p8
+[2025-07-03 13:56:16] SUCCESS: ✅ File validated: /tmp/AuthKey_ZFD9GRMS7R.p8 (257 bytes)
+[2025-07-03 13:56:16] SUCCESS: ✅ API key format validation passed
+[2025-07-03 13:56:16] SUCCESS: ✅ API key file permissions set correctly
+[2025-07-03 13:56:16] SUCCESS: ✅ App Store Connect API credentials validated successfully
+[2025-07-03 13:56:16] INFO: 🔍 Validating code signing setup...
+[2025-07-03 13:56:16] SUCCESS: ✅ Found code signing identities:
+[2025-07-03 13:56:16] INFO:    1) 1DBEE49627AB50AB6C87811901BEBDE374CD0E18 "iPhone Distribution: Pixaware Technology Solutions Private Limited (9H2AD7NQ49)"
+[2025-07-03 13:56:16] INFO:    1 valid identities found
+[2025-07-03 13:56:16] SUCCESS: ✅ Found iOS distribution certificates!
+[2025-07-03 13:56:16] INFO: 📱 Processing provisioning profile...
+[2025-07-03 13:56:16] INFO: 📥 Downloading from https://raw.githubusercontent.com/prasanna91/QuikApp/main/comtwinklubtwinklub__IOS_APP_STORE.mobileprovision (attempt 1/3)...
+[2025-07-03 13:56:16] SUCCESS: ✅ Download completed: ios/certificates/profile.mobileprovision
+[2025-07-03 13:56:16] SUCCESS: ✅ File validated: ios/certificates/profile.mobileprovision (13532 bytes)
+[2025-07-03 13:56:16] SUCCESS: ✅ Mobileprovision UUID extracted: [2025-07-03 13:56:16] INFO: 🔍 Extracting UUID from mobileprovision file...
+[2025-07-03 13:56:16] SUCCESS: ✅ Extracted UUID: f62f712b-b4a1-47e1-90f9-db7093485ec4
+f62f712b-b4a1-47e1-90f9-db7093485ec4
+UUID: [2025-07-03 13:56:16] INFO: 🔍 Extracting UUID from mobileprovision file...
+[2025-07-03 13:56:16] SUCCESS: ✅ Extracted UUID: f62f712b-b4a1-47e1-90f9-db7093485ec4
+f62f712b-b4a1-47e1-90f9-db7093485ec4
+MOBILEPROVISION_UUID=[2025-07-03 13:56:16] INFO: 🔍 Extracting UUID from mobileprovision file...
+[2025-07-03 13:56:16] SUCCESS: ✅ Extracted UUID: f62f712b-b4a1-47e1-90f9-db7093485ec4
+f62f712b-b4a1-47e1-90f9-db7093485ec4
+[2025-07-03 13:56:16] SUCCESS: ✅ Provisioning profile installed: /Users/builder/Library/MobileDevice/Provisioning Profiles/[2025-07-03 13:56:16] INFO: 🔍 Extracting UUID from mobileprovision file...
+[2025-07-03 13:56:16] SUCCESS: ✅ Extracted UUID: f62f712b-b4a1-47e1-90f9-db7093485ec4
+f62f712b-b4a1-47e1-90f9-db7093485ec4.mobileprovision
+[2025-07-03 13:56:16] SUCCESS: 🎉 Comprehensive certificate validation completed successfully!
+[2025-07-03 13:56:16] INFO: 📋 Summary:
+[2025-07-03 13:56:16] INFO:    - Certificate: ✅ Installed and validated
+[2025-07-03 13:56:16] INFO:    - Code Signing: ✅ Ready for IPA export
+[2025-07-03 13:56:16] INFO:    - Provisioning Profile: ✅ UUID: [2025-07-03 13:56:16] INFO: 🔍 Extracting UUID from mobileprovision file...
+[2025-07-03 13:56:16] SUCCESS: ✅ Extracted UUID: f62f712b-b4a1-47e1-90f9-db7093485ec4
+f62f712b-b4a1-47e1-90f9-db7093485ec4
+[2025-07-03 13:56:16] INFO:    - App Store Connect API: ✅ Ready for upload
+[2025-07-03 13:56:16] SUCCESS: ✅ Comprehensive certificate validation completed successfully
+[2025-07-03 13:56:16] INFO: 🎯 All certificate methods validated and configured
+[2025-07-03 13:56:16] INFO: 🔍 Extracting provisioning profile UUID...
+[2025-07-03 13:56:16] SUCCESS: ✅ Extracted valid UUID from validation log: f62f712b-b4a1-47e1-90f9-db7093485ec4
+[2025-07-03 13:56:16] INFO: 📋 Certificate Status:
+[2025-07-03 13:56:16] INFO:    - Provisioning Profile UUID: f62f712b-b4a1-47e1-90f9-db7093485ec4
+[2025-07-03 13:56:16] INFO: --- Stage 4: Generating Flutter Launcher Icons ---
+[2025-07-03 13:56:16] INFO: 🎨 Using logo from assets/images/logo.png (created by Stage 1 branding_assets.sh)
+[2025-07-03 13:56:16] INFO: ✨ Generating App Store compliant iOS icons (removing transparency)
+[2025-07-03 13:56:16] INFO: 🎨 Generating Flutter Launcher Icons for iOS...
+[2025-07-03 13:56:16] INFO: 🚀 Starting iOS Launcher Icons Generation...
+[2025-07-03 13:56:16] SUCCESS: ✅ Found logo from branding_assets.sh: assets/images/logo.png
+[2025-07-03 13:56:16] INFO: 🎯 Using logo downloaded/created by branding_assets.sh in Stage 4
+[2025-07-03 13:56:16] INFO: 📋 Logo properties: assets/images/logo.png: ISO Media, AVIF Image
+[2025-07-03 13:56:16] WARNING: ⚠️ Logo is in AVIF format, converting to PNG...
+[2025-07-03 13:56:17] SUCCESS: ✅ Logo converted from AVIF to PNG format
+[2025-07-03 13:56:17] INFO: 📋 Converted logo properties: assets/images/logo.png: PNG image data, 180 x 133, 8-bit/color RGBA, non-interlaced
+[2025-07-03 13:56:17] INFO: 🔧 CRITICAL: Pre-processing logo to remove any transparency...
+[2025-07-03 13:56:17] SUCCESS: ✅ Logo alpha channel removed via JPEG conversion
+[2025-07-03 13:56:17] INFO: 📋 Final logo properties: assets/images/logo.png: PNG image data, 180 x 133, 8-bit/color RGB, non-interlaced
+[2025-07-03 13:56:17] SUCCESS: ✅ Logo verified - App Store compliant (no alpha channel)
+[2025-07-03 13:56:17] INFO: 📋 Ensuring logo is available at expected path for flutter_launcher_icons...
+[2025-07-03 13:56:17] INFO: 📸 Copying logo from branding_assets.sh to flutter_launcher_icons path...
+[2025-07-03 13:56:17] INFO:    Source: assets/images/logo.png
+[2025-07-03 13:56:17] INFO:    Target: assets/icons/app_icon.png
+[2025-07-03 13:56:17] SUCCESS: ✅ Logo successfully copied to: assets/icons/app_icon.png
+[2025-07-03 13:56:17] INFO: 🔧 CRITICAL: Applying transparency removal to copied app_icon.png...
+[2025-07-03 13:56:17] SUCCESS: ✅ app_icon.png alpha channel removed via JPEG conversion
+[2025-07-03 13:56:17] INFO: 📊 File sizes: Source: 42860 bytes, Target: 43547 bytes
+[2025-07-03 13:56:17] INFO: 📋 Copied app_icon.png properties: assets/icons/app_icon.png: PNG image data, 180 x 133, 8-bit/color RGB, non-interlaced
+[2025-07-03 13:56:17] SUCCESS: ✅ app_icon.png verified - App Store compliant (no alpha)
+[2025-07-03 13:56:17] INFO: 💾 Backing up existing iOS app icons...
+[2025-07-03 13:56:17] SUCCESS: ✅ Backup created: ios/Runner/Assets.xcassets/AppIcon.appiconset.backup.20250703_135617
+[2025-07-03 13:56:17] INFO: 📦 Checking flutter_launcher_icons dependency...
+[2025-07-03 13:56:17] SUCCESS: ✅ flutter_launcher_icons already configured
+[2025-07-03 13:56:17] INFO: 📥 Installing dependencies...
+Resolving dependencies...
+Downloading packages...
+  _flutterfire_internals 1.3.56 (1.3.58 available)
+  characters 1.4.0 (1.4.1 available)
+  firebase_core 3.14.0 (3.15.1 available)
+  firebase_core_platform_interface 5.4.0 (6.0.0 available)
+  firebase_core_web 2.23.0 (2.24.1 available)
+  firebase_messaging 15.2.7 (15.2.9 available)
+  firebase_messaging_platform_interface 4.6.7 (4.6.9 available)
+  firebase_messaging_web 3.10.7 (3.10.9 available)
+  flutter_launcher_icons 0.13.1 (0.14.4 available)
+  flutter_lints 4.0.0 (6.0.0 available)
+  flutter_local_notifications 17.2.4 (19.3.0 available)
+  flutter_local_notifications_linux 4.0.1 (6.0.0 available)
+  flutter_local_notifications_platform_interface 7.2.0 (9.1.0 available)
+  js 0.6.7 (0.7.2 available)
+  leak_tracker 10.0.9 (11.0.1 available)
+  leak_tracker_flutter_testing 3.0.9 (3.0.10 available)
+  leak_tracker_testing 3.0.1 (3.0.2 available)
+  lints 4.0.0 (6.0.0 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  meta 1.16.0 (1.17.0 available)
+  permission_handler 11.4.0 (12.0.1 available)
+  permission_handler_android 12.1.0 (13.0.1 available)
+  petitparser 6.1.0 (7.0.0 available)
+  posix 6.0.2 (6.0.3 available)
+  speech_to_text 6.6.0 (7.1.0 available)
+  test_api 0.7.4 (0.7.6 available)
+  timezone 0.9.4 (0.10.1 available)
+  vector_math 2.1.4 (2.2.0 available)
+  vm_service 15.0.0 (15.0.2 available)
+  xml 6.5.0 (6.6.0 available)
+Got dependencies!
+30 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+[2025-07-03 13:56:18] INFO: 🔍 Validating flutter_launcher_icons configuration...
+[2025-07-03 13:56:18] SUCCESS: ✅ remove_alpha_ios: true is already configured
+[2025-07-03 13:56:18] INFO: 📋 Current flutter_launcher_icons configuration:
+  flutter_launcher_icons:
+    android: "launcher_icon"
+    ios: true
+    image_path: "assets/icons/app_icon.png"
+    min_sdk_android: 21
+    web:
+      generate: false
+    windows:
+      generate: false
+    macos:
+      generate: false
+    # iOS specific configuration to fix App Store validation
+    remove_alpha_ios: true
+    background_color_ios: "#FFFFFF"
+    # Adaptive icon for Android
+    adaptive_icon_background: "#FFFFFF"
+[2025-07-03 13:56:18] INFO: 📋 Configured image path: assets/icons/app_icon.png
+[2025-07-03 13:56:18] SUCCESS: ✅ Configured image path exists: assets/icons/app_icon.png
+[2025-07-03 13:56:18] SUCCESS: ✅ flutter_launcher_icons configuration validated
+[2025-07-03 13:56:18] INFO: 🎨 Generating iOS launcher icons...
+[2025-07-03 13:56:18] INFO: 🚀 Running dart run flutter_launcher_icons...
+[2025-07-03 13:56:20] SUCCESS: ✅ iOS launcher icons generated successfully
+  [FLI]   ════════════════════════════════════════════
+  [FLI]      FLUTTER LAUNCHER ICONS (v0.13.1)                               
+  [FLI]   ════════════════════════════════════════════
+  [FLI]   
+  [FLI] • Creating default icons Android
+  [FLI] • Adding a new Android launcher icon
+  [FLI] • Creating adaptive icons Android
+  [FLI] • Updating colors.xml with color for adaptive icon background
+  [FLI] • Overwriting default iOS launcher icon with new icon
+  [FLI] Creating Icons for Web...
+  [FLI] ⚠️Requirements failed for platform Web. Skipped
+  [FLI] Creating Icons for Windows...
+  [FLI] ⚠️Windows config is not provided or windows.generate is false. Skipped...
+  [FLI] ⚠️Requirements failed for platform Windows. Skipped
+  [FLI] Creating Icons for MacOS...
+  [FLI] ⚠️Requirements failed for platform MacOS. Skipped
+  [FLI] 
+  [FLI] ✓ Successfully generated launcher icons
+[2025-07-03 13:56:20] SUCCESS: ✅ Generated: Icon-App-1024x1024@1x.png
+[2025-07-03 13:56:20] SUCCESS: ✅ Icon-App-1024x1024@1x.png - no alpha channel
+[2025-07-03 13:56:20] SUCCESS: ✅ Generated: Icon-App-60x60@2x.png
+[2025-07-03 13:56:20] SUCCESS: ✅ Icon-App-60x60@2x.png - no alpha channel
+[2025-07-03 13:56:20] SUCCESS: ✅ Generated: Icon-App-60x60@3x.png
+[2025-07-03 13:56:20] SUCCESS: ✅ Icon-App-60x60@3x.png - no alpha channel
+[2025-07-03 13:56:20] INFO: 🔧 CRITICAL: Removing ALL transparency from iOS icons for App Store compliance...
+[2025-07-03 13:56:20] INFO: 🖼️ Processing: Icon-App-57x57@1x.png
+[2025-07-03 13:56:20] INFO: 🔧 Method 1: Converting Icon-App-57x57@1x.png to remove alpha channel...
+[2025-07-03 13:56:20] SUCCESS: ✅ Icon-App-57x57@1x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:20] INFO: 🔧 Method 2: Force RGB mode for Icon-App-57x57@1x.png...
+[2025-07-03 13:56:20] INFO: 🔧 Method 3: Disable alpha property for Icon-App-57x57@1x.png...
+[2025-07-03 13:56:20] SUCCESS: ✅ Icon-App-57x57@1x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:20] INFO: 🖼️ Processing: Icon-App-76x76@2x.png
+[2025-07-03 13:56:20] INFO: 🔧 Method 1: Converting Icon-App-76x76@2x.png to remove alpha channel...
+[2025-07-03 13:56:20] SUCCESS: ✅ Icon-App-76x76@2x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:20] INFO: 🔧 Method 2: Force RGB mode for Icon-App-76x76@2x.png...
+[2025-07-03 13:56:20] INFO: 🔧 Method 3: Disable alpha property for Icon-App-76x76@2x.png...
+[2025-07-03 13:56:20] SUCCESS: ✅ Icon-App-76x76@2x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:20] INFO: 🖼️ Processing: Icon-App-29x29@1x.png
+[2025-07-03 13:56:20] INFO: 🔧 Method 1: Converting Icon-App-29x29@1x.png to remove alpha channel...
+[2025-07-03 13:56:20] SUCCESS: ✅ Icon-App-29x29@1x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:20] INFO: 🔧 Method 2: Force RGB mode for Icon-App-29x29@1x.png...
+[2025-07-03 13:56:20] INFO: 🔧 Method 3: Disable alpha property for Icon-App-29x29@1x.png...
+[2025-07-03 13:56:20] SUCCESS: ✅ Icon-App-29x29@1x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:20] INFO: 🖼️ Processing: Icon-App-40x40@1x.png
+[2025-07-03 13:56:20] INFO: 🔧 Method 1: Converting Icon-App-40x40@1x.png to remove alpha channel...
+[2025-07-03 13:56:20] SUCCESS: ✅ Icon-App-40x40@1x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:20] INFO: 🔧 Method 2: Force RGB mode for Icon-App-40x40@1x.png...
+[2025-07-03 13:56:20] INFO: 🔧 Method 3: Disable alpha property for Icon-App-40x40@1x.png...
+[2025-07-03 13:56:20] SUCCESS: ✅ Icon-App-40x40@1x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:20] INFO: 🖼️ Processing: Icon-App-72x72@1x.png
+[2025-07-03 13:56:20] INFO: 🔧 Method 1: Converting Icon-App-72x72@1x.png to remove alpha channel...
+[2025-07-03 13:56:20] SUCCESS: ✅ Icon-App-72x72@1x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:20] INFO: 🔧 Method 2: Force RGB mode for Icon-App-72x72@1x.png...
+[2025-07-03 13:56:20] INFO: 🔧 Method 3: Disable alpha property for Icon-App-72x72@1x.png...
+[2025-07-03 13:56:20] SUCCESS: ✅ Icon-App-72x72@1x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:20] INFO: 🖼️ Processing: Icon-App-20x20@1x.png
+[2025-07-03 13:56:20] INFO: 🔧 Method 1: Converting Icon-App-20x20@1x.png to remove alpha channel...
+[2025-07-03 13:56:20] SUCCESS: ✅ Icon-App-20x20@1x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:20] INFO: 🔧 Method 2: Force RGB mode for Icon-App-20x20@1x.png...
+[2025-07-03 13:56:20] INFO: 🔧 Method 3: Disable alpha property for Icon-App-20x20@1x.png...
+[2025-07-03 13:56:20] SUCCESS: ✅ Icon-App-20x20@1x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:20] INFO: 🖼️ Processing: Icon-App-50x50@2x.png
+[2025-07-03 13:56:20] INFO: 🔧 Method 1: Converting Icon-App-50x50@2x.png to remove alpha channel...
+[2025-07-03 13:56:20] SUCCESS: ✅ Icon-App-50x50@2x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:20] INFO: 🔧 Method 2: Force RGB mode for Icon-App-50x50@2x.png...
+[2025-07-03 13:56:20] INFO: 🔧 Method 3: Disable alpha property for Icon-App-50x50@2x.png...
+[2025-07-03 13:56:20] SUCCESS: ✅ Icon-App-50x50@2x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:20] INFO: 🖼️ Processing: Icon-App-1024x1024@1x.png
+[2025-07-03 13:56:20] INFO: 🔧 Method 1: Converting Icon-App-1024x1024@1x.png to remove alpha channel...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-1024x1024@1x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:21] INFO: 🔧 Method 2: Force RGB mode for Icon-App-1024x1024@1x.png...
+[2025-07-03 13:56:21] INFO: 🔧 Method 3: Disable alpha property for Icon-App-1024x1024@1x.png...
+[2025-07-03 13:56:21] INFO: 🔧 Method 4: Background composition for critical 1024x1024 icon...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-1024x1024@1x.png - CRITICAL: Background composition applied
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-1024x1024@1x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:21] INFO: 🖼️ Processing: Icon-App-83.5x83.5@2x.png
+[2025-07-03 13:56:21] INFO: 🔧 Method 1: Converting Icon-App-83.5x83.5@2x.png to remove alpha channel...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-83.5x83.5@2x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:21] INFO: 🔧 Method 2: Force RGB mode for Icon-App-83.5x83.5@2x.png...
+[2025-07-03 13:56:21] INFO: 🔧 Method 3: Disable alpha property for Icon-App-83.5x83.5@2x.png...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-83.5x83.5@2x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:21] INFO: 🖼️ Processing: Icon-App-20x20@3x.png
+[2025-07-03 13:56:21] INFO: 🔧 Method 1: Converting Icon-App-20x20@3x.png to remove alpha channel...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-20x20@3x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:21] INFO: 🔧 Method 2: Force RGB mode for Icon-App-20x20@3x.png...
+[2025-07-03 13:56:21] INFO: 🔧 Method 3: Disable alpha property for Icon-App-20x20@3x.png...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-20x20@3x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:21] INFO: 🖼️ Processing: Icon-App-50x50@1x.png
+[2025-07-03 13:56:21] INFO: 🔧 Method 1: Converting Icon-App-50x50@1x.png to remove alpha channel...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-50x50@1x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:21] INFO: 🔧 Method 2: Force RGB mode for Icon-App-50x50@1x.png...
+[2025-07-03 13:56:21] INFO: 🔧 Method 3: Disable alpha property for Icon-App-50x50@1x.png...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-50x50@1x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:21] INFO: 🖼️ Processing: Icon-App-20x20@2x.png
+[2025-07-03 13:56:21] INFO: 🔧 Method 1: Converting Icon-App-20x20@2x.png to remove alpha channel...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-20x20@2x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:21] INFO: 🔧 Method 2: Force RGB mode for Icon-App-20x20@2x.png...
+[2025-07-03 13:56:21] INFO: 🔧 Method 3: Disable alpha property for Icon-App-20x20@2x.png...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-20x20@2x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:21] INFO: 🖼️ Processing: Icon-App-29x29@3x.png
+[2025-07-03 13:56:21] INFO: 🔧 Method 1: Converting Icon-App-29x29@3x.png to remove alpha channel...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-29x29@3x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:21] INFO: 🔧 Method 2: Force RGB mode for Icon-App-29x29@3x.png...
+[2025-07-03 13:56:21] INFO: 🔧 Method 3: Disable alpha property for Icon-App-29x29@3x.png...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-29x29@3x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:21] INFO: 🖼️ Processing: Icon-App-40x40@2x.png
+[2025-07-03 13:56:21] INFO: 🔧 Method 1: Converting Icon-App-40x40@2x.png to remove alpha channel...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-40x40@2x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:21] INFO: 🔧 Method 2: Force RGB mode for Icon-App-40x40@2x.png...
+[2025-07-03 13:56:21] INFO: 🔧 Method 3: Disable alpha property for Icon-App-40x40@2x.png...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-40x40@2x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:21] INFO: 🖼️ Processing: Icon-App-72x72@2x.png
+[2025-07-03 13:56:21] INFO: 🔧 Method 1: Converting Icon-App-72x72@2x.png to remove alpha channel...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-72x72@2x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:21] INFO: 🔧 Method 2: Force RGB mode for Icon-App-72x72@2x.png...
+[2025-07-03 13:56:21] INFO: 🔧 Method 3: Disable alpha property for Icon-App-72x72@2x.png...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-72x72@2x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:21] INFO: 🖼️ Processing: Icon-App-60x60@3x.png
+[2025-07-03 13:56:21] INFO: 🔧 Method 1: Converting Icon-App-60x60@3x.png to remove alpha channel...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-60x60@3x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:21] INFO: 🔧 Method 2: Force RGB mode for Icon-App-60x60@3x.png...
+[2025-07-03 13:56:21] INFO: 🔧 Method 3: Disable alpha property for Icon-App-60x60@3x.png...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-60x60@3x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:21] INFO: 🖼️ Processing: Icon-App-60x60@2x.png
+[2025-07-03 13:56:21] INFO: 🔧 Method 1: Converting Icon-App-60x60@2x.png to remove alpha channel...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-60x60@2x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:21] INFO: 🔧 Method 2: Force RGB mode for Icon-App-60x60@2x.png...
+[2025-07-03 13:56:21] INFO: 🔧 Method 3: Disable alpha property for Icon-App-60x60@2x.png...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-60x60@2x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:21] INFO: 🖼️ Processing: Icon-App-57x57@2x.png
+[2025-07-03 13:56:21] INFO: 🔧 Method 1: Converting Icon-App-57x57@2x.png to remove alpha channel...
+[2025-07-03 13:56:21] SUCCESS: ✅ Icon-App-57x57@2x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:21] INFO: 🔧 Method 2: Force RGB mode for Icon-App-57x57@2x.png...
+[2025-07-03 13:56:21] INFO: 🔧 Method 3: Disable alpha property for Icon-App-57x57@2x.png...
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-57x57@2x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] INFO: 🖼️ Processing: Icon-App-76x76@1x.png
+[2025-07-03 13:56:22] INFO: 🔧 Method 1: Converting Icon-App-76x76@1x.png to remove alpha channel...
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-76x76@1x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:22] INFO: 🔧 Method 2: Force RGB mode for Icon-App-76x76@1x.png...
+[2025-07-03 13:56:22] INFO: 🔧 Method 3: Disable alpha property for Icon-App-76x76@1x.png...
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-76x76@1x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] INFO: 🖼️ Processing: Icon-App-40x40@3x.png
+[2025-07-03 13:56:22] INFO: 🔧 Method 1: Converting Icon-App-40x40@3x.png to remove alpha channel...
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-40x40@3x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:22] INFO: 🔧 Method 2: Force RGB mode for Icon-App-40x40@3x.png...
+[2025-07-03 13:56:22] INFO: 🔧 Method 3: Disable alpha property for Icon-App-40x40@3x.png...
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-40x40@3x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] INFO: 🖼️ Processing: Icon-App-29x29@2x.png
+[2025-07-03 13:56:22] INFO: 🔧 Method 1: Converting Icon-App-29x29@2x.png to remove alpha channel...
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-29x29@2x.png - Method 1: Alpha removed via JPEG conversion
+[2025-07-03 13:56:22] INFO: 🔧 Method 2: Force RGB mode for Icon-App-29x29@2x.png...
+[2025-07-03 13:56:22] INFO: 🔧 Method 3: Disable alpha property for Icon-App-29x29@2x.png...
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-29x29@2x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] INFO: 📊 Transparency removal summary:
+[2025-07-03 13:56:22] INFO:    Icons processed: 0
+[2025-07-03 13:56:22] SUCCESS: ✅ ALL icons are now App Store compliant (no transparency)
+[2025-07-03 13:56:22] INFO: 🔍 Validating generated iOS icons...
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-57x57@1x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-76x76@2x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-29x29@1x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-40x40@1x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-72x72@1x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-20x20@1x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-50x50@2x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-1024x1024@1x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-83.5x83.5@2x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-20x20@3x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-50x50@1x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-20x20@2x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-29x29@3x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-40x40@2x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-72x72@2x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-60x60@3x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-60x60@2x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-57x57@2x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-76x76@1x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-40x40@3x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ Icon-App-29x29@2x.png - App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: ✅ CRITICAL: 1024x1024 icon is App Store compliant (no alpha)
+[2025-07-03 13:56:22] SUCCESS: 🎉 All iOS icons validated - App Store compliant!
+[2025-07-03 13:56:22] INFO: 🔍 FINAL CRITICAL VALIDATION: Checking ALL generated icons for transparency...
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-1024x1024@1x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-20x20@1x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-20x20@2x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-20x20@3x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-29x29@1x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-29x29@2x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-29x29@3x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-40x40@1x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-40x40@2x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-40x40@3x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-50x50@1x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-50x50@2x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-57x57@1x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-57x57@2x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-60x60@2x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-60x60@3x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-72x72@1x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-72x72@2x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-76x76@1x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-76x76@2x.png is App Store compliant
+[2025-07-03 13:56:22] SUCCESS: ✅ FINAL CHECK: Icon-App-83.5x83.5@2x.png is App Store compliant
+[2025-07-03 13:56:22] INFO: 🔍 CRITICAL ICON VALIDATION: Checking 1024x1024 icon...
+[2025-07-03 13:56:22] SUCCESS: ✅ CRITICAL SUCCESS: 1024x1024 icon is App Store compliant!
+[2025-07-03 13:56:22] SUCCESS: 📋 Icon validation summary created: output/ios/ICON_VALIDATION_SUMMARY.txt
+[2025-07-03 13:56:22] SUCCESS: 🎉 iOS launcher icons generated successfully!
+[2025-07-03 13:56:22] SUCCESS: 🎯 FINAL VALIDATION PASSED: All icons are App Store compliant!
+[2025-07-03 13:56:22] INFO: Summary:
+[2025-07-03 13:56:22] INFO:   ✅ All icons generated without transparency
+[2025-07-03 13:56:22] INFO:   ✅ App Store validation error (409) PREVENTED
+[2025-07-03 13:56:22] INFO:   ✅ 1024x1024 icon is fully compliant
+[2025-07-03 13:56:22] INFO:   ✅ Ready for App Store submission
+[2025-07-03 13:56:22] INFO:   ✅ No more 'Invalid large app icon' errors
+[2025-07-03 13:56:22] INFO: --- Stage 4.5: CFBundleIdentifier Collision Check ---
+[2025-07-03 13:56:22] INFO: 🔍 PRE-BUILD VALIDATION: Ensuring all bundle IDs are unique
+[2025-07-03 13:56:22] INFO: 🎯 Purpose: Prevent CFBundleIdentifier collisions before build starts
+[2025-07-03 13:56:22] INFO: 📁 Project File: ios/Runner.xcodeproj/project.pbxproj
+[2025-07-03 13:56:22] INFO: 🔍 Running CFBundleIdentifier collision check...
+[2025-07-03 13:56:22] INFO: 🔍 CFBundleIdentifier Collision Check Starting...
+[2025-07-03 13:56:22] INFO: 📁 Project File: ios/Runner.xcodeproj/project.pbxproj
+./lib/scripts/ios/check_bundle_id_collisions.sh: line 167: syntax error in conditional expression: unexpected token `;'
+[2025-07-03 13:56:22] SUCCESS: ✅ Stage 4.5 completed: CFBundleIdentifier collision check passed
+[2025-07-03 13:56:22] INFO: 🎯 All bundle identifiers are unique
+[2025-07-03 13:56:22] INFO: 🚀 Safe to proceed with build
+[2025-07-03 13:56:22] INFO: --- Stage 5: Injecting Dynamic Permissions ---
+[2025-07-03 13:56:22] INFO: Starting Dynamic Permission Injection for iOS...
+[2025-07-03 13:56:22] INFO: Dynamic Permission Injection Starting...
+[2025-07-03 13:56:22] INFO: 📂 Script Location: /Users/builder/clone/lib/scripts/ios/inject_permissions.sh
+[2025-07-03 13:56:22] INFO: ⏰ Current Time: Thu Jul  3 13:56:22 UTC 2025
+[2025-07-03 13:56:22] INFO: 
+[2025-07-03 13:56:22] INFO: Injecting permissions into: ios/Runner/Info.plist
+[2025-07-03 13:56:22] SUCCESS: Info.plist backed up to: ios/Runner/Info.plist.backup.20250703_135622
+[2025-07-03 13:56:22] INFO: ⏭️ Camera permission disabled
+[2025-07-03 13:56:22] INFO: Removing permission: NSCameraUsageDescription
+ios/Runner/Info.plist: Could not modify plist, error: No value to remove at key path NSCameraUsageDescription
+[2025-07-03 13:56:22] INFO: Permission not found or already removed: NSCameraUsageDescription
+[2025-07-03 13:56:22] INFO: ⏭️ Location permission disabled
+[2025-07-03 13:56:22] INFO: Removing permission: NSLocationWhenInUseUsageDescription
+ios/Runner/Info.plist: Could not modify plist, error: No value to remove at key path NSLocationWhenInUseUsageDescription
+[2025-07-03 13:56:22] INFO: Permission not found or already removed: NSLocationWhenInUseUsageDescription
+[2025-07-03 13:56:22] INFO: Removing permission: NSLocationAlwaysAndWhenInUseUsageDescription
+ios/Runner/Info.plist: Could not modify plist, error: No value to remove at key path NSLocationAlwaysAndWhenInUseUsageDescription
+[2025-07-03 13:56:22] INFO: Permission not found or already removed: NSLocationAlwaysAndWhenInUseUsageDescription
+[2025-07-03 13:56:22] INFO: Removing permission: NSLocationAlwaysUsageDescription
+ios/Runner/Info.plist: Could not modify plist, error: No value to remove at key path NSLocationAlwaysUsageDescription
+[2025-07-03 13:56:22] INFO: Permission not found or already removed: NSLocationAlwaysUsageDescription
+[2025-07-03 13:56:22] INFO: ✅ Microphone permission enabled
+[2025-07-03 13:56:22] INFO: Adding permission: NSMicrophoneUsageDescription
+[2025-07-03 13:56:22] INFO: ✅ Notifications permission enabled
+[2025-07-03 13:56:22] INFO: Adding permission: NSUserNotificationUsageDescription
+[2025-07-03 13:56:22] INFO: ⏭️ Contacts permission disabled
+[2025-07-03 13:56:22] INFO: Removing permission: NSContactsUsageDescription
+ios/Runner/Info.plist: Could not modify plist, error: No value to remove at key path NSContactsUsageDescription
+[2025-07-03 13:56:22] INFO: Permission not found or already removed: NSContactsUsageDescription
+[2025-07-03 13:56:22] INFO: ⏭️ Biometric permission disabled
+[2025-07-03 13:56:22] INFO: Removing permission: NSFaceIDUsageDescription
+ios/Runner/Info.plist: Could not modify plist, error: No value to remove at key path NSFaceIDUsageDescription
+[2025-07-03 13:56:22] INFO: Permission not found or already removed: NSFaceIDUsageDescription
+[2025-07-03 13:56:22] INFO: ⏭️ Calendar permission disabled
+[2025-07-03 13:56:22] INFO: Removing permission: NSCalendarsUsageDescription
+ios/Runner/Info.plist: Could not modify plist, error: No value to remove at key path NSCalendarsUsageDescription
+[2025-07-03 13:56:22] INFO: Permission not found or already removed: NSCalendarsUsageDescription
+[2025-07-03 13:56:22] INFO: ✅ Photo Library permission enabled
+[2025-07-03 13:56:22] INFO: Adding permission: NSPhotoLibraryUsageDescription
+[2025-07-03 13:56:22] INFO: Adding permission: NSPhotoLibraryAddUsageDescription
+[2025-07-03 13:56:22] INFO: Adding background modes for push notifications
+[2025-07-03 13:56:22] INFO: Adding network security settings for domain access
+ios/Runner/Info.plist: Could not modify plist, error: Value true not valid for key path NSAppTransportSecurity.NSAllowsArbitraryLoads
+[2025-07-03 13:56:22] SUCCESS: Permission injection completed!
+[2025-07-03 13:56:22] INFO: Permissions Summary:
+[2025-07-03 13:56:22] INFO:   - Added: 6 permissions
+[2025-07-03 13:56:22] INFO:   - Removed: 7 permissions
+[2025-07-03 13:56:22] INFO:   - Backup: ios/Runner/Info.plist.backup.20250703_135622
+[2025-07-03 13:56:22] SUCCESS: Info.plist validation passed
+[2025-07-03 13:56:22] INFO: Creating permissions summary...
+[2025-07-03 13:56:22] SUCCESS: Permissions summary created: output/ios/PERMISSIONS_SUMMARY.txt
+[2025-07-03 13:56:22] SUCCESS: Dynamic permission injection completed successfully!
+[2025-07-03 13:56:22] INFO: Permissions have been injected into Info.plist
+[2025-07-03 13:56:22] INFO: Summary file created: output/ios/PERMISSIONS_SUMMARY.txt
+[2025-07-03 13:56:22] INFO: --- Stage 6: Enhanced Push Notification Handler ---
+[2025-07-03 13:56:22] INFO: 🔔 Starting Enhanced Push Notification Handler...
+[2025-07-03 13:56:22] INFO: 🚀 Starting Enhanced Push Notification Handler...
+[2025-07-03 13:56:22] INFO: 🔍 Validating PUSH_NOTIFY configuration...
+[2025-07-03 13:56:22] INFO: 🔔 Push notifications ENABLED - Firebase will be fully configured
+[2025-07-03 13:56:22] SUCCESS: ✅ PUSH_NOTIFY flag validated: true
+[2025-07-03 13:56:23] INFO: 📊 Configuration Summary:
+[2025-07-03 13:56:23] INFO:    - Firebase Enabled: true
+[2025-07-03 13:56:23] INFO:    - Push Notifications: true
+[2025-07-03 13:56:23] INFO: 🔔 Adding push notification permissions to iOS Info.plist...
+ios/Runner/Info.plist: Could not modify plist, error: Value (
+    "remote-notification"
+) already exists at key path UIBackgroundModes
+ios/Runner/Info.plist: Could not modify plist, error: Value This app uses notifications to keep you updated with important information from Twinklub App. already exists at key path NSUserNotificationUsageDescription
+[2025-07-03 13:56:23] SUCCESS: ✅ Push notification permissions added to iOS Info.plist
+[2025-07-03 13:56:23] INFO: 🔥 Running conditional Firebase injection...
+[2025-07-03 13:56:23] INFO: 🔥 Starting Enhanced Conditional Firebase Injection System...
+[2025-07-03 13:56:23] INFO: 🚀 Starting Enhanced Conditional Firebase Injection System...
+[2025-07-03 13:56:23] INFO: 🔍 Validating PUSH_NOTIFY configuration...
+[2025-07-03 13:56:23] INFO: 🔔 Push notifications ENABLED - Firebase will be fully configured
+[2025-07-03 13:56:23] SUCCESS: ✅ PUSH_NOTIFY flag validated: true
+[2025-07-03 13:56:23] INFO: 📊 Configuration Summary:
+[2025-07-03 13:56:23] INFO:    - Firebase Enabled: true
+[2025-07-03 13:56:23] INFO:    - Push Notifications: true
+[2025-07-03 13:56:23] INFO: 🎯 Performing conditional Firebase injection based on PUSH_NOTIFY: true
+[2025-07-03 13:56:23] INFO: 🔥 === FIREBASE ENABLED MODE ===
+[2025-07-03 13:56:23] INFO: 🔥 Injecting Firebase-enabled pubspec.yaml...
+[2025-07-03 13:56:23] INFO: ✅ Original pubspec.yaml backed up
+[2025-07-03 13:56:23] SUCCESS: ✅ Firebase-enabled pubspec.yaml injected
+[2025-07-03 13:56:23] INFO: 🔥 Injecting Firebase-enabled main.dart...
+[2025-07-03 13:56:23] INFO: ✅ Original main.dart backed up
+[2025-07-03 13:56:23] SUCCESS: ✅ Firebase-enabled main.dart injected
+[2025-07-03 13:56:23] INFO: 🔥 Injecting Firebase-enabled iOS Podfile...
+[2025-07-03 13:56:23] INFO: ✅ Original Podfile backed up
+[2025-07-03 13:56:23] SUCCESS: ✅ Firebase-enabled Podfile injected
+[2025-07-03 13:56:23] INFO: 🔥 Injecting Firebase configuration files...
+[2025-07-03 13:56:23] INFO: 📱 Downloading iOS Firebase config...
+[2025-07-03 13:56:23] SUCCESS: ✅ iOS Firebase config downloaded
+[2025-07-03 13:56:23] INFO: 🤖 Downloading Android Firebase config...
+[2025-07-03 13:56:23] SUCCESS: ✅ Android Firebase config downloaded
+[2025-07-03 13:56:23] SUCCESS: ✅ Firebase configuration files processed
+[2025-07-03 13:56:23] INFO: 🔔 Adding push notification permissions to iOS Info.plist...
+ios/Runner/Info.plist: Could not modify plist, error: Value (
+    "remote-notification",
+    "remote-notification"
+) already exists at key path UIBackgroundModes
+ios/Runner/Info.plist: Could not modify plist, error: Value This app uses notifications to keep you updated with important information. already exists at key path NSUserNotificationUsageDescription
+[2025-07-03 13:56:23] SUCCESS: ✅ Push notification permissions added to iOS Info.plist
+[2025-07-03 13:56:23] SUCCESS: ✅ Firebase injection completed - all Firebase features enabled
+[2025-07-03 13:56:23] SUCCESS: ✅ Injection summary created: FIREBASE_INJECTION_SUMMARY.txt
+[2025-07-03 13:56:23] SUCCESS: ✅ Enhanced Conditional Firebase injection completed successfully!
+[2025-07-03 13:56:23] INFO: 📋 Summary: PUSH_NOTIFY=true, Firebase=ENABLED, Push Notifications=ENABLED
+[2025-07-03 13:56:23] SUCCESS: ✅ Conditional Firebase injection completed
+[2025-07-03 13:56:23] INFO: 🔥 Running Firebase setup...
+[2025-07-03 13:56:23] INFO: 🔥 Starting Firebase Setup...
+[2025-07-03 13:56:23] INFO: 🎯 Firebase Setup Starting...
+[2025-07-03 13:56:23] INFO: 🔔 Push notifications enabled - setting up Firebase
+[2025-07-03 13:56:23] INFO: 📥 Downloading Firebase configuration...
+[2025-07-03 13:56:23] INFO: Downloading from https://raw.githubusercontent.com/prasanna91/QuikApp/main/GoogleService-Info-TK.plist (attempt 1/3)...
+[2025-07-03 13:56:23] SUCCESS: Download completed: ios/Runner/GoogleService-Info.plist
+[2025-07-03 13:56:23] SUCCESS: File validated: ios/Runner/GoogleService-Info.plist (882 bytes)
+[2025-07-03 13:56:23] SUCCESS: Firebase configuration downloaded and validated
+[2025-07-03 13:56:23] INFO: 📁 Copying Firebase configuration to assets...
+[2025-07-03 13:56:23] SUCCESS: Firebase configuration copied to assets
+[2025-07-03 13:56:23] INFO: 📝 Updating Info.plist for push notifications...
+[2025-07-03 13:56:23] INFO: Adding push notification permissions...
+[2025-07-03 13:56:23] SUCCESS: Info.plist updated for push notifications
+[2025-07-03 13:56:23] INFO: 📦 Checking Podfile for Firebase compatibility...
+[2025-07-03 13:56:23] SUCCESS: Firebase dependencies found in pubspec.yaml - Flutter will manage them automatically
+[2025-07-03 13:56:23] SUCCESS: Podfile Firebase compatibility check completed
+[2025-07-03 13:56:23] INFO: 🔍 Verifying Firebase configuration...
+[2025-07-03 13:56:23] INFO: Checking Firebase configuration keys...
+[2025-07-03 13:56:23] SUCCESS: Firebase dependencies verified in pubspec.yaml
+[2025-07-03 13:56:23] SUCCESS: Firebase configuration verification completed
+[2025-07-03 13:56:23] INFO: 📦 Installing CocoaPods dependencies...
+[2025-07-03 13:56:23] INFO: Running flutter clean to ensure fresh build...
+Deleting build...                                                    0ms
+Deleting .dart_tool...                                               0ms
+Deleting ephemeral...                                                0ms
+Deleting Generated.xcconfig...                                       0ms
+Deleting flutter_export_environment.sh...                            0ms
+Deleting .flutter-plugins-dependencies...                            0ms
+[2025-07-03 13:56:23] INFO: Running flutter pub get to generate required files...
+Resolving dependencies...
+Downloading packages...
+< _flutterfire_internals 1.3.35 (was 1.3.56) (1.3.58 available)
+  characters 1.4.0 (1.4.1 available)
+< connectivity_plus 5.0.2 (was 6.1.4) (6.1.4 available)
+< connectivity_plus_platform_interface 1.2.4 (was 2.0.1) (2.0.1 available)
++ firebase_analytics 10.10.7 (11.5.2 available)
++ firebase_analytics_platform_interface 3.10.8 (4.4.2 available)
++ firebase_analytics_web 0.5.7+7 (0.5.10+15 available)
+< firebase_core 2.32.0 (was 3.14.0) (3.15.1 available)
+  firebase_core_platform_interface 5.4.0 (6.0.0 available)
+  firebase_core_web 2.23.0 (2.24.1 available)
+< firebase_messaging 14.7.10 (was 15.2.7) (15.2.9 available)
+< firebase_messaging_platform_interface 4.5.37 (was 4.6.7) (4.6.9 available)
+< firebase_messaging_web 3.5.18 (was 3.10.7) (3.10.9 available)
+  flutter_launcher_icons 0.13.1 (from dev dependency to direct dependency) (0.14.4 available)
+< flutter_lints 3.0.2 (was 4.0.0) (6.0.0 available)
+  js 0.6.7 (0.7.2 available)
+  leak_tracker 10.0.9 (11.0.1 available)
+  leak_tracker_flutter_testing 3.0.9 (3.0.10 available)
+  leak_tracker_testing 3.0.1 (3.0.2 available)
+< lints 3.0.0 (was 4.0.0) (6.0.0 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  meta 1.16.0 (1.17.0 available)
+  permission_handler 11.4.0 (12.0.1 available)
+  permission_handler_android 12.1.0 (13.0.1 available)
+  petitparser 6.1.0 (7.0.0 available)
+  posix 6.0.2 (6.0.3 available)
+  test_api 0.7.4 (0.7.6 available)
+  vector_math 2.1.4 (2.2.0 available)
+  vm_service 15.0.0 (15.0.2 available)
++ webview_flutter 4.13.0
++ webview_flutter_android 4.7.0
++ webview_flutter_platform_interface 2.13.1
++ webview_flutter_wkwebview 3.22.0
+  xml 6.5.0 (6.6.0 available)
+These packages are no longer being depended on:
+- change_app_package_name 1.5.0
+- csslib 1.0.2
+- file 7.0.1
+- flutter_inappwebview 6.1.5
+- flutter_inappwebview_android 1.1.3
+- flutter_inappwebview_internal_annotations 1.2.0
+- flutter_inappwebview_ios 1.1.2
+- flutter_inappwebview_macos 1.1.2
+- flutter_inappwebview_platform_interface 1.3.0+1
+- flutter_inappwebview_web 1.1.2
+- flutter_inappwebview_windows 0.6.0
+- flutter_local_notifications 17.2.4
+- flutter_local_notifications_linux 4.0.1
+- flutter_local_notifications_platform_interface 7.2.0
+- flutter_svg 2.2.0
+- fluttertoast 8.2.12
+- google_fonts 6.2.1
+- html 0.15.6
+- package_info_plus 8.3.0
+- package_info_plus_platform_interface 3.2.0
+- path_parsing 1.1.0
+- path_provider 2.1.5
+- path_provider_android 2.2.17
+- path_provider_foundation 2.4.1
+- path_provider_linux 2.2.1
+- path_provider_platform_interface 2.1.2
+- path_provider_windows 2.3.0
+- pedantic 1.11.1
+- platform 3.1.6
+- shared_preferences 2.5.3
+- shared_preferences_android 2.4.10
+- shared_preferences_foundation 2.5.4
+- shared_preferences_linux 2.4.1
+- shared_preferences_platform_interface 2.4.1
+- shared_preferences_web 2.4.3
+- shared_preferences_windows 2.4.1
+- speech_to_text 6.6.0
+- speech_to_text_macos 1.1.0
+- speech_to_text_platform_interface 2.3.0
+- timezone 0.9.4
+- vector_graphics 1.1.19
+- vector_graphics_codec 1.1.13
+- vector_graphics_compiler 1.1.17
+- win32 5.14.0
+- xdg_directories 1.1.0
+Changed 62 dependencies!
+30 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+[2025-07-03 13:56:26] SUCCESS: Flutter dependencies resolved
+[2025-07-03 13:56:26] INFO: Ensuring iOS platform files are generated...
+Recreating project ....
+  ios/Runner.xcworkspace/contents.xcworkspacedata (created)
+  ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist (created)
+  ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings (created)
+  twinklub_app.iml (created)
+  README.md (created)
+  .idea/runConfigurations/main_dart.xml (created)
+  .idea/libraries/Dart_SDK.xml (created)
+  .idea/libraries/KotlinJavaRuntime.xml (created)
+  .idea/modules.xml (created)
+  .idea/workspace.xml (created)
+Resolving dependencies...
+Downloading packages...
+Got dependencies.
+Wrote 10 files.
+
+All done!
+You can find general documentation for Flutter at: https://docs.flutter.dev/
+Detailed API documentation is available at: https://api.flutter.dev/
+If you prefer video documentation, consider: https://www.youtube.com/c/flutterdev
+
+In order to run your application, type:
+
+  $ cd .
+  $ flutter run
+
+Your application code is in ./lib/main.dart.
+
+[2025-07-03 13:56:29] INFO: Installing CocoaPods with Firebase optimizations...
+  Preparing
+
+Updating local specs repositories
+
+Adding spec repo `trunk` with CDN `https://cdn.cocoapods.org/`
+  CDN: trunk Relative path downloaded: CocoaPods-version.yml, save ETag: "6866889a-38"
+  CDN: trunk Relative path: CocoaPods-version.yml exists! Returning local because checking is only performed in repo update
+
+Updating spec repo `trunk`
+  CDN: trunk Relative path downloaded: deprecated_podspecs.txt, save ETag: W/"6866889a-cf03e"
+  CDN: trunk Going to update 1 files
+  CDN: trunk Relative path: CocoaPods-version.yml, has ETag? "6866889a-38"
+  CDN: trunk Relative path not modified: CocoaPods-version.yml
+
+Analyzing dependencies
+
+Inspecting targets to integrate
+
+――― MARKDOWN TEMPLATE ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+
+### Command
+
+```
+/Users/builder/.rbenv/versions/3.0.4/bin/pod install --verbose --repo-update
+```
+
+### Report
+
+* What did you do?
+
+* What did you expect to happen?
+
+* What happened instead?
+
+
+### Stack
+
+```
+   CocoaPods : 1.16.2
+        Ruby : ruby 3.0.4p208 (2022-04-12 revision 3fa771dded) [arm64-darwin21]
+    RubyGems : 3.5.22
+        Host : macOS 14.7 (23H124)
+       Xcode : 16.0 (16A242d)
+         Git : git version 2.44.0
+Ruby lib dir : /Users/builder/.rbenv/versions/3.0.4/lib
+Repositories : master - git - https://github.com/CocoaPods/Specs.git @ f57d551901dfa98f7ecc5ff3e87656ab487d3e4b
+
+               trunk - CDN - https://cdn.cocoapods.org/
+```
+
+### Plugins
+
+```
+cocoapods-deintegrate : 1.0.5
+cocoapods-plugins     : 1.0.0
+cocoapods-search      : 1.0.1
+cocoapods-trunk       : 1.6.0
+cocoapods-try         : 1.2.0
+```
+
+### Podfile
+
+```ruby
+platform :ios, '13.0'
+use_frameworks! :linkage => :static
+
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
 }
-    httpBody: 
-=======================================
-2025-07-03 00:49:19.975 DEBUG: [ContentDelivery.Uploader.6000004E5480] BuildID '60bff64f-d74c-4596-96e5-e539dde0460c' was deleted.
-2025-07-03 00:49:19.980 DEBUG: [ContentDelivery.Uploader.6000004E5480] Removed the temporary asset directory '~/Library/Caches/com.apple.cds/com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38'.
-2025-07-03 00:49:19.980 DEBUG: [ContentDelivery.Uploader.6000004E5480] Removing uploader saved state for identifier 'com.apple.cds_A640F8CD-1ABB-4F39-9DFC-C530AC162D38'. Upload was canceled.
-2025-07-03 00:49:19.981 DEBUG: [ContentDelivery.Uploader.6000004E5480] Show Progress: Upload failed.
-Validation failed
-CFBundleIdentifier Collision. There is more than one bundle with the CFBundleIdentifier value 'com.insurancegroupmo.insurancegroupmo' under the iOS application 'Runner.app'. (ID: 2fe7baf3-3f29-4783-9e3f-bc38d8ad7681)
-2025-07-03 00:49:19.981  INFO: [ContentDelivery.Uploader.6000004E5480] 
-=============
-UPLOAD FAILED with 1 error.
-=============
-2025-07-03 00:49:19.982 DEBUG: [ContentDelivery.Uploader.6000004E5480] Log file path: ~/Library/Logs/ContentDelivery/com.apple.TransporterApp/com.apple.TransporterApp_Upload_2025-07-03_00-48-42_074.txt
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_ios_podfile_setup
+
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+    target.build_configurations.each do |config|
+      # Core iOS settings
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+      config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
+      config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+      config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
+      
+      # Firebase & Xcode 16.0 compatibility settings
+      config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
+      config.build_settings['SWIFT_VERSION'] = '5.0'
+      config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-Onone'
+      config.build_settings['ENABLE_PREVIEWS'] = 'NO'
+      config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+      
+      # Firebase specific settings for Xcode 16
+      if target.name.start_with?('Firebase')
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'GPB_USE_PROTOBUF_FRAMEWORK_IMPORTS=1'
+        config.build_settings['OTHER_CFLAGS'] ||= ['$(inherited)']
+        config.build_settings['OTHER_CFLAGS'] << '-Wno-error'
+        config.build_settings['CLANG_WARN_STRICT_PROTOTYPES'] = 'NO'
+      end
+      
+      # Bundle identifier collision prevention
+      next if target.name == 'Runner'
+      
+      if config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
+        current_bundle_id = config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
+        if current_bundle_id.include?('${BUNDLE_ID:-com.twinklub.twinklub}') || current_bundle_id.include?('com.example')
+          config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = current_bundle_id + '.pod.' + target.name.downcase
+        end
+      end
+    end
+  end
+end
+```
+
+### Error
+
+```
+Nanaimo::Reader::ParseError - [!] Dictionary missing value for key "Target", expected '=' and found "1"
+   #  -------------------------------------------
+   #  					"@executable_path/Frameworks",
+   #  				);
+499>      Target 1 (Main App): com.twinklub.twinklub
+                 ^
+   #  				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub;
+   #  				PRODUCT_NAME = "$(TARGET_NAME)";
+   #  -------------------------------------------
+
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:284:in `raise_parser_error'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:190:in `parse_dictionary'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:132:in `parse_object'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:193:in `parse_dictionary'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:132:in `parse_object'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:193:in `parse_dictionary'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:132:in `parse_object'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:193:in `parse_dictionary'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:132:in `parse_object'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:107:in `parse!'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/xcodeproj-1.27.0/lib/xcodeproj/plist.rb:27:in `read_from_path'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/xcodeproj-1.27.0/lib/xcodeproj/project.rb:211:in `initialize_from_file'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/xcodeproj-1.27.0/lib/xcodeproj/project.rb:113:in `open'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/installer/analyzer.rb:1194:in `block (2 levels) in inspect_targets_to_integrate'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/installer/analyzer.rb:1193:in `each'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/installer/analyzer.rb:1193:in `block in inspect_targets_to_integrate'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/user_interface.rb:64:in `section'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/installer/analyzer.rb:1188:in `inspect_targets_to_integrate'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/installer/analyzer.rb:107:in `analyze'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:422:in `analyze'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:244:in `block in resolve_dependencies'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/user_interface.rb:64:in `section'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:243:in `resolve_dependencies'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:162:in `install!'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/command/install.rb:52:in `run'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/claide-1.1.0/lib/claide/command.rb:334:in `run'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/command.rb:52:in `run'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/bin/pod:55:in `<top (required)>'
+/Users/builder/.rbenv/versions/3.0.4/bin/pod:25:in `load'
+/Users/builder/.rbenv/versions/3.0.4/bin/pod:25:in `<main>'
+```
+
+――― TEMPLATE END ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+
+[!] Oh no, an error occurred.
+
+Search for existing GitHub issues similar to yours:
+https://github.com/CocoaPods/CocoaPods/search?q=%5B%21%5D+Dictionary+missing+value+for+key+%22Target%22%2C+expected+%27%3D%27+and+found+%221%22%0A+++%23++-------------------------------------------%0A+++%23++%09%09%09%09%09%22%40executable_path%2FFrameworks%22%2C%0A+++%23++%09%09%09%09%29%3B%0A499%3E++++++Target+1+%28Main+App%29%3A+com.twinklub.twinklub%0A+++++++++++++++++%5E%0A+++%23++%09%09%09%09PRODUCT_BUNDLE_IDENTIFIER+%3D+com.twinklub.twinklub%3B%0A+++%23++%09%09%09%09PRODUCT_NAME+%3D+%22%24%28TARGET_NAME%29%22%3B%0A+++%23++-------------------------------------------%0A&type=Issues
+
+If none exists, create a ticket, with the template displayed above, on:
+https://github.com/CocoaPods/CocoaPods/issues/new
+
+Be sure to first read the contributing guide for details on how to properly submit a ticket:
+https://github.com/CocoaPods/CocoaPods/blob/master/CONTRIBUTING.md
+
+Don't forget to anonymize any private data!
+
+Searching for inspections failed: undefined method `map' for nil:NilClass
+Looking for related issues on cocoapods/cocoapods...
+[2025-07-03 13:56:30] WARNING: Standard pod install failed, trying with legacy mode...
+[!] Unknown option: `--legacy`
+Did you mean: --help?
+
+Usage:
+
+    $ pod install
+
+      Downloads all dependencies defined in `Podfile` and creates an Xcode Pods
+      library project in `./Pods`.
+
+      The Xcode project file should be specified in your `Podfile` like this:
+
+          project 'path/to/XcodeProject.xcodeproj'
+
+      If no project is specified, then a search for an Xcode project will be made. If
+      more than one Xcode project is found, the command will raise an error.
+
+      This will configure the project to reference the Pods static library, add a
+      build configuration file, and add a post build script to copy Pod resources.
+
+      This may return one of several error codes if it encounters problems. * `1`
+      Generic error code * `31` Spec not found (i.e out-of-date source repos, mistyped
+      Pod name etc...)
+
+Options:
+
+    --repo-update                       Force running `pod repo update` before install
+    --deployment                        Disallow any changes to the Podfile or the
+                                        Podfile.lock during installation
+    --clean-install                     Ignore the contents of the project cache and
+                                        force a full pod installation. This only
+                                        applies to projects that have enabled
+                                        incremental installation
+    --project-directory=/project/dir/   The path to the root of the project directory
+    --allow-root                        Allows CocoaPods to run as root
+    --silent                            Show nothing
+    --verbose                           Show more debugging information
+    --no-ansi                           Show output without ANSI codes
+    --help                              Show help banner of specified command
+
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/claide-1.1.0/lib/claide/command.rb:439:in `help!'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/claide-1.1.0/lib/claide/command.rb:609:in `help!'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/claide-1.1.0/lib/claide/command.rb:569:in `validate!'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/command/options/project_directory.rb:28:in `validate!'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/claide-1.1.0/lib/claide/command.rb:333:in `run'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/command.rb:52:in `run'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/bin/pod:55:in `<top (required)>'
+/Users/builder/.rbenv/versions/3.0.4/bin/pod:25:in `load'
+/Users/builder/.rbenv/versions/3.0.4/bin/pod:25:in `<main>'
+[2025-07-03 13:56:30] WARNING: Legacy mode failed, trying with deintegrate and clean install...
+
+――― MARKDOWN TEMPLATE ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+
+### Command
+
+```
+/Users/builder/.rbenv/versions/3.0.4/bin/pod deintegrate
+```
+
+### Report
+
+* What did you do?
+
+* What did you expect to happen?
+
+* What happened instead?
+
+
+### Stack
+
+```
+   CocoaPods : 1.16.2
+        Ruby : ruby 3.0.4p208 (2022-04-12 revision 3fa771dded) [arm64-darwin21]
+    RubyGems : 3.5.22
+        Host : macOS 14.7 (23H124)
+       Xcode : 16.0 (16A242d)
+         Git : git version 2.44.0
+Ruby lib dir : /Users/builder/.rbenv/versions/3.0.4/lib
+Repositories : master - git - https://github.com/CocoaPods/Specs.git @ f57d551901dfa98f7ecc5ff3e87656ab487d3e4b
+
+               trunk - CDN - https://cdn.cocoapods.org/
+```
+
+### Plugins
+
+```
+cocoapods-deintegrate : 1.0.5
+cocoapods-plugins     : 1.0.0
+cocoapods-search      : 1.0.1
+cocoapods-trunk       : 1.6.0
+cocoapods-try         : 1.2.0
+```
+
+### Podfile
+
+```ruby
+platform :ios, '13.0'
+use_frameworks! :linkage => :static
+
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_ios_podfile_setup
+
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+    target.build_configurations.each do |config|
+      # Core iOS settings
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+      config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
+      config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+      config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
+      
+      # Firebase & Xcode 16.0 compatibility settings
+      config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
+      config.build_settings['SWIFT_VERSION'] = '5.0'
+      config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-Onone'
+      config.build_settings['ENABLE_PREVIEWS'] = 'NO'
+      config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+      
+      # Firebase specific settings for Xcode 16
+      if target.name.start_with?('Firebase')
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'GPB_USE_PROTOBUF_FRAMEWORK_IMPORTS=1'
+        config.build_settings['OTHER_CFLAGS'] ||= ['$(inherited)']
+        config.build_settings['OTHER_CFLAGS'] << '-Wno-error'
+        config.build_settings['CLANG_WARN_STRICT_PROTOTYPES'] = 'NO'
+      end
+      
+      # Bundle identifier collision prevention
+      next if target.name == 'Runner'
+      
+      if config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
+        current_bundle_id = config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
+        if current_bundle_id.include?('${BUNDLE_ID:-com.twinklub.twinklub}') || current_bundle_id.include?('com.example')
+          config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = current_bundle_id + '.pod.' + target.name.downcase
+        end
+      end
+    end
+  end
+end
+```
+
+### Error
+
+```
+Nanaimo::Reader::ParseError - [!] Dictionary missing value for key "Target", expected '=' and found "1"
+   #  -------------------------------------------
+   #  					"@executable_path/Frameworks",
+   #  				);
+499>      Target 1 (Main App): com.twinklub.twinklub
+                 ^
+   #  				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub;
+   #  				PRODUCT_NAME = "$(TARGET_NAME)";
+   #  -------------------------------------------
+
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:284:in `raise_parser_error'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:190:in `parse_dictionary'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:132:in `parse_object'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:193:in `parse_dictionary'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:132:in `parse_object'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:193:in `parse_dictionary'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:132:in `parse_object'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:193:in `parse_dictionary'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:132:in `parse_object'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:107:in `parse!'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/xcodeproj-1.27.0/lib/xcodeproj/plist.rb:27:in `read_from_path'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/xcodeproj-1.27.0/lib/xcodeproj/project.rb:211:in `initialize_from_file'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/xcodeproj-1.27.0/lib/xcodeproj/project.rb:113:in `open'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-deintegrate-1.0.5/lib/cocoapods/command/deintegrate.rb:40:in `validate!'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/claide-1.1.0/lib/claide/command.rb:333:in `run'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/command.rb:52:in `run'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/bin/pod:55:in `<top (required)>'
+/Users/builder/.rbenv/versions/3.0.4/bin/pod:25:in `load'
+/Users/builder/.rbenv/versions/3.0.4/bin/pod:25:in `<main>'
+```
+
+――― TEMPLATE END ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+
+[!] Oh no, an error occurred.
+
+Search for existing GitHub issues similar to yours:
+https://github.com/CocoaPods/CocoaPods/search?q=%5B%21%5D+Dictionary+missing+value+for+key+%22Target%22%2C+expected+%27%3D%27+and+found+%221%22%0A+++%23++-------------------------------------------%0A+++%23++%09%09%09%09%09%22%40executable_path%2FFrameworks%22%2C%0A+++%23++%09%09%09%09%29%3B%0A499%3E++++++Target+1+%28Main+App%29%3A+com.twinklub.twinklub%0A+++++++++++++++++%5E%0A+++%23++%09%09%09%09PRODUCT_BUNDLE_IDENTIFIER+%3D+com.twinklub.twinklub%3B%0A+++%23++%09%09%09%09PRODUCT_NAME+%3D+%22%24%28TARGET_NAME%29%22%3B%0A+++%23++-------------------------------------------%0A&type=Issues
+
+If none exists, create a ticket, with the template displayed above, on:
+https://github.com/CocoaPods/CocoaPods/issues/new
+
+Be sure to first read the contributing guide for details on how to properly submit a ticket:
+https://github.com/CocoaPods/CocoaPods/blob/master/CONTRIBUTING.md
+
+Don't forget to anonymize any private data!
+
+Looking for related issues on cocoapods/cocoapods...
+  Preparing
+
+Updating local specs repositories
+  CDN: trunk Relative path: CocoaPods-version.yml exists! Returning local because checking is only performed in repo update
+
+Updating spec repo `trunk`
+  CDN: trunk Relative path: deprecated_podspecs.txt, has ETag? W/"6866889a-cf03e"
+  CDN: trunk Relative path not modified: deprecated_podspecs.txt
+  CDN: trunk Going to update 1 files
+  CDN: trunk Relative path: CocoaPods-version.yml, has ETag? "6866889a-38"
+  CDN: trunk Relative path not modified: CocoaPods-version.yml
+
+Analyzing dependencies
+
+Inspecting targets to integrate
+  CDN: trunk Relative path: CocoaPods-version.yml exists! Returning local because checking is only performed in repo update
+
+――― MARKDOWN TEMPLATE ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+
+### Command
+
+```
+/Users/builder/.rbenv/versions/3.0.4/bin/pod install --verbose --repo-update
+```
+
+### Report
+
+* What did you do?
+
+* What did you expect to happen?
+
+* What happened instead?
+
+
+### Stack
+
+```
+   CocoaPods : 1.16.2
+        Ruby : ruby 3.0.4p208 (2022-04-12 revision 3fa771dded) [arm64-darwin21]
+    RubyGems : 3.5.22
+        Host : macOS 14.7 (23H124)
+       Xcode : 16.0 (16A242d)
+         Git : git version 2.44.0
+Ruby lib dir : /Users/builder/.rbenv/versions/3.0.4/lib
+Repositories : master - git - https://github.com/CocoaPods/Specs.git @ f57d551901dfa98f7ecc5ff3e87656ab487d3e4b
+
+               trunk - CDN - https://cdn.cocoapods.org/
+```
+
+### Plugins
+
+```
+cocoapods-deintegrate : 1.0.5
+cocoapods-plugins     : 1.0.0
+cocoapods-search      : 1.0.1
+cocoapods-trunk       : 1.6.0
+cocoapods-try         : 1.2.0
+```
+
+### Podfile
+
+```ruby
+platform :ios, '13.0'
+use_frameworks! :linkage => :static
+
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_ios_podfile_setup
+
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+    target.build_configurations.each do |config|
+      # Core iOS settings
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+      config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
+      config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+      config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
+      
+      # Firebase & Xcode 16.0 compatibility settings
+      config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
+      config.build_settings['SWIFT_VERSION'] = '5.0'
+      config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-Onone'
+      config.build_settings['ENABLE_PREVIEWS'] = 'NO'
+      config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+      
+      # Firebase specific settings for Xcode 16
+      if target.name.start_with?('Firebase')
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'GPB_USE_PROTOBUF_FRAMEWORK_IMPORTS=1'
+        config.build_settings['OTHER_CFLAGS'] ||= ['$(inherited)']
+        config.build_settings['OTHER_CFLAGS'] << '-Wno-error'
+        config.build_settings['CLANG_WARN_STRICT_PROTOTYPES'] = 'NO'
+      end
+      
+      # Bundle identifier collision prevention
+      next if target.name == 'Runner'
+      
+      if config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
+        current_bundle_id = config.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
+        if current_bundle_id.include?('${BUNDLE_ID:-com.twinklub.twinklub}') || current_bundle_id.include?('com.example')
+          config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = current_bundle_id + '.pod.' + target.name.downcase
+        end
+      end
+    end
+  end
+end
+```
+
+### Error
+
+```
+Nanaimo::Reader::ParseError - [!] Dictionary missing value for key "Target", expected '=' and found "1"
+   #  -------------------------------------------
+   #  					"@executable_path/Frameworks",
+   #  				);
+499>      Target 1 (Main App): com.twinklub.twinklub
+                 ^
+   #  				PRODUCT_BUNDLE_IDENTIFIER = com.twinklub.twinklub;
+   #  				PRODUCT_NAME = "$(TARGET_NAME)";
+   #  -------------------------------------------
+
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:284:in `raise_parser_error'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:190:in `parse_dictionary'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:132:in `parse_object'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:193:in `parse_dictionary'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:132:in `parse_object'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:193:in `parse_dictionary'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:132:in `parse_object'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:193:in `parse_dictionary'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:132:in `parse_object'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/nanaimo-0.4.0/lib/nanaimo/reader.rb:107:in `parse!'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/xcodeproj-1.27.0/lib/xcodeproj/plist.rb:27:in `read_from_path'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/xcodeproj-1.27.0/lib/xcodeproj/project.rb:211:in `initialize_from_file'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/xcodeproj-1.27.0/lib/xcodeproj/project.rb:113:in `open'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/installer/analyzer.rb:1194:in `block (2 levels) in inspect_targets_to_integrate'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/installer/analyzer.rb:1193:in `each'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/installer/analyzer.rb:1193:in `block in inspect_targets_to_integrate'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/user_interface.rb:64:in `section'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/installer/analyzer.rb:1188:in `inspect_targets_to_integrate'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/installer/analyzer.rb:107:in `analyze'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:422:in `analyze'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:244:in `block in resolve_dependencies'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/user_interface.rb:64:in `section'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:243:in `resolve_dependencies'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:162:in `install!'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/command/install.rb:52:in `run'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/claide-1.1.0/lib/claide/command.rb:334:in `run'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/lib/cocoapods/command.rb:52:in `run'
+/Users/builder/.rbenv/versions/3.0.4/lib/ruby/gems/3.0.0/gems/cocoapods-1.16.2/bin/pod:55:in `<top (required)>'
+/Users/builder/.rbenv/versions/3.0.4/bin/pod:25:in `load'
+/Users/builder/.rbenv/versions/3.0.4/bin/pod:25:in `<main>'
+```
+
+――― TEMPLATE END ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+
+[!] Oh no, an error occurred.
+
+Search for existing GitHub issues similar to yours:
+https://github.com/CocoaPods/CocoaPods/search?q=%5B%21%5D+Dictionary+missing+value+for+key+%22Target%22%2C+expected+%27%3D%27+and+found+%221%22%0A+++%23++-------------------------------------------%0A+++%23++%09%09%09%09%09%22%40executable_path%2FFrameworks%22%2C%0A+++%23++%09%09%09%09%29%3B%0A499%3E++++++Target+1+%28Main+App%29%3A+com.twinklub.twinklub%0A+++++++++++++++++%5E%0A+++%23++%09%09%09%09PRODUCT_BUNDLE_IDENTIFIER+%3D+com.twinklub.twinklub%3B%0A+++%23++%09%09%09%09PRODUCT_NAME+%3D+%22%24%28TARGET_NAME%29%22%3B%0A+++%23++-------------------------------------------%0A&type=Issues
+
+If none exists, create a ticket, with the template displayed above, on:
+https://github.com/CocoaPods/CocoaPods/issues/new
+
+Be sure to first read the contributing guide for details on how to properly submit a ticket:
+https://github.com/CocoaPods/CocoaPods/blob/master/CONTRIBUTING.md
+
+Don't forget to anonymize any private data!
+
+Searching for inspections failed: undefined method `map' for nil:NilClass
+Looking for related issues on cocoapods/cocoapods...
+[2025-07-03 13:56:32] ERROR: CocoaPods installation failed even after clean install
+[2025-07-03 13:56:32] ERROR: CocoaPods installation failed
+[2025-07-03 13:56:32] ERROR: Script exited with error code: 1
+[2025-07-03 13:56:32] INFO: Sending build_failed email for iOS build 68668b8c16bd48d7ce99e616
+2025-07-03 13:56:32,626 - INFO - === QuikApp Email System Debug Info ===
+2025-07-03 13:56:32,626 - INFO - Python version: 3.8.13 (default, Aug 12 2022, 16:48:03) 
+[Clang 13.1.6 (clang-1316.0.21.2.5)]
+2025-07-03 13:56:32,626 - INFO - Arguments received: ['lib/scripts/utils/send_email.py', 'build_failed', 'iOS', '68668b8c16bd48d7ce99e616', 'Script failed with exit code 1']
+2025-07-03 13:56:32,626 - INFO - Environment variables:
+2025-07-03 13:56:32,626 - INFO -   EMAIL_SMTP_SERVER: smtp.gmail.com
+2025-07-03 13:56:32,626 - INFO -   EMAIL_SMTP_PORT: 587
+2025-07-03 13:56:32,626 - INFO -   EMAIL_SMTP_USER: prasannasrie@gmail.com
+2025-07-03 13:56:32,626 - INFO -   EMAIL_SMTP_PASS: SET
+2025-07-03 13:56:32,626 - INFO -   EMAIL_ID: prasannasrinivasan32@gmail.com
+2025-07-03 13:56:32,626 - INFO -   ENABLE_EMAIL_NOTIFICATIONS: true
+2025-07-03 13:56:32,626 - INFO -   APP_NAME: Twinklub App
+2025-07-03 13:56:32,626 - INFO -   CM_BUILD_ID: 68668b8c16bd48d7ce99e616
+2025-07-03 13:56:32,626 - INFO -   CM_PROJECT_ID: 6864e68e7d85750373d521a1
+2025-07-03 13:56:32,626 - INFO -   FCI_BUILD_ID: 68668b8c16bd48d7ce99e616
+2025-07-03 13:56:32,626 - INFO -   FCI_PROJECT_ID: 6864e68e7d85750373d521a1
+2025-07-03 13:56:32,626 - INFO -   BUILD_NUMBER: 28
+2025-07-03 13:56:32,626 - INFO - =======================================
+2025-07-03 13:56:32,626 - INFO - Processing email: type=build_failed, platform=iOS, build_id=68668b8c16bd48d7ce99e616
+2025-07-03 13:56:32,626 - INFO - Email notifier initialized for Twinklub App v1.0.6
+2025-07-03 13:56:32,626 - INFO - SMTP: smtp.gmail.com:587, User: prasannasrie@gmail.com
+2025-07-03 13:56:32,626 - INFO - Recipient: prasannasrinivasan32@gmail.com
+2025-07-03 13:56:32,626 - INFO - Email notifier initialized successfully
+2025-07-03 13:56:32,626 - INFO - Sending email to prasannasrinivasan32@gmail.com via smtp.gmail.com:587
+2025-07-03 13:56:35,756 - INFO - ✅ Email sent successfully to prasannasrinivasan32@gmail.com
+2025-07-03 13:56:35,789 - INFO - ✅ Email sent successfully
+[2025-07-03 13:56:35] SUCCESS: Email sent successfully
+[2025-07-03 13:56:35] ERROR: ❌ Firebase setup failed
+[2025-07-03 13:56:35] ERROR: ❌ Firebase setup failed
+[2025-07-03 13:56:35] ERROR: Script exited with error code: 1
+[2025-07-03 13:56:35] INFO: Sending build_failed email for iOS build 68668b8c16bd48d7ce99e616
+2025-07-03 13:56:35,853 - INFO - === QuikApp Email System Debug Info ===
+2025-07-03 13:56:35,853 - INFO - Python version: 3.8.13 (default, Aug 12 2022, 16:48:03) 
+[Clang 13.1.6 (clang-1316.0.21.2.5)]
+2025-07-03 13:56:35,853 - INFO - Arguments received: ['lib/scripts/utils/send_email.py', 'build_failed', 'iOS', '68668b8c16bd48d7ce99e616', 'Script failed with exit code 1']
+2025-07-03 13:56:35,853 - INFO - Environment variables:
+2025-07-03 13:56:35,853 - INFO -   EMAIL_SMTP_SERVER: smtp.gmail.com
+2025-07-03 13:56:35,853 - INFO -   EMAIL_SMTP_PORT: 587
+2025-07-03 13:56:35,853 - INFO -   EMAIL_SMTP_USER: prasannasrie@gmail.com
+2025-07-03 13:56:35,853 - INFO -   EMAIL_SMTP_PASS: SET
+2025-07-03 13:56:35,853 - INFO -   EMAIL_ID: prasannasrinivasan32@gmail.com
+2025-07-03 13:56:35,853 - INFO -   ENABLE_EMAIL_NOTIFICATIONS: true
+2025-07-03 13:56:35,853 - INFO -   APP_NAME: Twinklub App
+2025-07-03 13:56:35,853 - INFO -   CM_BUILD_ID: 68668b8c16bd48d7ce99e616
+2025-07-03 13:56:35,853 - INFO -   CM_PROJECT_ID: 6864e68e7d85750373d521a1
+2025-07-03 13:56:35,853 - INFO -   FCI_BUILD_ID: 68668b8c16bd48d7ce99e616
+2025-07-03 13:56:35,853 - INFO -   FCI_PROJECT_ID: 6864e68e7d85750373d521a1
+2025-07-03 13:56:35,853 - INFO -   BUILD_NUMBER: 28
+2025-07-03 13:56:35,853 - INFO - =======================================
+2025-07-03 13:56:35,853 - INFO - Processing email: type=build_failed, platform=iOS, build_id=68668b8c16bd48d7ce99e616
+2025-07-03 13:56:35,853 - INFO - Email notifier initialized for Twinklub App v1.0.6
+2025-07-03 13:56:35,853 - INFO - SMTP: smtp.gmail.com:587, User: prasannasrie@gmail.com
+2025-07-03 13:56:35,853 - INFO - Recipient: prasannasrinivasan32@gmail.com
+2025-07-03 13:56:35,853 - INFO - Email notifier initialized successfully
+2025-07-03 13:56:35,853 - INFO - Sending email to prasannasrinivasan32@gmail.com via smtp.gmail.com:587
+2025-07-03 13:56:37,092 - INFO - ✅ Email sent successfully to prasannasrinivasan32@gmail.com
+2025-07-03 13:56:37,126 - INFO - ✅ Email sent successfully
+[2025-07-03 13:56:37] SUCCESS: Email sent successfully
+[2025-07-03 13:56:37] INFO: Sending build_failed email for iOS build 68668b8c16bd48d7ce99e616
+./lib/scripts/ios/main.sh: line 23: ./lib/scripts/ios/email_notifications.sh: cannot execute binary file
+[2025-07-03 13:56:37] WARNING: Failed to send email notification
+[2025-07-03 13:56:37] ERROR: Script exited with error code: 1
+[2025-07-03 13:56:37] INFO: Sending build_failed email for iOS build 68668b8c16bd48d7ce99e616
+./lib/scripts/ios/main.sh: line 23: ./lib/scripts/ios/email_notifications.sh: cannot execute binary file
+[2025-07-03 13:56:37] WARNING: Failed to send email notification
+
+
+Build failed :|
+Step 3 script `🚀 iOS Universal Build` exited with status code 1
+
+
+Applications
+Builds
+App Preview
+TRY DEMO
+Teams
+Billing
+Try enterprise
+Security statement
+Documentation
+Support
+
+keerthiprasannasrie@gmail.com
+
+quikapptest09
+quikapptest09
+github.com/Prasannaka94/quikapptest09
+
+
+Start new build
+Build overview
+ID:
+68668b8c16bd48d7ce99e616
+Please provide this ID when you contact our support team
+Index:
+28
+Status:
+failed
+Workflow:
+iOS Universal Build (App Store + Ad Hoc + Enterprise + Development)
+Started by:
+keerthiprasannasrie@gmail.com
+
+keerthiprasannasrie@gmail.com
+Started:
+12 minutes ago
+Jul 3rd, 2025 at 19:24 IST
+Duration:
+2m 15s
+Machine:
+Mac mini M2
+Branch:
+main3
+Commit:
+aacfe41
+Artifacts
+quikapptest09_28_artifacts.zip
+[2.51 KB]
+Click on the build steps for details.
+
+Preparing build machine
+37s
+
+
+
+Showing the last 50 lines. Click this button to load the full log
+SPLASH_TAGLINE=TWINKLUB
+SPLASH_TAGLINE_COLOR=#a30237
+SPLASH_URL=https://raw.githubusercontent.com/prasanna91/QuikApp/main/twinklub_png_logo.png
+THINNING=$THINNING
+USER_NAME=prasannasrie
+VERSION_CODE=66
+VERSION_NAME=1.0.6
+WEB_URL=https://twinklub.com/
+WORKFLOW_ID=ios-workflow
+XCODE_CLEAN_BUILD=true
+XCODE_FAST_BUILD=true
+XCODE_OPTIMIZATION=true
+XCODE_PARALLEL_BUILD=true
+XCODE_PARALLEL_JOBS=8
+XCODE_SKIP_SIGNING=false
+
+== Use Xcode 16.0 ==
+> sudo xcode-select --switch /Applications/Xcode-16.0.app/Contents/Developer
+Xcode 16.0
+Build version 16A242d
+
+== Use CocoaPods version 1.16.2 ==
+> gem uninstall cocoapods --executables --all
+Removing pod
+Removing sandbox-pod
+Successfully uninstalled cocoapods-1.16.1
+
+> gem install cocoapods --version 1.16.2
+Successfully installed cocoapods-core-1.16.2
+Successfully installed cocoapods-1.16.2
+Parsing documentation for cocoapods-core-1.16.2
+Installing ri documentation for cocoapods-core-1.16.2
+Parsing documentation for cocoapods-1.16.2
+Installing ri documentation for cocoapods-1.16.2
+Done installing documentation for cocoapods-core, cocoapods after 2 seconds
+2 gems installed
+
+> gem list '^cocoapods$' --no-verbose
+cocoapods (1.16.2)
+
+== Use Java version 17 ==
+> java -version
+openjdk version "17.0.11" 2024-04-16 LTS
+OpenJDK Runtime Environment Zulu17.50+19-CA (build 17.0.11+9-LTS)
+OpenJDK 64-Bit Server VM Zulu17.50+19-CA (build 17.0.11+9-LTS, mixed mode, sharing)
+
+== Codemagic CLI tools ==
+> codemagic-cli-tools version
+codemagic-cli-tools 0.60.0
+
+Fetching app sources
+2s
+Installing SDKs
+47s
+
+
+
+
+== Use Flutter version 3.32.2 ==
+> curl --fail --show-error --silent --output flutter_macos_arm64_3.32.2-stable.zip --connect-timeout 10.00 --max-time 120.00 https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_arm64_3.32.2-stable.zip
+
+> 7z -bd x flutter_macos_arm64_3.32.2-stable.zip
+
+7-Zip [64] 17.04 : Copyright (c) 1999-2021 Igor Pavlov : 2017-08-28
+p7zip Version 17.04 (locale=utf8,Utf16=on,HugeFiles=on,64 bits,8 CPUs LE)
+
+Scanning the drive for archives:
+1 file, 2084631068 bytes (1989 MiB)
+
+Extracting archive: flutter_macos_arm64_3.32.2-stable.zip
+--
+Path = flutter_macos_arm64_3.32.2-stable.zip
+Type = zip
+Physical Size = 2084631068
+
+Everything is Ok
+
+Folders: 3767
+Files: 17104
+Size:       4151400829
+Compressed: 2084631068
+
+Flutter 3.32.2 • Dart 3.8.1
+
+Publishing
+1s
+Cleaning up
+< 1s
+Step 3 script `🚀 iOS Universal Build` exited with status code 1
+
+

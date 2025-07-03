@@ -1,0 +1,149 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Rules for Dynamic iOS Workflow Configuration
+🔧 1. No Hardcoded Values
+All fixed values are now dynamic and must be passed via Codemagic environment variables.
+
+Variable Name	Data Type	Notes
+WORKFLOW_ID	String	
+USER_NAME	String	
+APP_ID	String	
+VERSION_NAME	String	
+VERSION_CODE	String	Number represented as a string.
+APP_NAME	String	
+ORG_NAME	String	
+WEB_URL	String	URL.
+PKG_NAME	String	Android package name.
+BUNDLE_ID	String	iOS bundle ID.
+EMAIL_ID	String	
+PUSH_NOTIFY	String	Boolean represented as a string.
+IS_CHATBOT	String	Boolean represented as a string.
+IS_DOMAIN_URL	String	Boolean represented as a string.
+IS_SPLASH	String	Boolean represented as a string.
+IS_PULLDOWN	String	Boolean represented as a string.
+IS_BOTTOMMENU	String	Boolean represented as a string.
+IS_LOAD_IND	String	Boolean represented as a string.
+IS_CAMERA	String	Boolean represented as a string.
+IS_LOCATION	String	Boolean represented as a string.
+IS_MIC	String	Boolean represented as a string.
+IS_NOTIFICATION	String	Boolean represented as a string.
+IS_CONTACT	String	Boolean represented as a string.
+IS_BIOMETRIC	String	Boolean represented as a string.
+IS_CALENDAR	String	Boolean represented as a string.
+IS_STORAGE	String	Boolean represented as a string.
+LOGO_URL	String	URL.
+SPLASH_URL	String	URL.
+SPLASH_BG_URL	String	URL, can be empty.
+SPLASH_BG_COLOR	String	Hex color code.
+SPLASH_TAGLINE	String	
+SPLASH_TAGLINE_COLOR	String	Hex color code.
+SPLASH_ANIMATION	String	
+SPLASH_DURATION	String	Number represented as a string.
+BOTTOMMENU_ITEMS	String	A JSON array represented as a single string.
+BOTTOMMENU_BG_COLOR	String	Hex color code.
+BOTTOMMENU_ICON_COLOR	String	Hex color code.
+BOTTOMMENU_TEXT_COLOR	String	Hex color code.
+BOTTOMMENU_FONT	String	
+BOTTOMMENU_FONT_SIZE	String	Number represented as a string.
+BOTTOMMENU_FONT_BOLD	String	Boolean represented as a string.
+BOTTOMMENU_FONT_ITALIC	String	Boolean represented as a string.
+BOTTOMMENU_ACTIVE_TAB_COLOR	String	Hex color code.
+BOTTOMMENU_ICON_POSITION	String	
+FIREBASE_CONFIG_ANDROID	String	URL to a .json file.
+FIREBASE_CONFIG_IOS	String	URL to a .plist file.
+APPLE_TEAM_ID	String	
+APNS_KEY_ID	String	
+APNS_AUTH_KEY_URL	String	URL to a .p8 key file.
+PROFILE_TYPE	String	e.g., "app-store", "ad-hoc".
+PROFILE_URL	String	URL to a .mobileprovision file.
+CERT_PASSWORD	String	
+CERT_P12_URL	String	URL to a .p12 certificate file.
+IS_TESTFLIGHT	String	Boolean represented as a string.
+APPLE_ID	String	Email address.
+APPLE_ID_PASSWORD	String	App-specific password.
+APP_STORE_CONNECT_KEY_IDENTIFIER	String	
+APP_STORE_CONNECT_API_KEY	String	URL to a .p8 key file.
+APP_STORE_CONNECT_API_KEY_PATH	String	URL to a .p8 key file.
+APP_STORE_CONNECT_ISSUER_ID	String	UUID.
+KEY_STORE_URL	String	URL to a .jks file.
+CM_KEYSTORE_PASSWORD	String	
+CM_KEY_ALIAS	String	
+CM_KEY_PASSWORD	String	
+ENABLE_EMAIL_NOTIFICATIONS	String	Boolean represented as a string.
+EMAIL_SMTP_SERVER	String	
+EMAIL_SMTP_PORT	String	Number represented as a string.
+EMAIL_SMTP_USER	String	
+EMAIL_SMTP_PASS	String	
+
+
+
+
+Category	Replaced With Variables
+App Store Credentials	$APP_STORE_CONNECT_*
+Email Settings	$EMAIL_SMTP_*
+Bundle Identifiers	$BUNDLE_ID
+
+📦 2. All Variables Are Dynamically Referenced
+Core App Info
+WORKFLOW_ID, USER_NAME, APP_ID, VERSION_NAME, VERSION_CODE, APP_NAME, ORG_NAME, WEB_URL, PKG_NAME, BUNDLE_ID, EMAIL_ID
+
+Feature Flags
+PUSH_NOTIFY, IS_CHATBOT, IS_DOMAIN_URL, IS_SPLASH, IS_PULLDOWN, IS_BOTTOMMENU, IS_LOAD_IND
+
+Permissions
+IS_CAMERA, IS_LOCATION, IS_MIC, IS_NOTIFICATION, IS_CONTACT, IS_BIOMETRIC, IS_CALENDAR, IS_STORAGE
+
+UI Configuration
+LOGO_URL, SPLASH_URL, SPLASH_BG_URL, SPLASH_BG_COLOR, SPLASH_TAGLINE, SPLASH_TAGLINE_COLOR, SPLASH_ANIMATION, SPLASH_DURATION, BOTTOMMENU_*
+
+Apple Developer Settings
+APPLE_TEAM_ID, APNS_KEY_ID, APNS_AUTH_KEY_URL, PROFILE_TYPE, PROFILE_URL, CERT_PASSWORD, CERT_P12_URL, IS_TESTFLIGHT, APPLE_ID, APPLE_ID_PASSWORD
+
+App Store Connect
+APP_STORE_CONNECT_KEY_IDENTIFIER, APP_STORE_CONNECT_API_KEY, APP_STORE_CONNECT_API_KEY_PATH, APP_STORE_CONNECT_ISSUER_ID
+
+Firebase Configuration
+FIREBASE_CONFIG_ANDROID, FIREBASE_CONFIG_IOS
+
+Email Notifications
+ENABLE_EMAIL_NOTIFICATIONS, EMAIL_SMTP_SERVER, EMAIL_SMTP_PORT, EMAIL_SMTP_USER, EMAIL_SMTP_PASS
+
+Android Keystore (for combined workflows)
+KEY_STORE_URL, CM_KEYSTORE_PASSWORD, CM_KEY_ALIAS, CM_KEY_PASSWORD
+
+🧠 3. Dynamic Bundle ID Injection
+Script: lib/scripts/ios/dynamic_bundle_id_injector.sh
+
+Functionality:
+
+Reads BUNDLE_ID from environment
+
+Validates format
+
+Injects into:
+
+Main App: $BUNDLE_ID
+
+Tests: $BUNDLE_ID.tests
+
+Extensions: $BUNDLE_ID.extension
+
+Widgets: $BUNDLE_ID.widget
+
+🚀 4. Benefits of This Dynamic Setup
+Advantage	Description
+🔁 Template-Ready	Supports any app with any config
+🔒 Secure	Secrets stored safely in Codemagic
+🧩 Flexible	Easily switch app configs
+🧼 Maintainable	Single source of truth (via env vars)
+✅ CI/CD Safe	No sensitive info in codebase
+
+🎯 5. Compliance Rule
+All workflows must use only environment variables
+
+No hardcoded values are allowed in scripts or source code
+
+Validate dynamic injections for correctness at runtime
