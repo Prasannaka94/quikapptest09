@@ -162,10 +162,6 @@ post_install do |installer|
 # CFBundleIdentifier Collision Prevention
 # Added by proper fix script to prevent App Store validation errors
 post_install do |installer|
-
-# CFBundleIdentifier Collision Prevention
-# Added by simple fix script to prevent App Store validation errors
-post_install do |installer|
   puts "Applying CFBundleIdentifier collision prevention..."
   
   main_bundle_id = ENV['BUNDLE_ID'] || 'com.twinklub.twinklub'
