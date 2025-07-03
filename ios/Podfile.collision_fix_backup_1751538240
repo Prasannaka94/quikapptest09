@@ -150,28 +150,3 @@ post_install do |installer|
   puts "💥 NO MORE COLLISIONS POSSIBLE - GUARANTEED SUCCESS!"
   puts "================================================================="
 end
-
-# 🛡️ CFBundleIdentifier Collision Prevention
-# Added by manual fix script to prevent App Store validation errors
-post_install do |installer|
-  puts "🛡️ Applying CFBundleIdentifier collision prevention..."
-  
-  main_bundle_id = ENV['BUNDLE_ID'] || 'com.twinklub.twinklub'
-  timestamp = Time.now.to_i
-  
-  installer.pods_project.targets.each do |target|
-    target.build_configurations.each do |config|
-      # Skip the main Runner target
-      next if target.name == 'Runner'
-      
-      # Generate unique bundle ID for each framework/pod
-      unique_bundle_id = "#{main_bundle_id}.framework.#{target.name.downcase.gsub(/[^a-z0-9]/, '')}.#{timestamp}"
-      
-      config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = unique_bundle_id
-      
-      puts "   📦 #{target.name}: #{unique_bundle_id}"
-    end
-  end
-  
-  puts "✅ All frameworks now have unique bundle identifiers"
-end
