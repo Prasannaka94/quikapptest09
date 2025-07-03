@@ -188,7 +188,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 // Firebase background message handler
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print('Handling a background message: ${message.messageId}');
+  print('Handling a background message: \${message.messageId}');
 }
 
 void main() async {
@@ -237,15 +237,15 @@ class _MyAppState extends State<MyApp> {
       
       // Get FCM token
       _fcmToken = await _messaging!.getToken();
-      print('FCM Token: $_fcmToken');
+      print('FCM Token: \$_fcmToken');
       
       // Listen to foreground messages
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         print('Got a message whilst in the foreground!');
-        print('Message data: ${message.data}');
+        print('Message data: \${message.data}');
         
         if (message.notification != null) {
-          print('Message also contained a notification: ${message.notification}');
+          print('Message also contained a notification: \${message.notification}');
           _showNotificationDialog(message.notification!);
         }
       });
@@ -253,7 +253,7 @@ class _MyAppState extends State<MyApp> {
       // Handle notification taps
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
         print('A new onMessageOpenedApp event was published!');
-        print('Message data: ${message.data}');
+        print('Message data: \${message.data}');
       });
     } else {
       print('User declined or has not accepted permission');
@@ -475,7 +475,7 @@ inject_firebase_config_files() {
             
             # Create placeholder Firebase config
             log_info "📝 Creating placeholder iOS Firebase config..."
-            cat > ios/Runner/GoogleService-Info.plist << 'PLIST_EOF'
+            cat > ios/Runner/GoogleService-Info.plist << PLIST_EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -516,7 +516,7 @@ PLIST_EOF
     else
         log_warn "⚠️ FIREBASE_CONFIG_IOS not provided, creating placeholder config..."
         mkdir -p ios/Runner
-        cat > ios/Runner/GoogleService-Info.plist << 'PLIST_EOF'
+        cat > ios/Runner/GoogleService-Info.plist << PLIST_EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
