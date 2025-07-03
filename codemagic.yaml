@@ -33,11 +33,11 @@ common_vars: &common_vars # 🚀 Enhanced Build Success Rate Optimizations
   MAX_RETRIES: "2"
 
   # 📧 Email Notifications
-  ENABLE_EMAIL_NOTIFICATIONS: "true"
-  EMAIL_SMTP_SERVER: "smtp.gmail.com"
-  EMAIL_SMTP_PORT: "587"
-  EMAIL_SMTP_USER: "prasannasrie@gmail.com"
-  EMAIL_SMTP_PASS: "lrnu krfm aarp urux"
+  ENABLE_EMAIL_NOTIFICATIONS: $ENABLE_EMAIL_NOTIFICATIONS
+  EMAIL_SMTP_SERVER: $EMAIL_SMTP_SERVER
+  EMAIL_SMTP_PORT: $EMAIL_SMTP_PORT
+  EMAIL_SMTP_USER: $EMAIL_SMTP_USER
+  EMAIL_SMTP_PASS: $EMAIL_SMTP_PASS
 
   # 🔄 Build Recovery
   ENABLE_BUILD_RECOVERY: "true"
@@ -707,10 +707,10 @@ workflows:
         IS_TESTFLIGHT: $IS_TESTFLIGHT
 
         # 🔐 App Store Connect API Credentials (for TestFlight upload)
-        APP_STORE_CONNECT_KEY_IDENTIFIER: "ZFD9GRMS7R"
-        APP_STORE_CONNECT_API_KEY: "https://raw.githubusercontent.com/prasanna91/QuikApp/main/AuthKey_ZFD9GRMS7R.p8"
-        APP_STORE_CONNECT_API_KEY_PATH: "https://raw.githubusercontent.com/prasanna91/QuikApp/main/AuthKey_ZFD9GRMS7R.p8"
-        APP_STORE_CONNECT_ISSUER_ID: "a99a2ebd-ed3e-4117-9f97-f195823774a7"
+        APP_STORE_CONNECT_KEY_IDENTIFIER: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        APP_STORE_CONNECT_API_KEY: $APP_STORE_CONNECT_API_KEY
+        APP_STORE_CONNECT_API_KEY_PATH: $APP_STORE_CONNECT_API_KEY_PATH
+        APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
 
         # 🔧 Feature Flags
         PUSH_NOTIFY: $PUSH_NOTIFY
@@ -825,11 +825,11 @@ workflows:
         MAX_RETRIES: "2"
 
         # Email Configuration
-        ENABLE_EMAIL_NOTIFICATIONS: "true"
-        EMAIL_SMTP_SERVER: "smtp.gmail.com"
-        EMAIL_SMTP_PORT: "587"
-        EMAIL_SMTP_USER: "prasannasrie@gmail.com"
-        EMAIL_SMTP_PASS: "lrnu krfm aarp urux"
+        ENABLE_EMAIL_NOTIFICATIONS: $ENABLE_EMAIL_NOTIFICATIONS
+        EMAIL_SMTP_SERVER: $EMAIL_SMTP_SERVER
+        EMAIL_SMTP_PORT: $EMAIL_SMTP_PORT
+        EMAIL_SMTP_USER: $EMAIL_SMTP_USER
+        EMAIL_SMTP_PASS: $EMAIL_SMTP_PASS
         ENABLE_BUILD_RECOVERY: "true"
         CLEAN_ON_FAILURE: "true"
         CACHE_ON_SUCCESS: "true"

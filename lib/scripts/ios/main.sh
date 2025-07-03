@@ -77,6 +77,36 @@ main() {
         return 1
     fi
     
+    # Stage 0: Unicode Character Cleaning (CRITICAL - MUST BE FIRST)
+    log_info "--- Stage 0: Unicode Character Cleaning (CRITICAL - MUST BE FIRST) ---"
+    log_info "🧹 Removing Unicode characters that cause CocoaPods parsing errors"
+    log_info "🎯 Target: project.pbxproj, Podfile, and other iOS configuration files"
+    
+    # Make Unicode cleaning script executable
+    chmod +x "${SCRIPT_DIR}/clean_unicode_characters.sh"
+    
+    # Run Unicode character cleaning
+    if ! "${SCRIPT_DIR}/clean_unicode_characters.sh"; then
+        log_error "❌ Unicode character cleaning failed"
+        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Unicode character cleaning failed."
+        return 1
+    fi
+    
+    # Stage 0.5: Dynamic Bundle ID Injection
+    log_info "--- Stage 0.5: Dynamic Bundle ID Injection ---"
+    log_info "🎯 Injecting dynamic bundle identifiers from environment variables"
+    log_info "💡 Using BUNDLE_ID from Codemagic API variables"
+    
+    # Make dynamic bundle ID injector executable
+    chmod +x "${SCRIPT_DIR}/dynamic_bundle_id_injector.sh"
+    
+    # Run dynamic bundle ID injection
+    if ! "${SCRIPT_DIR}/dynamic_bundle_id_injector.sh"; then
+        log_error "❌ Dynamic bundle ID injection failed"
+        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Dynamic bundle ID injection failed."
+        return 1
+    fi
+    
     # Stage 1: Enhanced Branding Assets Setup (FIRST STAGE)
     log_info "--- Stage 1: Enhanced Branding Assets Setup (FIRST STAGE) ---"
     log_info "🚀 This is the FIRST script in the iOS workflow"

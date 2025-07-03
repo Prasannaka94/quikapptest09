@@ -1,6 +1,6 @@
 # 💥 AGGRESSIVE CFBundleIdentifier Collision Prevention
-# 🚀 Strategy: Change ALL external package bundle IDs for absolute uniqueness
-# 🎯 Target: ERROR ID d969fe7f-7598-47a6-ab32-b16d4f3473f2 + ALL FUTURE ERRORS
+#  Strategy: Change ALL external package bundle IDs for absolute uniqueness
+#  Target: ERROR ID d969fe7f-7598-47a6-ab32-b16d4f3473f2 + ALL FUTURE ERRORS
 
 platform :ios, '13.0'
 use_frameworks! :linkage => :static
@@ -46,15 +46,15 @@ post_install do |installer|
   puts ""
   puts "💥 AGGRESSIVE CFBundleIdentifier COLLISION PREVENTION"
   puts "================================================================="
-  puts "🚀 AGGRESSIVE STRATEGY: Change ALL external package bundle IDs"
-  puts "🎯 Target Error ID: d969fe7f-7598-47a6-ab32-b16d4f3473f2"
+  puts " AGGRESSIVE STRATEGY: Change ALL external package bundle IDs"
+  puts " Target Error ID: d969fe7f-7598-47a6-ab32-b16d4f3473f2"
   puts "💥 NO MORE COLLISIONS - GUARANTEED SUCCESS"
   puts ""
   
   main_bundle_id = ENV['BUNDLE_ID'] || "com.insurancegroupmo.insurancegroupmo"
   test_bundle_id = "#{main_bundle_id}.tests"
   
-  puts "📱 Main Bundle ID: #{main_bundle_id}"
+  puts " Main Bundle ID: #{main_bundle_id}"
   puts "🧪 Test Bundle ID: #{test_bundle_id}"
   puts ""
   
@@ -72,7 +72,7 @@ post_install do |installer|
   used_bundle_ids.add(main_bundle_id)
   used_bundle_ids.add(test_bundle_id)
   
-  puts "🔧 AGGRESSIVE collision prevention configuration:"
+  puts " AGGRESSIVE collision prevention configuration:"
   puts "   📅 Timestamp: #{timestamp_suffix}"
   puts "   ⏱️ Microseconds: #{microsecond_suffix}"
   puts "   🆔 Error ID: #{error_id_suffix}"
@@ -142,11 +142,11 @@ post_install do |installer|
   puts ""
   puts "🎉 AGGRESSIVE COLLISION PREVENTION COMPLETE!"
   puts "   💥 External packages changed: #{external_changes}"
-  puts "   📦 Total bundle assignments: #{bundle_changes}"
+  puts "    Total bundle assignments: #{bundle_changes}"
   puts "   🆔 Total unique bundle IDs: #{used_bundle_ids.size}"
   puts ""
-  puts "✅ ERROR ID d969fe7f-7598-47a6-ab32-b16d4f3473f2 ELIMINATED!"
-  puts "🚀 ALL EXTERNAL PACKAGES NOW HAVE UNIQUE BUNDLE IDS"
+  puts " ERROR ID d969fe7f-7598-47a6-ab32-b16d4f3473f2 ELIMINATED!"
+  puts " ALL EXTERNAL PACKAGES NOW HAVE UNIQUE BUNDLE IDS"
   puts "💥 NO MORE COLLISIONS POSSIBLE - GUARANTEED SUCCESS!"
   puts "================================================================="
 end
