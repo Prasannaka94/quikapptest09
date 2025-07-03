@@ -77,8 +77,20 @@ main() {
         return 1
     fi
     
-    # Stage 1: Pre-build Setup
-    log_info "--- Stage 1: Pre-build Setup ---"
+    # Stage 1: Environment Variable Validation
+    log_info "--- Stage 1: Environment Variable Validation ---"
+    
+    # Make environment validator script executable
+    chmod +x "${SCRIPT_DIR}/environment_validator.sh"
+    
+    # Run comprehensive environment variable validation
+    if ! "${SCRIPT_DIR}/environment_validator.sh"; then
+        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Environment variable validation failed."
+        return 1
+    fi
+    
+    # Stage 1.5: Pre-build Setup
+    log_info "--- Stage 1.5: Pre-build Setup ---"
     if ! "${SCRIPT_DIR}/setup_environment.sh"; then
         send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Pre-build setup failed."
         return 1
