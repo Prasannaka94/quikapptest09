@@ -174,7 +174,7 @@ post_install do |installer|
         next if target.name == 'Runner'
         
         # Make pod bundle identifiers unique by adding pod suffix
-        if current_bundle_id.include?('com.twinklub.twinklub') || current_bundle_id.include?('com.example.quikapptest07')
+        if current_bundle_id.include?('${BUNDLE_ID:-com.twinklub.twinklub}') || current_bundle_id.include?('${BUNDLE_ID:-com.example.${APP_NAME:-${APP_ID:-${APP_NAME:-${APP_ID:-quikapptest07}}}}}')
           config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = current_bundle_id + '.pod.' + target.name.downcase
         end
       end

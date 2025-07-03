@@ -2,7 +2,7 @@
 
 # Pre-Build Collision Elimination for Error ID: 2375d0ef-7f95-4a0d-b424-9782f5092cd1
 # Purpose: Prevent CFBundleIdentifier collisions before build starts
-# Error: CFBundleIdentifier Collision. There is more than one bundle with the CFBundleIdentifier value 'com.insurancegroupmo.insurancegroupmo' under the iOS application 'Runner.app'.
+# Error: CFBundleIdentifier Collision. There is more than one bundle with the CFBundleIdentifier value '${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}' under the iOS application 'Runner.app'.
 
 set -euo pipefail
 
@@ -12,7 +12,7 @@ source "${SCRIPT_DIR}/utils.sh"
 
 log_info "🎯 2375D0EF Pre-Build Collision Elimination Starting..."
 log_info "🎯 Target Error ID: 2375d0ef-7f95-4a0d-b424-9782f5092cd1"
-log_info "⚠️  Issue: Multiple bundles with same CFBundleIdentifier 'com.insurancegroupmo.insurancegroupmo'"
+log_info "⚠️  Issue: Multiple bundles with same CFBundleIdentifier '${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}'"
 log_info "🔧 Strategy: Bundle-ID-Rules compliant unique bundle assignment"
 
 # Function to analyze current bundle identifiers

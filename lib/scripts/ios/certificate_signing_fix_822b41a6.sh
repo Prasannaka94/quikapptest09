@@ -2,7 +2,7 @@
 
 # Certificate Signing Fix for Error ID: 822b41a6-8771-40c5-b6f5-df38db7abf2c
 # Purpose: Fix "Missing or invalid signature" error for Apple submission certificates
-# Error: Missing or invalid signature. The bundle 'com.insurancegroupmo.insurancegroupmo' at bundle path 'Payload/Runner.app' is not signed using an Apple submission certificate.
+# Error: Missing or invalid signature. The bundle '${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}' at bundle path 'Payload/Runner.app' is not signed using an Apple submission certificate.
 
 set -euo pipefail
 

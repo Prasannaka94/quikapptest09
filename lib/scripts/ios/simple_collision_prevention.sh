@@ -132,7 +132,7 @@ main() {
     
     local main_bundle_id="${1:-${BUNDLE_ID:-com.example.app}}"
     
-    if [ "$main_bundle_id" = "com.example.app" ]; then
+    if [ "$main_bundle_id" = "${BUNDLE_ID:-com.example.app}" ]; then
         log_warn "Using default bundle ID - set BUNDLE_ID environment variable"
     fi
     

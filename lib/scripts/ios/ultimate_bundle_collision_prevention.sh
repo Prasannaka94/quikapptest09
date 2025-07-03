@@ -1,7 +1,7 @@
 #!/bin/bash
 # ULTIMATE Bundle Identifier Collision Prevention System
 # Addresses ALL possible collision sources for App Store Connect upload
-# Error IDs: 73b7b133, 66775b51, 16fe2c8f, b4b31bab, and ALL future variations
+# Error IDs: 73b7b133, 66775b${VERSION_CODE:-51}, 16fe2c8f, b4b31bab, and ALL future variations
 
 set -euo pipefail
 
@@ -19,7 +19,7 @@ ultimate_collision_prevention() {
     
     log_info "🚀 ULTIMATE BUNDLE IDENTIFIER COLLISION PREVENTION"
     log_info "🎯 Target Bundle ID: $main_bundle_id"
-    log_info "🎯 Addressing Error IDs: 73b7b133, 66775b51, 16fe2c8f, b4b31bab + ALL variations"
+    log_info "🎯 Addressing Error IDs: 73b7b133, 66775b${VERSION_CODE:-51}, 16fe2c8f, b4b31bab + ALL variations"
     
     local total_fixes=0
     
@@ -64,7 +64,7 @@ ultimate_collision_prevention() {
     
     log_success "🎉 ULTIMATE COLLISION PREVENTION COMPLETED"
     log_info "📊 Total fixes applied: $total_fixes"
-    log_info "🎯 All known error IDs addressed: 73b7b133, 66775b51, 16fe2c8f, b4b31bab"
+    log_info "🎯 All known error IDs addressed: 73b7b133, 66775b${VERSION_CODE:-51}, 16fe2c8f, b4b31bab"
     
     return 0
 }
@@ -390,11 +390,11 @@ EXPORT_EOF
 # Main execution
 main() {
     log_info "🚀 ULTIMATE BUNDLE IDENTIFIER COLLISION PREVENTION"
-    log_info "🎯 Targeting ALL error IDs: 73b7b133, 66775b51, 16fe2c8f, b4b31bab + future"
+    log_info "🎯 Targeting ALL error IDs: 73b7b133, 66775b${VERSION_CODE:-51}, 16fe2c8f, b4b31bab + future"
     
     local main_bundle_id="${1:-${BUNDLE_ID:-com.example.app}}"
     
-    if [ "$main_bundle_id" = "com.example.app" ]; then
+    if [ "$main_bundle_id" = "${BUNDLE_ID:-com.example.app}" ]; then
         log_warn "Using default bundle ID - set BUNDLE_ID environment variable for production"
     fi
     

@@ -2,7 +2,7 @@
 
 # Pre-Build Collision Eliminator for Error ID: 33b35808
 # Target Error: 33b35808-d2f2-4ae6-a2c8-9f04f05b93d4
-# Issue: CFBundleIdentifier Collision - Multiple bundles with 'com.insurancegroupmo.insurancegroupmo'
+# Issue: CFBundleIdentifier Collision - Multiple bundles with '${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}'
 # Strategy: iOS App Store compliance-focused collision prevention
 
 set -euo pipefail

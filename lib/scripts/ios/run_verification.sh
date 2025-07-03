@@ -21,7 +21,7 @@ OUTPUT_DIR="$PROJECT_ROOT/output/verification"
 
 # Set environment variables for verification
 export BUNDLE_ID="${BUNDLE_ID:-com.twinklub.twinklub}"
-export APP_NAME="${APP_NAME:-Twinklub App}"
+export APP_NAME="${APP_NAME:-${APP_NAME:-${ORG_NAME:-Twinklub} App}}"
 export VERSION_NAME="${VERSION_NAME:-1.0.6}"
 export VERSION_CODE="${VERSION_CODE:-50}"
 export PUSH_NOTIFY="$FIREBASE_ENABLED"

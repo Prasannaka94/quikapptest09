@@ -26,7 +26,7 @@ cp "$IOS_PROJECT_FILE" "$IOS_PROJECT_FILE.backup.$(date +%Y%m%d_%H%M%S)"
 echo "✅ Backup created"
 
 # Get the main bundle identifier
-MAIN_BUNDLE_ID="${BUNDLE_ID:-com.example.quikapptest07}"
+MAIN_BUNDLE_ID="${BUNDLE_ID:-${BUNDLE_ID:-com.example.${APP_NAME:-${APP_ID:-${APP_NAME:-${APP_ID:-quikapptest07}}}}}}"
 echo "🎯 Main Bundle ID: $MAIN_BUNDLE_ID"
 
 # Fix 1: Ensure unique bundle identifiers for all targets
@@ -156,7 +156,7 @@ post_install do |installer|
        # Make pod bundle identifiers unique
        if config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
          current_bundle_id = config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
-         if current_bundle_id == "com.twinklub.twinklub" || current_bundle_id == "com.example.quikapptest07"
+         if current_bundle_id == "${BUNDLE_ID:-com.twinklub.twinklub}" || current_bundle_id == "${BUNDLE_ID:-com.example.${APP_NAME:-${APP_ID:-${APP_NAME:-${APP_ID:-quikapptest07}}}}}"
            config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"] = current_bundle_id + ".pod"
          end
        end

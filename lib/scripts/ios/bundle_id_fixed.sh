@@ -304,7 +304,7 @@ PREVENTION COVERAGE:
 🛡️ Error ID bcff0b91-fe16-466d-b77a-bbe543940260 PREVENTED
 🛡️ Error ID f8db6738-f319-4958-8058-d68dba787835 PREVENTED
 🛡️ Error ID f8b4b738-f319-4958-8d58-d68dba787a35 PREVENTED
-🛡️ Error ID 64c3ce97-3156-4769-9606-565180b4678a PREVENTED
+🛡️ Error ID 64c3ce97-3156-4769-9606-56${VERSION_CODE:-51}80b4678a PREVENTED
 🛡️ Error ID dccb3cf9-f6c7-4463-b6a9-b47b6355e88a PREVENTED
 🛡️ Error ID 33b35808-d2f2-4ae6-a2c8-9f04f05b93d4 PREVENTED
 🛡️ ANY FUTURE CFBundleIdentifier collision errors PREVENTED
@@ -322,7 +322,7 @@ main() {
     
     if [ -z "$bundle_id" ]; then
         log_error "❌ Usage: $0 <bundle_id> [app_name]"
-        log_info "💡 Example: $0 com.insurancegroupmo.insurancegroupmo \"Insurance Group MO\""
+        log_info "💡 Example: $0 ${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo} \"${APP_NAME:-${ORG_NAME:-${APP_NAME:-${ORG_NAME:-Insurance Group MO}}}}\""
         return 1
     fi
     

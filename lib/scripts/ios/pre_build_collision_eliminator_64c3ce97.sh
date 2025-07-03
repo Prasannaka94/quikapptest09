@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Pre-Build Collision Eliminator for Error ID: 64c3ce97-3156-4769-9606-565180b4678a
+# Pre-Build Collision Eliminator for Error ID: 64c3ce97-3156-4769-9606-56${VERSION_CODE:-51}80b4678a
 # Enhanced with Advanced Flow Ordering and Bundle-ID-Rules Compliance
 
 set -e
@@ -24,7 +24,7 @@ log_error() {
 
 # Configuration
 MAIN_BUNDLE_ID="${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}"
-ERROR_ID="64c3ce97-3156-4769-9606-565180b4678a"
+ERROR_ID="64c3ce97-3156-4769-9606-56${VERSION_CODE:-51}80b4678a"
 PROJECT_FILE="ios/Runner.xcodeproj/project.pbxproj"
 
 log_info "=== 64C3CE97 Specific Pre-Build Collision Elimination ==="
@@ -191,7 +191,7 @@ rm -f "$TEMP_FILE"
 log_info "--- Stage 3: 64c3ce97 Flow Ordering Validation ---"
 
 # Verify that API integration has run before this stage
-if [ -n "${MAIN_BUNDLE_ID:-}" ] && [ "$MAIN_BUNDLE_ID" != "com.insurancegroupmo.insurancegroupmo" ]; then
+if [ -n "${MAIN_BUNDLE_ID:-}" ] && [ "$MAIN_BUNDLE_ID" != "${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}" ]; then
     log_success "✅ Flow Ordering: API bundle ID detected - API integration ran first"
     log_info "   API Bundle ID: $MAIN_BUNDLE_ID"
     log_info "   🔄 Now applying collision prevention to API-configured bundle IDs"
@@ -266,7 +266,7 @@ fi
 
 # Generate 64c3ce97 specific summary
 log_info "--- 64c3ce97 Summary ---"
-log_success "✅ Error ID 64c3ce97-3156-4769-9606-565180b4678a Prevention Applied"
+log_success "✅ Error ID 64c3ce97-3156-4769-9606-56${VERSION_CODE:-51}80b4678a Prevention Applied"
 log_info "🎯 Bundle-ID-Rules compliant naming applied"
 log_info "⚡ Enhanced flow ordering compatibility confirmed"
 log_info "🛡️ Framework embedding conflicts prevented"

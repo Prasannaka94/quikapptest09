@@ -160,8 +160,8 @@ with open('$IOS_PROJECT_FILE', 'r') as f:
     content = f.read()
 
 # Replace any remaining com.example bundle IDs with com.twinklub
-content = re.sub(r'com\.example\.quikapptest07', 'com.twinklub.twinklub', content)
-content = re.sub(r'com\.example\.[a-zA-Z0-9_]+', 'com.twinklub.twinklub', content)
+content = re.sub(r'com\.example\.${APP_NAME:-${APP_ID:-${APP_NAME:-${APP_ID:-quikapptest07}}}}', '${BUNDLE_ID:-com.twinklub.twinklub}', content)
+content = re.sub(r'com\.example\.[a-zA-Z0-9_]+', '${BUNDLE_ID:-com.twinklub.twinklub}', content)
 
 # Write back to file
 with open('$IOS_PROJECT_FILE', 'w') as f:
@@ -329,7 +329,7 @@ post_install do |installer|
       
       if config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
         current_bundle_id = config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
-        if current_bundle_id.include?("com.twinklub.twinklub") || current_bundle_id.include?("com.example.quikapptest07")
+        if current_bundle_id.include?("${BUNDLE_ID:-com.twinklub.twinklub}") || current_bundle_id.include?("${BUNDLE_ID:-com.example.${APP_NAME:-${APP_ID:-${APP_NAME:-${APP_ID:-quikapptest07}}}}}")
           config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"] = current_bundle_id + ".pod." + target.name.downcase
         end
       end

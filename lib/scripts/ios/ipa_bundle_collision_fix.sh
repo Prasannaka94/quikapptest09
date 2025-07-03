@@ -1,5 +1,5 @@
 #!/bin/bash
-# IPA Bundle Collision Fix - Error ID: 16fe2c8f-330a-451b-90c5-7c218848c196
+# IPA Bundle Collision Fix - Error ID: 16fe2c8f-330a-4${VERSION_CODE:-51}b-90c5-7c218848c196
 # Fixes CFBundleIdentifier collisions that occur INSIDE the app bundle during IPA export
 
 set -euo pipefail

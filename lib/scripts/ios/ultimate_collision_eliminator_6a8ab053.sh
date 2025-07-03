@@ -155,7 +155,7 @@ post_install do |installer|
   puts "💥 Conservative approach - only fix actual collisions"
   puts ""
   
-  main_bundle_id = ENV['BUNDLE_ID'] || "com.insurancegroupmo.insurancegroupmo"
+  main_bundle_id = ENV['BUNDLE_ID'] || "${BUNDLE_ID:-com.insurancegroupmo.insurancegroupmo}"
   test_bundle_id = "#{main_bundle_id}.tests"
   
   puts "🎯 Main Bundle ID: #{main_bundle_id}"
