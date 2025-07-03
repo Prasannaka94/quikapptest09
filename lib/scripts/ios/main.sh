@@ -339,15 +339,15 @@ main() {
         return 1
     fi
     
-    # Stage 6: Conditional Firebase Injection
-    log_info "--- Stage 6: Conditional Firebase Injection ---"
+    # Stage 6: Enhanced Push Notification Handler
+    log_info "--- Stage 6: Enhanced Push Notification Handler ---"
     
-    # Make conditional Firebase injection script executable
-    chmod +x "${SCRIPT_DIR}/conditional_firebase_injection.sh"
+    # Make enhanced push notification handler script executable
+    chmod +x "${SCRIPT_DIR}/enhanced_push_notification_handler.sh"
     
-    # Run conditional Firebase injection based on PUSH_NOTIFY flag
-    if ! "${SCRIPT_DIR}/conditional_firebase_injection.sh"; then
-        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Conditional Firebase injection failed."
+    # Run enhanced push notification handler based on PUSH_NOTIFY flag
+    if ! "${SCRIPT_DIR}/enhanced_push_notification_handler.sh"; then
+        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Enhanced push notification handler failed."
         return 1
     fi
     
@@ -361,107 +361,31 @@ main() {
         log_info "🔐 App Store Connect API: Ready for upload"
     fi
     
-    # Stage 6.7: Firebase Setup (Only if PUSH_NOTIFY=true)
-if [ "${PUSH_NOTIFY:-false}" = "true" ]; then
-        log_info "--- Stage 6.7: Setting up Firebase (Push notifications enabled) ---"
-        if ! "${SCRIPT_DIR}/firebase_setup.sh"; then
-            send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Firebase setup failed."
-            return 1
-        fi
-        
-        # Stage 6.8: Critical Firebase Xcode 16.0 Compatibility Fixes
-        log_info "--- Stage 6.8: Applying Firebase Xcode 16.0 Compatibility Fixes ---"
-        log_info "🔥 Applying ULTRA AGGRESSIVE Firebase Xcode 16.0 fixes..."
-        log_info "🎯 Targeting FIRHeartbeatLogger.m compilation issues"
-        
-        firebase_fixes_applied=false
-        
-        # Primary Firebase Fix: Xcode 16.0 compatibility
-        if [ -f "${SCRIPT_DIR}/fix_firebase_xcode16.sh" ]; then
-            chmod +x "${SCRIPT_DIR}/fix_firebase_xcode16.sh"
-            log_info "🎯 Applying Firebase Xcode 16.0 Compatibility Fix (Primary)..."
-            if "${SCRIPT_DIR}/fix_firebase_xcode16.sh"; then
-                log_success "✅ Firebase Xcode 16.0 fixes applied successfully"
-                log_info "🎯 FIRHeartbeatLogger.m compilation issues should be resolved"
-                log_info "📋 Ultra-aggressive warning suppression activated"
-                log_info "🔧 Xcode 16.0 compatibility mode enabled"
-                firebase_fixes_applied=true
-            else
-                log_warn "⚠️ Firebase Xcode 16.0 fixes failed, trying source file patches..."
+    # Stage 6.7: Enhanced Push Notification Handler Summary
+    log_info "--- Stage 6.7: Enhanced Push Notification Handler Summary ---"
+    log_info "✅ Enhanced push notification handler completed successfully"
+    log_info "📊 PUSH_NOTIFY=$PUSH_NOTIFY - Firebase and push notifications properly configured"
+    
+    # Apply bundle identifier collision fixes after push notification setup
+    log_info "🔧 Applying Bundle Identifier Collision fixes after push notification setup..."
+    if [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh" ]; then
+        chmod +x "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh"
+        if ! "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh"; then
+            log_warn "⚠️ Bundle Identifier Collision fixes (v2) failed after push notification setup"
+            # Try v1 as fallback
+            if [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh" ]; then
+                chmod +x "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh"
+                "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh" || log_warn "Bundle Identifier Collision fixes failed"
             fi
         else
-            log_warn "⚠️ Firebase Xcode 16.0 fix script not found, trying source file patches..."
+            log_success "✅ Bundle Identifier Collision fixes applied after push notification setup"
         fi
-        
-        # Fallback: Source file patches
-        if [ "$firebase_fixes_applied" = "false" ] && [ -f "${SCRIPT_DIR}/fix_firebase_source_files.sh" ]; then
-            chmod +x "${SCRIPT_DIR}/fix_firebase_source_files.sh"
-            log_info "🎯 Applying Firebase Source File Patches (Fallback)..."
-            if "${SCRIPT_DIR}/fix_firebase_source_files.sh"; then
-                log_success "✅ Firebase source file patches applied successfully"
-                firebase_fixes_applied=true
-            else
-                log_warn "⚠️ Firebase source file patches failed, trying final solution..."
-            fi
-        fi
-        
-        # Ultimate Fix: Final Firebase solution
-        if [ "$firebase_fixes_applied" = "false" ] && [ -f "${SCRIPT_DIR}/final_firebase_solution.sh" ]; then
-            chmod +x "${SCRIPT_DIR}/final_firebase_solution.sh"
-            log_info "🎯 Applying Final Firebase Solution (Ultimate Fix)..."
-            if "${SCRIPT_DIR}/final_firebase_solution.sh"; then
-                log_success "✅ Final Firebase solution applied successfully"
-                firebase_fixes_applied=true
-            else
-                log_warn "⚠️ Final Firebase solution failed - continuing with standard build"
-            fi
-        fi
-        
-        # Report Firebase fix status
-        if [ "$firebase_fixes_applied" = "true" ]; then
-            log_success "🔥 FIREBASE FIXES: Successfully applied Firebase compilation fixes"
-            log_info "✅ FIRHeartbeatLogger.m compilation guaranteed"
-        else
-            log_warn "⚠️ FIREBASE FIXES: All Firebase fixes failed - build may have compilation issues"
-            log_warn "🔥 FIRHeartbeatLogger.m may fail to compile"
-            log_warn "📋 Build will continue - standard compilation attempted"
-            # This is NOT a hard failure - let the build try standard compilation
-        fi
-        
-
-        
-        # Apply bundle identifier collision fixes after Firebase setup and Xcode fixes
-        log_info "🔧 Applying Bundle Identifier Collision fixes after Firebase setup..."
-        if [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh" ]; then
-            chmod +x "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh"
-            if ! "${SCRIPT_DIR}/fix_bundle_identifier_collision_v2.sh"; then
-                log_warn "⚠️ Bundle Identifier Collision fixes (v2) failed after Firebase setup"
-                # Try v1 as fallback
-                if [ -f "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh" ]; then
-                    chmod +x "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh"
-                    "${SCRIPT_DIR}/fix_bundle_identifier_collision.sh" || log_warn "Bundle Identifier Collision fixes failed"
-                fi
-            else
-                log_success "✅ Bundle Identifier Collision fixes applied after Firebase setup"
-            fi
-        fi
-    else
-        log_info "--- Stage 6.7: Firebase Setup Skipped (Push notifications disabled) ---"
-        log_info "--- Stage 6.8: Firebase Xcode 16.0 Fixes Skipped (Firebase disabled) ---"
     fi
     
-    # Stage 6.9: Final Firebase Setup (complete integration)
-    log_info "--- Stage 6.9: Final Firebase Setup ---"
-    if [ -f "${SCRIPT_DIR}/final_firebase_solution.sh" ]; then
-        chmod +x "${SCRIPT_DIR}/final_firebase_solution.sh"
-        if source "${SCRIPT_DIR}/final_firebase_solution.sh"; then
-            log_success "✅ Stage 6.9 completed: Final Firebase integration applied"
-        else
-            log_warn "⚠️ Stage 6.9 partial: Firebase integration had issues, but continuing"
-        fi
-    else
-        log_warn "⚠️ Stage 6.9 skipped: Final Firebase solution script not found"
-    fi
+    # Stage 6.9: Push Notification Configuration Complete
+    log_info "--- Stage 6.9: Push Notification Configuration Complete ---"
+    log_info "✅ All push notification and Firebase configuration completed"
+    log_info "📋 PUSH_NOTIFY=$PUSH_NOTIFY - Configuration applied successfully"
 
     # Stage 6.90: CODEMAGIC API INTEGRATION (MOVED HERE - BEFORE COLLISION PREVENTION)
     log_info "--- Stage 6.90: Codemagic API Integration ---"

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Conditional Firebase Injection Script
-# Purpose: Enable or disable Firebase based on PUSH_NOTIFY flag with proper file injection
+# Enhanced Conditional Firebase Injection Script
+# Purpose: Enable or disable Firebase and push notifications based on PUSH_NOTIFY flag
 
 set -euo pipefail
 
@@ -9,7 +9,7 @@ set -euo pipefail
 SCRIPT_DIR="$(dirname "$0")"
 source "${SCRIPT_DIR}/utils.sh"
 
-log_info "🔥 Starting Conditional Firebase Injection System..."
+log_info "🔥 Starting Enhanced Conditional Firebase Injection System..."
 
 # Function to validate PUSH_NOTIFY flag
 validate_push_notify_flag() {
@@ -20,21 +20,27 @@ validate_push_notify_flag() {
         "true"|"TRUE"|"True"|"1"|"yes"|"YES"|"Yes")
             export PUSH_NOTIFY="true"
             export FIREBASE_ENABLED="true"
-            log_info "🔔 Push notifications ENABLED - Firebase will be configured"
+            export PUSH_NOTIFICATIONS_ENABLED="true"
+            log_info "🔔 Push notifications ENABLED - Firebase will be fully configured"
             ;;
         "false"|"FALSE"|"False"|"0"|"no"|"NO"|"No"|"")
             export PUSH_NOTIFY="false"
             export FIREBASE_ENABLED="false"
-            log_info "🔕 Push notifications DISABLED - Firebase will be excluded"
+            export PUSH_NOTIFICATIONS_ENABLED="false"
+            log_info "🔕 Push notifications DISABLED - Firebase will be completely excluded"
             ;;
         *)
             log_warn "⚠️ Invalid PUSH_NOTIFY value: ${PUSH_NOTIFY}. Defaulting to false"
             export PUSH_NOTIFY="false"
             export FIREBASE_ENABLED="false"
+            export PUSH_NOTIFICATIONS_ENABLED="false"
             ;;
     esac
     
     log_success "✅ PUSH_NOTIFY flag validated: $PUSH_NOTIFY"
+    log_info "📊 Configuration Summary:"
+    log_info "   - Firebase Enabled: $FIREBASE_ENABLED"
+    log_info "   - Push Notifications: $PUSH_NOTIFICATIONS_ENABLED"
     return 0
 }
 
@@ -70,7 +76,7 @@ dependencies:
   connectivity_plus: ^5.0.1
   permission_handler: ^11.0.1
   
-  # Firebase dependencies (ENABLED)
+  # Firebase dependencies (ENABLED for push notifications)
   firebase_core: ^2.24.2
   firebase_messaging: ^14.7.9
   firebase_analytics: ^10.7.4
@@ -132,7 +138,7 @@ dependencies:
   connectivity_plus: ^5.0.1
   permission_handler: ^11.0.1
   
-  # Firebase dependencies DISABLED - no Firebase packages
+  # Firebase dependencies DISABLED - no Firebase packages for push notifications
   
   # UI dependencies
   flutter_launcher_icons: ^0.13.1
@@ -369,7 +375,7 @@ import 'package:flutter/services.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // No Firebase initialization - Firebase disabled
+  // No Firebase initialization - Firebase and push notifications disabled
   
   runApp(MyApp());
 }
@@ -763,6 +769,68 @@ PODFILE_EOF
     log_success "✅ Firebase-disabled Podfile injected"
 }
 
+# Function to handle iOS Info.plist push notification permissions
+handle_ios_push_notification_permissions() {
+    local plist_file="ios/Runner/Info.plist"
+    
+    if [ "$PUSH_NOTIFICATIONS_ENABLED" = "true" ]; then
+        log_info "🔔 Adding push notification permissions to iOS Info.plist..."
+        
+        # Add background modes for push notifications
+        plutil -insert "UIBackgroundModes" -array "$plist_file" 2>/dev/null || true
+        plutil -insert "UIBackgroundModes.0" -string "remote-notification" "$plist_file" 2>/dev/null || true
+        
+        # Add notification usage description
+        plutil -insert "NSUserNotificationUsageDescription" -string "This app uses notifications to keep you updated with important information." "$plist_file" 2>/dev/null || \
+        plutil -replace "NSUserNotificationUsageDescription" -string "This app uses notifications to keep you updated with important information." "$plist_file" 2>/dev/null || true
+        
+        log_success "✅ Push notification permissions added to iOS Info.plist"
+    else
+        log_info "🔕 Removing push notification permissions from iOS Info.plist..."
+        
+        # Remove background modes for push notifications
+        plutil -remove "UIBackgroundModes" "$plist_file" 2>/dev/null || true
+        
+        # Remove notification usage description
+        plutil -remove "NSUserNotificationUsageDescription" "$plist_file" 2>/dev/null || true
+        
+        log_success "✅ Push notification permissions removed from iOS Info.plist"
+    fi
+}
+
+# Function to clean up Firebase-related files when disabled
+cleanup_firebase_files() {
+    log_info "🧹 Cleaning up Firebase-related files..."
+    
+    # Remove Firebase-related directories and files
+    local firebase_files=(
+        "ios/Pods/Firebase"
+        "ios/Pods/FirebaseCore"
+        "ios/Pods/FirebaseMessaging"
+        "ios/Pods/FirebaseAnalytics"
+        "ios/Pods/GoogleUtilities"
+        "ios/Pods/GTMSessionFetcher"
+        "ios/Pods/nanopb"
+        "ios/Pods/Protobuf"
+    )
+    
+    for file in "${firebase_files[@]}"; do
+        if [ -e "$file" ]; then
+            rm -rf "$file"
+            log_info "🗑️ Removed: $file"
+        fi
+    done
+    
+    # Clean up Pods directory if it exists
+    if [ -d "ios/Pods" ]; then
+        log_info "🧹 Cleaning up Pods directory..."
+        find ios/Pods -name "*Firebase*" -type d -exec rm -rf {} + 2>/dev/null || true
+        find ios/Pods -name "*GoogleUtilities*" -type d -exec rm -rf {} + 2>/dev/null || true
+    fi
+    
+    log_success "✅ Firebase cleanup completed"
+}
+
 # Main conditional injection function
 perform_conditional_injection() {
     log_info "🎯 Performing conditional Firebase injection based on PUSH_NOTIFY: $PUSH_NOTIFY"
@@ -775,6 +843,7 @@ perform_conditional_injection() {
         inject_firebase_enabled_main_dart
         inject_firebase_enabled_podfile
         inject_firebase_config_files
+        handle_ios_push_notification_permissions
         
         log_success "✅ Firebase injection completed - all Firebase features enabled"
         
@@ -786,6 +855,8 @@ perform_conditional_injection() {
         inject_firebase_disabled_main_dart
         inject_firebase_disabled_podfile
         remove_firebase_config_files
+        handle_ios_push_notification_permissions
+        cleanup_firebase_files
         
         log_success "✅ Firebase exclusion completed - all Firebase features disabled"
     fi
@@ -799,20 +870,23 @@ create_injection_summary() {
     local summary_file="FIREBASE_INJECTION_SUMMARY.txt"
     
     cat > "$summary_file" << SUMMARY_EOF
-=== Conditional Firebase Injection Summary ===
+=== Enhanced Conditional Firebase Injection Summary ===
 Date: $(date)
 PUSH_NOTIFY Flag: $PUSH_NOTIFY
 Firebase Status: $([ "$FIREBASE_ENABLED" = "true" ] && echo "ENABLED" || echo "DISABLED")
+Push Notifications: $([ "$PUSH_NOTIFICATIONS_ENABLED" = "true" ] && echo "ENABLED" || echo "DISABLED")
 
 === Files Modified ===
 - pubspec.yaml: $([ "$FIREBASE_ENABLED" = "true" ] && echo "Firebase dependencies INCLUDED" || echo "Firebase dependencies EXCLUDED")
 - lib/main.dart: $([ "$FIREBASE_ENABLED" = "true" ] && echo "Firebase initialization INCLUDED" || echo "Firebase initialization EXCLUDED")
 - ios/Podfile: $([ "$FIREBASE_ENABLED" = "true" ] && echo "Firebase pods ENABLED" || echo "Firebase pods DISABLED")
+- ios/Runner/Info.plist: $([ "$PUSH_NOTIFICATIONS_ENABLED" = "true" ] && echo "Push notification permissions ADDED" || echo "Push notification permissions REMOVED")
 - Firebase configs: $([ "$FIREBASE_ENABLED" = "true" ] && echo "ACTIVE" || echo "REMOVED")
 
 === Environment Variables ===
 PUSH_NOTIFY: ${PUSH_NOTIFY}
 FIREBASE_ENABLED: ${FIREBASE_ENABLED}
+PUSH_NOTIFICATIONS_ENABLED: ${PUSH_NOTIFICATIONS_ENABLED}
 FIREBASE_CONFIG_IOS: ${FIREBASE_CONFIG_IOS:+SET}
 FIREBASE_CONFIG_ANDROID: ${FIREBASE_CONFIG_ANDROID:+SET}
 
@@ -821,7 +895,10 @@ FIREBASE_CONFIG_ANDROID: ${FIREBASE_CONFIG_ANDROID:+SET}
 - lib/main.dart.firebase_backup
 - ios/Podfile.firebase_backup
 
-Conditional injection completed successfully!
+=== Cleanup Actions ===
+$([ "$FIREBASE_ENABLED" = "false" ] && echo "- Firebase-related files cleaned up" || echo "- No cleanup needed (Firebase enabled)")
+
+Enhanced conditional injection completed successfully!
 SUMMARY_EOF
     
     log_success "✅ Injection summary created: $summary_file"
@@ -829,7 +906,7 @@ SUMMARY_EOF
 
 # Main execution function
 main() {
-    log_info "🚀 Starting Conditional Firebase Injection System..."
+    log_info "🚀 Starting Enhanced Conditional Firebase Injection System..."
     
     # Step 1: Validate PUSH_NOTIFY flag
     validate_push_notify_flag
@@ -837,8 +914,8 @@ main() {
     # Step 2: Perform conditional injection
     perform_conditional_injection
     
-    log_success "✅ Conditional Firebase injection completed successfully!"
-    log_info "📋 Summary: PUSH_NOTIFY=$PUSH_NOTIFY, Firebase=$([ "$FIREBASE_ENABLED" = "true" ] && echo "ENABLED" || echo "DISABLED")"
+    log_success "✅ Enhanced Conditional Firebase injection completed successfully!"
+    log_info "📋 Summary: PUSH_NOTIFY=$PUSH_NOTIFY, Firebase=$([ "$FIREBASE_ENABLED" = "true" ] && echo "ENABLED" || echo "DISABLED"), Push Notifications=$([ "$PUSH_NOTIFICATIONS_ENABLED" = "true" ] && echo "ENABLED" || echo "DISABLED")"
     
     return 0
 }
