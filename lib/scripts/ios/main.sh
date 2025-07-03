@@ -77,8 +77,22 @@ main() {
         return 1
     fi
     
-    # Stage 1: Environment Variable Validation
-    log_info "--- Stage 1: Environment Variable Validation ---"
+    # Stage 1: Enhanced Branding Assets Setup (FIRST STAGE)
+    log_info "--- Stage 1: Enhanced Branding Assets Setup (FIRST STAGE) ---"
+    log_info "🚀 This is the FIRST script in the iOS workflow"
+    log_info "📋 Handling all basic app information: WORKFLOW_ID, APP_ID, VERSION_NAME, VERSION_CODE, APP_NAME, ORG_NAME, BUNDLE_ID, WEB_URL, LOGO_URL, SPLASH_URL, SPLASH_BG_URL, BOTTOMMENU_ITEMS"
+    
+    # Make branding assets script executable
+    chmod +x "${SCRIPT_DIR}/branding_assets.sh"
+    
+    # Run enhanced branding assets setup
+    if ! "${SCRIPT_DIR}/branding_assets.sh"; then
+        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Enhanced branding assets setup failed."
+        return 1
+    fi
+    
+    # Stage 1.5: Environment Variable Validation
+    log_info "--- Stage 1.5: Environment Variable Validation ---"
     
     # Make environment validator script executable
     chmod +x "${SCRIPT_DIR}/environment_validator.sh"
@@ -89,8 +103,8 @@ main() {
         return 1
     fi
     
-    # Stage 1.5: Pre-build Setup
-    log_info "--- Stage 1.5: Pre-build Setup ---"
+    # Stage 1.7: Pre-build Setup
+    log_info "--- Stage 1.7: Pre-build Setup ---"
     if ! "${SCRIPT_DIR}/setup_environment.sh"; then
         send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Pre-build setup failed."
         return 1
@@ -295,27 +309,17 @@ main() {
         log_info "   - App Store Connect API: Ready for upload"
     fi
     
-    # Stage 4: Branding Assets Setup (Downloads logo and sets up assets)
-    log_info "--- Stage 4: Setting up Branding Assets ---"
-    log_info "📥 Downloading logo from LOGO_URL (if provided) to assets/images/logo.png"
-    log_info "📱 Updating Bundle ID: ${BUNDLE_ID:-<not set>}"
-    log_info "🏷️ Updating App Name: ${APP_NAME:-<not set>}"
-    if ! "${SCRIPT_DIR}/branding_assets.sh"; then
-        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Branding assets setup failed."
-        return 1
-    fi
-    
-    # Stage 4.5: Generate Flutter Launcher Icons (Uses logo from Stage 4 as app icons)
-    log_info "--- Stage 4.5: Generating Flutter Launcher Icons ---"
-    log_info "🎨 Using logo from assets/images/logo.png (created by branding_assets.sh)"
+    # Stage 4: Generate Flutter Launcher Icons (Uses logo from Stage 1 as app icons)
+    log_info "--- Stage 4: Generating Flutter Launcher Icons ---"
+    log_info "🎨 Using logo from assets/images/logo.png (created by Stage 1 branding_assets.sh)"
     log_info "✨ Generating App Store compliant iOS icons (removing transparency)"
     if ! "${SCRIPT_DIR}/generate_launcher_icons.sh"; then
         send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Flutter Launcher Icons generation failed."
         return 1
     fi
     
-    # Stage 4.7: CFBundleIdentifier Collision Check (PRE-BUILD VALIDATION)
-    log_info "--- Stage 4.7: CFBundleIdentifier Collision Check ---"
+    # Stage 4.5: CFBundleIdentifier Collision Check (PRE-BUILD VALIDATION)
+    log_info "--- Stage 4.5: CFBundleIdentifier Collision Check ---"
     log_info "🔍 PRE-BUILD VALIDATION: Ensuring all bundle IDs are unique"
     log_info "🎯 Purpose: Prevent CFBundleIdentifier collisions before build starts"
     log_info "📁 Project File: ios/Runner.xcodeproj/project.pbxproj"
@@ -326,19 +330,19 @@ main() {
         log_info "🔍 Running CFBundleIdentifier collision check..."
         
         if "${SCRIPT_DIR}/check_bundle_id_collisions.sh" "ios/Runner.xcodeproj/project.pbxproj"; then
-            log_success "✅ Stage 4.7 completed: CFBundleIdentifier collision check passed"
+            log_success "✅ Stage 4.5 completed: CFBundleIdentifier collision check passed"
             log_info "🎯 All bundle identifiers are unique"
             log_info "🚀 Safe to proceed with build"
             export BUNDLE_ID_VALIDATION_PASSED="true"
         else
-            log_error "❌ Stage 4.7 failed: CFBundleIdentifier collision detected"
+            log_error "❌ Stage 4.5 failed: CFBundleIdentifier collision detected"
             log_error "🔧 Please fix duplicate bundle identifiers before building"
             log_error "📋 Check the bundle_id_validation_report.txt for details"
             send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "CFBundleIdentifier collision detected."
             return 1
         fi
     else
-        log_warn "⚠️ Stage 4.7 skipped: CFBundleIdentifier collision check script not found"
+        log_warn "⚠️ Stage 4.5 skipped: CFBundleIdentifier collision check script not found"
         log_info "📝 Expected: ${SCRIPT_DIR}/check_bundle_id_collisions.sh"
         log_warn "🔧 Proceeding without bundle ID validation (not recommended)"
         export BUNDLE_ID_VALIDATION_PASSED="false"

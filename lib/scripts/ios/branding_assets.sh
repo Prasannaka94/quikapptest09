@@ -1,7 +1,8 @@
 ﻿#!/bin/bash
 
-# iOS Branding Assets Handler
-# Purpose: Download and process branding assets for iOS builds
+# iOS Branding Assets Handler - Enhanced Basic App Information
+# Purpose: Handle all basic app information and branding assets for iOS builds
+# This script should be the FIRST script in the iOS workflow
 
 set -euo pipefail
 
@@ -9,7 +10,226 @@ set -euo pipefail
 SCRIPT_DIR="$(dirname "$0")"
 source "${SCRIPT_DIR}/utils.sh"
 
-log_info "Starting iOS Branding Assets Setup..."
+log_info "🚀 Starting Enhanced iOS Branding Assets Setup (FIRST STAGE)..."
+
+# Function to validate and display basic app information
+validate_basic_app_info() {
+    log_info "📋 Validating Basic App Information..."
+    
+    # Required variables
+    local required_vars=("WORKFLOW_ID" "APP_ID" "VERSION_NAME" "VERSION_CODE" "APP_NAME" "BUNDLE_ID")
+    local missing_vars=()
+    
+    for var in "${required_vars[@]}"; do
+        if [ -z "${!var:-}" ]; then
+            missing_vars+=("$var")
+        fi
+    done
+    
+    if [ ${#missing_vars[@]} -gt 0 ]; then
+        log_error "❌ Missing required environment variables:"
+        for var in "${missing_vars[@]}"; do
+            log_error "   - $var"
+        done
+        log_error "📋 Required variables for basic app information:"
+        log_error "   WORKFLOW_ID: Unique workflow identifier"
+        log_error "   APP_ID: Application identifier"
+        log_error "   VERSION_NAME: App version (e.g., 1.0.0)"
+        log_error "   VERSION_CODE: Build number (e.g., 1)"
+        log_error "   APP_NAME: Display name of the app"
+        log_error "   BUNDLE_ID: iOS bundle identifier (e.g., com.company.app)"
+        return 1
+    fi
+    
+    # Display all basic app information
+    log_success "✅ Basic App Information Validation Passed"
+    log_info "📊 App Information Summary:"
+    log_info "   WORKFLOW_ID: ${WORKFLOW_ID}"
+    log_info "   APP_ID: ${APP_ID}"
+    log_info "   VERSION_NAME: ${VERSION_NAME}"
+    log_info "   VERSION_CODE: ${VERSION_CODE}"
+    log_info "   APP_NAME: ${APP_NAME}"
+    log_info "   ORG_NAME: ${ORG_NAME:-<not set>}"
+    log_info "   BUNDLE_ID: ${BUNDLE_ID}"
+    log_info "   WEB_URL: ${WEB_URL:-<not set>}"
+    log_info "   LOGO_URL: ${LOGO_URL:-<not set>}"
+    log_info "   SPLASH_URL: ${SPLASH_URL:-<not set>}"
+    log_info "   SPLASH_BG_URL: ${SPLASH_BG_URL:-<not set>}"
+    
+    # Display bottom menu items if provided
+    if [ -n "${BOTTOMMENU_ITEMS:-}" ]; then
+        log_info "   BOTTOMMENU_ITEMS: ${BOTTOMMENU_ITEMS}"
+    else
+        log_info "   BOTTOMMENU_ITEMS: <not set>"
+    fi
+    
+    return 0
+}
+
+# Function to update app configuration files with basic information
+update_app_configuration() {
+    log_info "🔧 Updating App Configuration Files..."
+    
+    # Update pubspec.yaml with basic app information
+    if [ -f "pubspec.yaml" ]; then
+        log_info "📝 Updating pubspec.yaml with basic app information..."
+        
+        # Create backup
+        cp "pubspec.yaml" "pubspec.yaml.basic_info.backup"
+        
+        # Update app name (sanitized for pubspec)
+        local sanitized_name
+        sanitized_name=$(echo "$APP_NAME" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9 ' | tr ' ' '_')
+        
+        # Update version
+        local new_version="${VERSION_NAME}+${VERSION_CODE}"
+        
+        # Update pubspec.yaml
+        sed -i.tmp "s/^name: .*/name: $sanitized_name/" "pubspec.yaml"
+        sed -i.tmp "s/^version: .*/version: $new_version/" "pubspec.yaml"
+        
+        # Update description if provided
+        if [ -n "${WEB_URL:-}" ]; then
+            local description="Flutter app for ${APP_NAME}"
+            if grep -q "^description:" "pubspec.yaml"; then
+                sed -i.tmp "s/^description: .*/description: $description/" "pubspec.yaml"
+            else
+                # Add description after name
+                sed -i.tmp "/^name: $sanitized_name/a\\
+description: $description" "pubspec.yaml"
+            fi
+        fi
+        
+        # Clean up temp files
+        rm -f "pubspec.yaml.tmp"
+        
+        log_success "✅ pubspec.yaml updated with basic app information"
+    fi
+    
+    # Update iOS Info.plist with basic app information
+    local info_plist="ios/Runner/Info.plist"
+    if [ -f "$info_plist" ]; then
+        log_info "📱 Updating iOS Info.plist with basic app information..."
+        
+        # Create backup
+        cp "$info_plist" "${info_plist}.basic_info.backup"
+        
+        # Update using plutil if available
+        if command -v plutil &> /dev/null; then
+            plutil -replace CFBundleName -string "$APP_NAME" "$info_plist" 2>/dev/null || true
+            plutil -replace CFBundleDisplayName -string "$APP_NAME" "$info_plist" 2>/dev/null || true
+            plutil -replace CFBundleShortVersionString -string "$VERSION_NAME" "$info_plist" 2>/dev/null || true
+            plutil -replace CFBundleVersion -string "$VERSION_CODE" "$info_plist" 2>/dev/null || true
+            
+            # Add organization name if provided
+            if [ -n "${ORG_NAME:-}" ]; then
+                plutil -replace CFBundleIdentifier -string "$BUNDLE_ID" "$info_plist" 2>/dev/null || true
+            fi
+            
+            log_success "✅ iOS Info.plist updated using plutil"
+        else
+            # Manual update as fallback
+            sed -i.tmp "s/<key>CFBundleName<\/key>.*<string>.*<\/string>/<key>CFBundleName<\/key><string>$APP_NAME<\/string>/g" "$info_plist"
+            sed -i.tmp "s/<key>CFBundleDisplayName<\/key>.*<string>.*<\/string>/<key>CFBundleDisplayName<\/key><string>$APP_NAME<\/string>/g" "$info_plist"
+            sed -i.tmp "s/<key>CFBundleShortVersionString<\/key>.*<string>.*<\/string>/<key>CFBundleShortVersionString<\/key><string>$VERSION_NAME<\/string>/g" "$info_plist"
+            sed -i.tmp "s/<key>CFBundleVersion<\/key>.*<string>.*<\/string>/<key>CFBundleVersion<\/key><string>$VERSION_CODE<\/string>/g" "$info_plist"
+            rm -f "${info_plist}.tmp"
+            log_success "✅ iOS Info.plist updated manually"
+        fi
+    fi
+    
+    # Update iOS project file with bundle identifier
+    local ios_project_file="ios/Runner.xcodeproj/project.pbxproj"
+    if [ -f "$ios_project_file" ]; then
+        log_info "📦 Updating iOS project file with bundle identifier..."
+        
+        # Create backup
+        cp "$ios_project_file" "${ios_project_file}.basic_info.backup"
+        
+        # Update bundle identifier
+        sed -i.tmp "s/PRODUCT_BUNDLE_IDENTIFIER = [^;]*;/PRODUCT_BUNDLE_IDENTIFIER = $BUNDLE_ID;/g" "$ios_project_file"
+        rm -f "${ios_project_file}.tmp"
+        
+        log_success "✅ iOS project file updated with bundle identifier"
+    fi
+    
+    log_success "🎉 App configuration files updated successfully"
+}
+
+# Function to handle bottom menu items with custom icons
+handle_bottom_menu_items() {
+    log_info "📱 Handling Bottom Menu Items with Custom Icons..."
+    
+    if [ -z "${BOTTOMMENU_ITEMS:-}" ]; then
+        log_info "📋 No BOTTOMMENU_ITEMS provided, skipping bottom menu configuration"
+        return 0
+    fi
+    
+    # Parse bottom menu items (expected format: "icon1:label1,icon2:label2,icon3:label3")
+    IFS=',' read -ra MENU_ITEMS <<< "$BOTTOMMENU_ITEMS"
+    
+    log_info "📋 Processing ${#MENU_ITEMS[@]} bottom menu items..."
+    
+    # Create menu items directory
+    ensure_directory "assets/icons/menu"
+    
+    local menu_config=""
+    local menu_index=0
+    
+    for item in "${MENU_ITEMS[@]}"; do
+        IFS=':' read -ra ITEM_PARTS <<< "$item"
+        
+        if [ ${#ITEM_PARTS[@]} -eq 2 ]; then
+            local icon_url="${ITEM_PARTS[0]}"
+            local label_name="${ITEM_PARTS[1]}"
+            
+            log_info "📥 Processing menu item $((menu_index + 1)): $label_name"
+            log_info "   Icon URL: $icon_url"
+            log_info "   Label: $label_name"
+            
+            # Download custom icon
+            local icon_filename="menu_icon_${menu_index}.png"
+            local icon_path="assets/icons/menu/$icon_filename"
+            
+            if download_asset_with_fallbacks "$icon_url" "$icon_path" "menu icon $label_name"; then
+                log_success "✅ Downloaded custom icon for: $label_name"
+                
+                # Add to menu configuration
+                if [ -z "$menu_config" ]; then
+                    menu_config="{\"icon\":\"$icon_filename\",\"label\":\"$label_name\"}"
+                else
+                    menu_config="$menu_config,{\"icon\":\"$icon_filename\",\"label\":\"$label_name\"}"
+                fi
+            else
+                log_warn "⚠️ Failed to download icon for: $label_name, using fallback"
+                
+                # Create fallback icon
+                create_fallback_asset "$icon_path" "menu icon $label_name"
+                
+                # Add to menu configuration with fallback
+                if [ -z "$menu_config" ]; then
+                    menu_config="{\"icon\":\"$icon_filename\",\"label\":\"$label_name\"}"
+                else
+                    menu_config="$menu_config,{\"icon\":\"$icon_filename\",\"label\":\"$label_name\"}"
+                fi
+            fi
+            
+            menu_index=$((menu_index + 1))
+        else
+            log_warn "⚠️ Invalid menu item format: $item (expected icon:label)"
+        fi
+    done
+    
+    # Save menu configuration
+    if [ -n "$menu_config" ]; then
+        local menu_config_file="assets/icons/menu/menu_config.json"
+        echo "[$menu_config]" > "$menu_config_file"
+        log_success "✅ Bottom menu configuration saved to: $menu_config_file"
+        log_info "📋 Menu items configured: $menu_index items"
+    fi
+    
+    return 0
+}
 
 # Function to download asset with multiple fallbacks
 download_asset_with_fallbacks() {
@@ -19,7 +239,7 @@ download_asset_with_fallbacks() {
     local max_retries=5
     local retry_delay=3
     
-    log_info "Downloading $asset_name from: $url"
+    log_info "📥 Downloading $asset_name from: $url"
     
     # Try multiple download methods
     for attempt in $(seq 1 $max_retries); do
@@ -315,35 +535,56 @@ update_pubspec_version() {
 
 # Main execution
 main() {
-    log_info "iOS Branding Assets Setup Starting..."
+    log_info "🚀 Enhanced iOS Branding Assets Setup Starting (FIRST STAGE)..."
     
-    # Step 1: Update Bundle ID and App Name (if provided)
+    # Step 1: Validate basic app information
+    log_info "--- Step 1: Validating Basic App Information ---"
+    if ! validate_basic_app_info; then
+        log_error "❌ Basic app information validation failed"
+        return 1
+    fi
+    
+    # Step 2: Update app configuration files
+    log_info "--- Step 2: Updating App Configuration Files ---"
+    if ! update_app_configuration; then
+        log_error "❌ App configuration update failed"
+        return 1
+    fi
+    
+    # Step 3: Update Bundle ID and App Name (if provided)
     if [ -n "${BUNDLE_ID:-}" ] || [ -n "${APP_NAME:-}" ] || [ -n "${PKG_NAME:-}" ]; then
-        log_info "--- Step 1: Updating Bundle ID and App Name ---"
+        log_info "--- Step 3: Updating Bundle ID and App Name ---"
         if ! update_bundle_id_and_app_name; then
             log_error "Bundle ID and App Name update failed"
             return 1
         fi
     else
-        log_info "--- Step 1: Skipping Bundle ID and App Name update (not provided) ---"
+        log_info "--- Step 3: Skipping Bundle ID and App Name update (not provided) ---"
     fi
     
-    # Step 1.5: Update Version in pubspec.yaml (if provided)
-    log_info "--- Step 1.5: Updating Version in pubspec.yaml ---"
+    # Step 4: Update Version in pubspec.yaml (if provided)
+    log_info "--- Step 4: Updating Version in pubspec.yaml ---"
     if ! update_pubspec_version; then
         log_error "Version update in pubspec.yaml failed"
         return 1
     fi
     
-    # Step 2: Setup directories
-    log_info "--- Step 2: Setting up Asset Directories ---"
+    # Step 5: Handle bottom menu items with custom icons
+    log_info "--- Step 5: Handling Bottom Menu Items ---"
+    if ! handle_bottom_menu_items; then
+        log_error "Bottom menu items handling failed"
+        return 1
+    fi
+    
+    # Step 6: Setup directories
+    log_info "--- Step 6: Setting up Asset Directories ---"
     ensure_directory "assets/images"
     ensure_directory "assets/icons"
     ensure_directory "ios/Runner/Assets.xcassets/AppIcon.appiconset"
     ensure_directory "ios/Runner/Assets.xcassets/LaunchImage.imageset"
     
-    # Step 3: Download logo
-    log_info "--- Step 3: Setting up Logo Assets ---"
+    # Step 7: Download logo
+    log_info "--- Step 7: Setting up Logo Assets ---"
     if [ -n "${LOGO_URL:-}" ]; then
         log_info "📥 Downloading logo from $LOGO_URL"
         log_info "📍 Target location: assets/images/logo.png (for Stage 4.5 app icon generation)"
@@ -365,8 +606,8 @@ main() {
         create_fallback_asset "assets/images/logo.png" "logo"
     fi
     
-    # Step 4: Download splash
-    log_info "--- Step 4: Setting up Splash Screen Assets ---"
+    # Step 8: Download splash
+    log_info "--- Step 8: Setting up Splash Screen Assets ---"
     if [ -n "${SPLASH_URL:-}" ]; then
         log_info "Downloading splash from $SPLASH_URL"
         download_asset_with_fallbacks "$SPLASH_URL" "assets/images/splash.png" "splash"
@@ -375,8 +616,15 @@ main() {
         cp "assets/images/logo.png" "assets/images/splash.png"
     fi
     
-    # Step 5: Copy assets to iOS locations
-    log_info "--- Step 5: Copying Assets to iOS ---"
+    # Step 9: Download splash background (if provided)
+    if [ -n "${SPLASH_BG_URL:-}" ]; then
+        log_info "--- Step 9: Setting up Splash Background Assets ---"
+        log_info "Downloading splash background from $SPLASH_BG_URL"
+        download_asset_with_fallbacks "$SPLASH_BG_URL" "assets/images/splash_bg.png" "splash background"
+    fi
+    
+    # Step 10: Copy assets to iOS locations
+    log_info "--- Step 10: Copying Assets to iOS ---"
     if [ -f "assets/images/logo.png" ]; then
         cp "assets/images/logo.png" "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png"
         log_success "Logo copied to iOS AppIcon"
@@ -389,10 +637,16 @@ main() {
         log_success "Splash copied to iOS LaunchImage"
     fi
     
-    log_success "🎉 iOS Branding Assets Setup completed successfully!"
-    log_info "📊 Branding Summary:"
-    log_info "   Bundle ID: ${BUNDLE_ID:-${PKG_NAME:-<not updated>}}"
-    log_info "   App Name: ${APP_NAME:-<not updated>}"
+    log_success "🎉 Enhanced iOS Branding Assets Setup completed successfully!"
+    log_info "📊 Enhanced Branding Summary:"
+    log_info "   WORKFLOW_ID: ${WORKFLOW_ID}"
+    log_info "   APP_ID: ${APP_ID}"
+    log_info "   VERSION_NAME: ${VERSION_NAME}"
+    log_info "   VERSION_CODE: ${VERSION_CODE}"
+    log_info "   APP_NAME: ${APP_NAME}"
+    log_info "   ORG_NAME: ${ORG_NAME:-<not set>}"
+    log_info "   BUNDLE_ID: ${BUNDLE_ID}"
+    log_info "   WEB_URL: ${WEB_URL:-<not set>}"
     
     # CFBundleIdentifier collision prevention status
     if [ -n "${BUNDLE_ID:-${PKG_NAME:-}}" ]; then
@@ -408,7 +662,7 @@ main() {
     # Enhanced version reporting
     if [ -n "${VERSION_NAME:-}" ] && [ -n "${VERSION_CODE:-}" ]; then
         local current_pubspec_version
-        current_pubspec_version=$(grep "^version:" "pubspec.yaml" | cut -d' ' -f2 2>/dev/null || echo "<unknown>")
+        current_pubspec_version=$(grep "^version:" "pubspec.yaml" | cut -d ' ' -f2 2>/dev/null || echo "<unknown>")
         log_info "   Version (Environment): ${VERSION_NAME} (build ${VERSION_CODE})"
         log_info "   Version (pubspec.yaml): $current_pubspec_version"
         log_success "   ✅ Version successfully updated from environment variables"
@@ -419,15 +673,36 @@ main() {
     
     log_info "   Logo: ${LOGO_URL:+downloaded}${LOGO_URL:-<fallback created>}"
     log_info "   Splash: ${SPLASH_URL:+downloaded}${SPLASH_URL:-<used logo>}"
+    log_info "   Splash Background: ${SPLASH_BG_URL:+downloaded}${SPLASH_BG_URL:-<not set>}"
+    
+    # Bottom menu items summary
+    if [ -n "${BOTTOMMENU_ITEMS:-}" ]; then
+        IFS=',' read -ra MENU_ITEMS <<< "$BOTTOMMENU_ITEMS"
+        log_info "   Bottom Menu Items: ${#MENU_ITEMS[@]} items configured"
+        for item in "${MENU_ITEMS[@]}"; do
+            IFS=':' read -ra ITEM_PARTS <<< "$item"
+            if [ ${#ITEM_PARTS[@]} -eq 2 ]; then
+                log_info "     - ${ITEM_PARTS[1]} (${ITEM_PARTS[0]})"
+            fi
+        done
+    else
+        log_info "   Bottom Menu Items: <not configured>"
+    fi
     
     # Environment variables summary
     log_info "📋 Environment Variables Used:"
-    log_info "   BUNDLE_ID: ${BUNDLE_ID:-<not set>}"
-    log_info "   APP_NAME: ${APP_NAME:-<not set>}"
-    log_info "   VERSION_NAME: ${VERSION_NAME:-<not set>}"
-    log_info "   VERSION_CODE: ${VERSION_CODE:-<not set>}"
+    log_info "   WORKFLOW_ID: ${WORKFLOW_ID}"
+    log_info "   APP_ID: ${APP_ID}"
+    log_info "   VERSION_NAME: ${VERSION_NAME}"
+    log_info "   VERSION_CODE: ${VERSION_CODE}"
+    log_info "   APP_NAME: ${APP_NAME}"
+    log_info "   ORG_NAME: ${ORG_NAME:-<not set>}"
+    log_info "   BUNDLE_ID: ${BUNDLE_ID}"
+    log_info "   WEB_URL: ${WEB_URL:-<not set>}"
     log_info "   LOGO_URL: ${LOGO_URL:-<not set>}"
     log_info "   SPLASH_URL: ${SPLASH_URL:-<not set>}"
+    log_info "   SPLASH_BG_URL: ${SPLASH_BG_URL:-<not set>}"
+    log_info "   BOTTOMMENU_ITEMS: ${BOTTOMMENU_ITEMS:-<not set>}"
     
     return 0
 }
