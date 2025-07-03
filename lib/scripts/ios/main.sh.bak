@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 
 # Main iOS Build Orchestration Script
 # Purpose: Orchestrate the entire iOS build workflow
