@@ -79,7 +79,7 @@ update_app_configuration() {
         
         # Update app name (sanitized for pubspec)
         local sanitized_name
-        sanitized_name=$(echo "$APP_NAME" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9 ' | tr ' ' '_')
+        sanitized_name=$(echo "${APP_NAME:-twinklub_app}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9 ' | tr ' ' '_')
         
         # Update version
         local new_version="${VERSION_NAME}+${VERSION_CODE}"
@@ -160,75 +160,190 @@ description: $description" "pubspec.yaml"
 handle_bottom_menu_items() {
     log_info "📱 Handling Bottom Menu Items with Custom Icons..."
     
+    # Check if bottom menu is enabled
+    if [ "${IS_BOTTOMMENU:-false}" != "true" ]; then
+        log_info "📋 IS_BOTTOMMENU is not set to 'true', skipping bottom menu configuration"
+        return 0
+    fi
+    
     if [ -z "${BOTTOMMENU_ITEMS:-}" ]; then
         log_info "📋 No BOTTOMMENU_ITEMS provided, skipping bottom menu configuration"
         return 0
     fi
     
-    # Parse bottom menu items (expected format: "icon1:label1,icon2:label2,icon3:label3")
-    IFS=',' read -ra MENU_ITEMS <<< "$BOTTOMMENU_ITEMS"
-    
-    log_info "📋 Processing ${#MENU_ITEMS[@]} bottom menu items..."
+    log_info "✅ IS_BOTTOMMENU is true, processing bottom menu items..."
     
     # Create menu items directory
-    ensure_directory "assets/icons/menu"
+    ensure_directory "assets/icons"
     
     local menu_config=""
     local menu_index=0
+    local custom_icons_processed=0
     
-    for item in "${MENU_ITEMS[@]}"; do
-        IFS=':' read -ra ITEM_PARTS <<< "$item"
+    # Try to parse as JSON first (new format with custom icons)
+    if [[ "$BOTTOMMENU_ITEMS" =~ ^\[.*\]$ ]]; then
+        log_info "📋 Detected JSON format for BOTTOMMENU_ITEMS"
         
-        if [ ${#ITEM_PARTS[@]} -eq 2 ]; then
-            local icon_url="${ITEM_PARTS[0]}"
-            local label_name="${ITEM_PARTS[1]}"
+        # Use jq to parse JSON if available, otherwise use basic parsing
+        if command -v jq >/dev/null 2>&1; then
+            log_info "🔧 Using jq for JSON parsing"
             
-            log_info "📥 Processing menu item $((menu_index + 1)): $label_name"
-            log_info "   Icon URL: $icon_url"
-            log_info "   Label: $label_name"
+            # Parse each menu item from JSON
+            local item_count=$(echo "$BOTTOMMENU_ITEMS" | jq length 2>/dev/null || echo "0")
+            log_info "📋 Processing $item_count JSON menu items..."
             
-            # Download custom icon
-            local icon_filename="menu_icon_${menu_index}.png"
-            local icon_path="assets/icons/menu/$icon_filename"
-            
-            if download_asset_with_fallbacks "$icon_url" "$icon_path" "menu icon $label_name"; then
-                log_success "✅ Downloaded custom icon for: $label_name"
+            for i in $(seq 0 $((item_count - 1))); do
+                local item_type=$(echo "$BOTTOMMENU_ITEMS" | jq -r ".[$i].type // \"default\"" 2>/dev/null)
+                local item_label=$(echo "$BOTTOMMENU_ITEMS" | jq -r ".[$i].label // \"\"" 2>/dev/null)
+                local item_icon_url=$(echo "$BOTTOMMENU_ITEMS" | jq -r ".[$i].icon_url // \"\"" 2>/dev/null)
                 
-                # Add to menu configuration
-                if [ -z "$menu_config" ]; then
-                    menu_config="{\"icon\":\"$icon_filename\",\"label\":\"$label_name\"}"
+                log_info "📥 Processing menu item $((menu_index + 1)): $item_label (type: $item_type)"
+                
+                if [ "$item_type" = "custom" ] && [ -n "$item_icon_url" ]; then
+                    log_info "🎨 Processing custom icon for: $item_label"
+                    log_info "   Icon URL: $item_icon_url"
+                    
+                    # Download custom SVG icon
+                    local icon_filename="${item_label}.svg"
+                    local icon_path="assets/icons/$icon_filename"
+                    
+                    if download_asset_with_fallbacks "$item_icon_url" "$icon_path" "custom icon $item_label"; then
+                        log_success "✅ Downloaded custom SVG icon for: $item_label"
+                        custom_icons_processed=$((custom_icons_processed + 1))
+                        
+                        # Add to menu configuration
+                        if [ -z "$menu_config" ]; then
+                            menu_config="{\"icon\":\"$icon_filename\",\"label\":\"$item_label\",\"type\":\"custom\"}"
+                        else
+                            menu_config="$menu_config,{\"icon\":\"$icon_filename\",\"label\":\"$item_label\",\"type\":\"custom\"}"
+                        fi
+                    else
+                        log_warn "⚠️ Failed to download custom icon for: $item_label, using fallback"
+                        
+                        # Create fallback icon
+                        create_fallback_asset "$icon_path" "custom icon $item_label"
+                        
+                        # Add to menu configuration with fallback
+                        if [ -z "$menu_config" ]; then
+                            menu_config="{\"icon\":\"$icon_filename\",\"label\":\"$item_label\",\"type\":\"custom\"}"
+                        else
+                            menu_config="$menu_config,{\"icon\":\"$icon_filename\",\"label\":\"$item_label\",\"type\":\"custom\"}"
+                        fi
+                    fi
                 else
-                    menu_config="$menu_config,{\"icon\":\"$icon_filename\",\"label\":\"$label_name\"}"
+                    log_info "📋 Skipping non-custom item: $item_label (type: $item_type)"
+                    
+                    # Add non-custom items to configuration without downloading
+                    if [ -z "$menu_config" ]; then
+                        menu_config="{\"label\":\"$item_label\",\"type\":\"$item_type\"}"
+                    else
+                        menu_config="$menu_config,{\"label\":\"$item_label\",\"type\":\"$item_type\"}"
+                    fi
                 fi
-            else
-                log_warn "⚠️ Failed to download icon for: $label_name, using fallback"
                 
-                # Create fallback icon
-                create_fallback_asset "$icon_path" "menu icon $label_name"
-                
-                # Add to menu configuration with fallback
-                if [ -z "$menu_config" ]; then
-                    menu_config="{\"icon\":\"$icon_filename\",\"label\":\"$label_name\"}"
-                else
-                    menu_config="$menu_config,{\"icon\":\"$icon_filename\",\"label\":\"$label_name\"}"
-                fi
-            fi
-            
-            menu_index=$((menu_index + 1))
+                menu_index=$((menu_index + 1))
+            done
         else
-            log_warn "⚠️ Invalid menu item format: $item (expected icon:label)"
+            log_warn "⚠️ jq not available, falling back to basic JSON parsing"
+            # Basic JSON parsing fallback
+            process_basic_json_menu_items
         fi
-    done
+    else
+        log_info "📋 Detected legacy format for BOTTOMMENU_ITEMS"
+        # Parse bottom menu items (legacy format: "icon1:label1,icon2:label2,icon3:label3")
+        IFS=',' read -ra MENU_ITEMS <<< "$BOTTOMMENU_ITEMS"
+        
+        log_info "📋 Processing ${#MENU_ITEMS[@]} legacy menu items..."
+        
+        for item in "${MENU_ITEMS[@]}"; do
+            IFS=':' read -ra ITEM_PARTS <<< "$item"
+            
+            if [ ${#ITEM_PARTS[@]} -eq 2 ]; then
+                local icon_url="${ITEM_PARTS[0]}"
+                local label_name="${ITEM_PARTS[1]}"
+                
+                log_info "📥 Processing menu item $((menu_index + 1)): $label_name"
+                log_info "   Icon URL: $icon_url"
+                log_info "   Label: $label_name"
+                
+                # Download custom icon
+                local icon_filename="menu_icon_${menu_index}.png"
+                local icon_path="assets/icons/$icon_filename"
+                
+                if download_asset_with_fallbacks "$icon_url" "$icon_path" "menu icon $label_name"; then
+                    log_success "✅ Downloaded custom icon for: $label_name"
+                    custom_icons_processed=$((custom_icons_processed + 1))
+                    
+                    # Add to menu configuration
+                    if [ -z "$menu_config" ]; then
+                        menu_config="{\"icon\":\"$icon_filename\",\"label\":\"$label_name\"}"
+                    else
+                        menu_config="$menu_config,{\"icon\":\"$icon_filename\",\"label\":\"$label_name\"}"
+                    fi
+                else
+                    log_warn "⚠️ Failed to download icon for: $label_name, using fallback"
+                    
+                    # Create fallback icon
+                    create_fallback_asset "$icon_path" "menu icon $label_name"
+                    
+                    # Add to menu configuration with fallback
+                    if [ -z "$menu_config" ]; then
+                        menu_config="{\"icon\":\"$icon_filename\",\"label\":\"$label_name\"}"
+                    else
+                        menu_config="$menu_config,{\"icon\":\"$icon_filename\",\"label\":\"$label_name\"}"
+                    fi
+                fi
+                
+                menu_index=$((menu_index + 1))
+            else
+                log_warn "⚠️ Invalid menu item format: $item (expected icon:label)"
+            fi
+        done
+    fi
     
     # Save menu configuration
     if [ -n "$menu_config" ]; then
-        local menu_config_file="assets/icons/menu/menu_config.json"
+        local menu_config_file="assets/icons/menu_config.json"
         echo "[$menu_config]" > "$menu_config_file"
         log_success "✅ Bottom menu configuration saved to: $menu_config_file"
         log_info "📋 Menu items configured: $menu_index items"
+        log_info "🎨 Custom icons processed: $custom_icons_processed items"
     fi
     
     return 0
+}
+
+# Helper function for basic JSON parsing when jq is not available
+process_basic_json_menu_items() {
+    log_info "🔧 Using basic JSON parsing fallback"
+    
+    # Remove outer brackets and split by },{
+    local json_content="${BOTTOMMENU_ITEMS:1:-1}"
+    local items=$(echo "$json_content" | sed 's/},{/|/g')
+    
+    IFS='|' read -ra MENU_ITEMS <<< "$items"
+    
+    for item in "${MENU_ITEMS[@]}"; do
+        # Extract type, label, and icon_url using basic string manipulation
+        local item_type=$(echo "$item" | grep -o '"type":"[^"]*"' | cut -d'"' -f4 || echo "default")
+        local item_label=$(echo "$item" | grep -o '"label":"[^"]*"' | cut -d'"' -f4 || echo "")
+        local item_icon_url=$(echo "$item" | grep -o '"icon_url":"[^"]*"' | cut -d'"' -f4 || echo "")
+        
+        if [ "$item_type" = "custom" ] && [ -n "$item_icon_url" ] && [ -n "$item_label" ]; then
+            log_info "🎨 Processing custom icon for: $item_label"
+            
+            # Download custom SVG icon
+            local icon_filename="${item_label}.svg"
+            local icon_path="assets/icons/$icon_filename"
+            
+            if download_asset_with_fallbacks "$item_icon_url" "$icon_path" "custom icon $item_label"; then
+                log_success "✅ Downloaded custom SVG icon for: $item_label"
+                custom_icons_processed=$((custom_icons_processed + 1))
+            fi
+        fi
+        
+        menu_index=$((menu_index + 1))
+    done
 }
 
 # Function to download asset with multiple fallbacks
@@ -585,7 +700,7 @@ main() {
     
     # Step 7: Download logo
     log_info "--- Step 7: Setting up Logo Assets ---"
-    if [ -n "${LOGO_URL:-}" ]; then
+    if [ -n "${LOGO_URL:-}" ] && [ "$LOGO_URL" != "null" ] && [ "$LOGO_URL" != "" ]; then
         log_info "📥 Downloading logo from $LOGO_URL"
         log_info "📍 Target location: assets/images/logo.png (for Stage 4.5 app icon generation)"
         download_asset_with_fallbacks "$LOGO_URL" "assets/images/logo.png" "logo"
@@ -601,26 +716,28 @@ main() {
             log_error "❌ Logo download failed - file not found at assets/images/logo.png"
         fi
     else
-        log_warn "LOGO_URL is empty, creating default logo"
+        log_info "📋 LOGO_URL is null, empty, or not provided, creating default logo"
         log_info "📍 Creating fallback logo at: assets/images/logo.png"
         create_fallback_asset "assets/images/logo.png" "logo"
     fi
     
     # Step 8: Download splash
     log_info "--- Step 8: Setting up Splash Screen Assets ---"
-    if [ -n "${SPLASH_URL:-}" ]; then
-        log_info "Downloading splash from $SPLASH_URL"
+    if [ -n "${SPLASH_URL:-}" ] && [ "$SPLASH_URL" != "null" ] && [ "$SPLASH_URL" != "" ]; then
+        log_info "📥 Downloading splash from $SPLASH_URL"
         download_asset_with_fallbacks "$SPLASH_URL" "assets/images/splash.png" "splash"
     else
-        log_info "Using logo as splash"
+        log_info "📋 SPLASH_URL is null, empty, or not provided, using logo as splash"
         cp "assets/images/logo.png" "assets/images/splash.png"
     fi
     
     # Step 9: Download splash background (if provided)
-    if [ -n "${SPLASH_BG_URL:-}" ]; then
+    if [ -n "${SPLASH_BG_URL:-}" ] && [ "$SPLASH_BG_URL" != "null" ] && [ "$SPLASH_BG_URL" != "" ]; then
         log_info "--- Step 9: Setting up Splash Background Assets ---"
-        log_info "Downloading splash background from $SPLASH_BG_URL"
+        log_info "📥 Downloading splash background from $SPLASH_BG_URL"
         download_asset_with_fallbacks "$SPLASH_BG_URL" "assets/images/splash_bg.png" "splash background"
+    else
+        log_info "📋 SPLASH_BG_URL is null, empty, or not provided, skipping splash background"
     fi
     
     # Step 10: Copy assets to iOS locations
@@ -674,19 +791,46 @@ main() {
     log_info "   Logo: ${LOGO_URL:+downloaded}${LOGO_URL:-<fallback created>}"
     log_info "   Splash: ${SPLASH_URL:+downloaded}${SPLASH_URL:-<used logo>}"
     log_info "   Splash Background: ${SPLASH_BG_URL:+downloaded}${SPLASH_BG_URL:-<not set>}"
+    log_info "   📋 Asset Download Logic:"
+    log_info "      - Skips download if URL is null, empty, or not provided"
+    log_info "      - Creates fallback assets when URLs are unavailable"
+    log_info "      - Uses logo as splash when SPLASH_URL is not available"
     
     # Bottom menu items summary
-    if [ -n "${BOTTOMMENU_ITEMS:-}" ]; then
-        IFS=',' read -ra MENU_ITEMS <<< "$BOTTOMMENU_ITEMS"
-        log_info "   Bottom Menu Items: ${#MENU_ITEMS[@]} items configured"
-        for item in "${MENU_ITEMS[@]}"; do
-            IFS=':' read -ra ITEM_PARTS <<< "$item"
-            if [ ${#ITEM_PARTS[@]} -eq 2 ]; then
-                log_info "     - ${ITEM_PARTS[1]} (${ITEM_PARTS[0]})"
+    if [ "${IS_BOTTOMMENU:-false}" = "true" ] && [ -n "${BOTTOMMENU_ITEMS:-}" ]; then
+        log_info "   Bottom Menu Items: Enabled with custom icons"
+        if [[ "$BOTTOMMENU_ITEMS" =~ ^\[.*\]$ ]]; then
+            # JSON format
+            if command -v jq >/dev/null 2>&1; then
+                local item_count=$(echo "$BOTTOMMENU_ITEMS" | jq length 2>/dev/null || echo "0")
+                log_info "     - JSON format: $item_count items"
+                for i in $(seq 0 $((item_count - 1))); do
+                    local item_type=$(echo "$BOTTOMMENU_ITEMS" | jq -r ".[$i].type // \"default\"" 2>/dev/null)
+                    local item_label=$(echo "$BOTTOMMENU_ITEMS" | jq -r ".[$i].label // \"\"" 2>/dev/null)
+                    if [ "$item_type" = "custom" ]; then
+                        log_info "       🎨 ${item_label} (custom icon)"
+                    else
+                        log_info "       📋 ${item_label} (${item_type})"
+                    fi
+                done
+            else
+                log_info "     - JSON format: <jq not available for detailed parsing>"
             fi
-        done
+        else
+            # Legacy format
+            IFS=',' read -ra MENU_ITEMS <<< "$BOTTOMMENU_ITEMS"
+            log_info "     - Legacy format: ${#MENU_ITEMS[@]} items"
+            for item in "${MENU_ITEMS[@]}"; do
+                IFS=':' read -ra ITEM_PARTS <<< "$item"
+                if [ ${#ITEM_PARTS[@]} -eq 2 ]; then
+                    log_info "       - ${ITEM_PARTS[1]} (${ITEM_PARTS[0]})"
+                fi
+            done
+        fi
+    elif [ "${IS_BOTTOMMENU:-false}" = "true" ]; then
+        log_info "   Bottom Menu Items: Enabled but no items configured"
     else
-        log_info "   Bottom Menu Items: <not configured>"
+        log_info "   Bottom Menu Items: Disabled (IS_BOTTOMMENU != true)"
     fi
     
     # Environment variables summary
@@ -702,6 +846,7 @@ main() {
     log_info "   LOGO_URL: ${LOGO_URL:-<not set>}"
     log_info "   SPLASH_URL: ${SPLASH_URL:-<not set>}"
     log_info "   SPLASH_BG_URL: ${SPLASH_BG_URL:-<not set>}"
+    log_info "   IS_BOTTOMMENU: ${IS_BOTTOMMENU:-<not set>}"
     log_info "   BOTTOMMENU_ITEMS: ${BOTTOMMENU_ITEMS:-<not set>}"
     
     return 0

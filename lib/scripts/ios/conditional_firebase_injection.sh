@@ -55,8 +55,8 @@ inject_firebase_enabled_pubspec() {
     fi
     
     # Generate Firebase-enabled pubspec.yaml
-    cat > pubspec.yaml << 'PUBSPEC_EOF'
-name: ${APP_ID:-twinklub_app}
+    cat > pubspec.yaml << PUBSPEC_EOF
+name: $(echo "${APP_NAME:-twinklub_app}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9 ' | tr ' ' '_')
 description: A Flutter application with Firebase support
 publish_to: 'none'
 version: ${VERSION_NAME:-1.0.6}+50
@@ -117,8 +117,8 @@ inject_firebase_disabled_pubspec() {
     fi
     
     # Generate Firebase-disabled pubspec.yaml  
-    cat > pubspec.yaml << 'PUBSPEC_EOF'
-name: ${APP_ID:-twinklub_app}
+    cat > pubspec.yaml << PUBSPEC_EOF
+name: $(echo "${APP_NAME:-twinklub_app}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9 ' | tr ' ' '_')
 description: A Flutter application without Firebase
 publish_to: 'none'
 version: ${VERSION_NAME:-1.0.6}+50
@@ -179,7 +179,7 @@ inject_firebase_enabled_main_dart() {
     mkdir -p lib
     
     # Generate Firebase-enabled main.dart
-    cat > lib/main.dart << 'DART_EOF'
+    cat > lib/main.dart << DART_EOF
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -281,7 +281,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '${APP_NAME:-${ORG_NAME:-Twinklub} App}',
+      title: '${APP_NAME:-${ORG_NAME:-QuikApp} App}',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -368,7 +368,7 @@ inject_firebase_disabled_main_dart() {
     mkdir -p lib
     
     # Generate Firebase-disabled main.dart
-    cat > lib/main.dart << 'DART_EOF'
+    cat > lib/main.dart << DART_EOF
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
