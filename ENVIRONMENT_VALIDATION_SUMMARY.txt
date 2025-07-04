@@ -1,0 +1,77 @@
+=== Environment Variable Validation Summary ===
+Date: Fri Jul  4 09:12:51 IST 2025
+Validation Status: PASSED
+
+=== Core App Configuration ===
+APP_ID: 1002
+VERSION_NAME: 1.0.6
+VERSION_CODE: 66
+APP_NAME: Twinklub App
+ORG_NAME: JPR Garments
+BUNDLE_ID: com.twinklub.twinklub
+PKG_NAME: com.twinklub.twinklub
+WEB_URL: https://twinklub.com/
+
+=== Profile Configuration ===
+PROFILE_TYPE: app-store
+PROFILE_URL: SET
+
+=== Certificate Configuration ===
+CERT_P12_URL: SET
+CERT_CER_URL: SET
+CERT_KEY_URL: SET
+CERT_PASSWORD: SET
+
+=== Firebase Configuration ===
+PUSH_NOTIFY: true
+FIREBASE_CONFIG_IOS: SET
+FIREBASE_CONFIG_ANDROID: SET
+APPLE_TEAM_ID: 9H2AD7NQ49
+APNS_KEY_ID: V566SWNF69
+APNS_AUTH_KEY_URL: SET
+
+=== App Store Connect Configuration ===
+APP_STORE_CONNECT_KEY_IDENTIFIER: ZFD9GRMS7R
+APP_STORE_CONNECT_API_KEY: SET
+APP_STORE_CONNECT_ISSUER_ID: a99a2ebd-ed3e-4117-9f97-f195823774a7
+APPLE_ID: pixaware.co@gmail.com
+
+=== Android Configuration ===
+KEY_STORE_URL: SET
+CM_KEYSTORE_PASSWORD: SET
+CM_KEY_ALIAS: my_key_alias
+CM_KEY_PASSWORD: SET
+
+=== Feature Flags ===
+IS_CHATBOT: true
+IS_DOMAIN_URL: true
+IS_SPLASH: true
+IS_PULLDOWN: true
+IS_BOTTOMMENU: true
+IS_LOAD_IND: true
+IS_TESTFLIGHT: false
+
+=== Permissions ===
+IS_CAMERA: false
+IS_LOCATION: false
+IS_MIC: true
+IS_NOTIFICATION: true
+IS_CONTACT: false
+IS_BIOMETRIC: false
+IS_CALENDAR: false
+IS_STORAGE: true
+
+=== Email Configuration ===
+ENABLE_EMAIL_NOTIFICATIONS: true
+EMAIL_SMTP_SERVER: smtp.gmail.com
+EMAIL_SMTP_PORT: 587
+EMAIL_SMTP_USER: prasannasrie@gmail.com
+EMAIL_SMTP_PASS: SET
+
+=== Workflow Configuration ===
+WORKFLOW_ID: ios-workflow
+USER_NAME: prasannasrie
+EMAIL_ID: prasannasrinivasan32@gmail.com
+BRANCH: NOT_SET
+
+Environment validation completed!

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "219658500755",
+    "project_id": "twinklub-1307d",
+    "storage_bucket": "twinklub-1307d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:219658500755:android:1f1587a6cbe74abaaeeb66",
+        "android_client_info": {
+          "package_name": "com.twinklub.twinklub"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMZ__gyRFf7JLCgVPWdQfM3KHuD-JDpHw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

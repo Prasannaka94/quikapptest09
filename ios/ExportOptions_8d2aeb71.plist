@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>method</key>
+    <string>app-store-connect</string>
+    <key>teamID</key>
+    <string>9H2AD7NQ49</string>
+    <key>signingStyle</key>
+    <string>manual</string>
+    <key>stripSwiftSymbols</key>
+    <true/>
+    <key>uploadBitcode</key>
+    <false/>
+    <key>compileBitcode</key>
+    <false/>
+    <key>uploadSymbols</key>
+    <true/>
+    <key>signingCertificate</key>
+    <string>Apple Distribution: Pixaware Technology Solutions Private Limited (9H2AD7NQ49)</string>
+    <key>provisioningProfiles</key>
+    <dict>
+        <key>com.twinklub.twinklub</key>
+        <string>289b7fd5-8dfe-48f1-8a3b-75c19330e0d9</string>
+    </dict>
+    <key>manageAppVersionAndBuildNumber</key>
+    <false/>
+    <key>destination</key>
+    <string>export</string>
+    <key>iCloudContainerEnvironment</key>
+    <string>Production</string>
+    <key>onDemandInstallCapable</key>
+    <false/>
+    <key>embedOnDemandResourcesAssetPacksInBundle</key>
+    <false/>
+    <key>generateAppStoreInformation</key>
+    <true/>
+    <key>distributionBundleIdentifier</key>
+    <string>com.twinklub.twinklub</string>
+    <key>signingFlags</key>
+    <string>--timestamp</string>
+    <key>installerSigningCertificate</key>
+    <string>Apple Distribution: Pixaware Technology Solutions Private Limited (9H2AD7NQ49)</string>
+</dict>
+</plist>

@@ -272,6 +272,14 @@ validate_code_signing() {
 main() {
     log_info "🚀 Starting comprehensive certificate validation..."
     
+    # Debug environment variables
+    log_info "🔍 Environment Variable Debug:"
+    log_info "   CERT_P12_URL: ${CERT_P12_URL:-NOT_SET}"
+    log_info "   CERT_CER_URL: ${CERT_CER_URL:-NOT_SET}"
+    log_info "   CERT_KEY_URL: ${CERT_KEY_URL:-NOT_SET}"
+    log_info "   CERT_PASSWORD: ${CERT_PASSWORD:+SET}"
+    log_info "   PROFILE_URL: ${PROFILE_URL:-NOT_SET}"
+    
     # Setup keychain
     if ! setup_keychain; then
         log_error "❌ Failed to setup keychain"
@@ -281,6 +289,13 @@ main() {
     # Check for P12 file
     if [ -n "${CERT_P12_URL:-}" ]; then
         log_info "📦 P12 file URL provided: $CERT_P12_URL"
+        
+        # Validate URL format
+        if [[ ! "$CERT_P12_URL" =~ ^https?:// ]]; then
+            log_error "❌ Invalid URL format: $CERT_P12_URL"
+            log_error "💡 URL must start with http:// or https://"
+            exit 1
+        fi
         
         # Download P12 file
         local p12_file="$CERT_DIR/certificate.p12"

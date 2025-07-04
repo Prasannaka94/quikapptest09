@@ -19,9 +19,9 @@ send_email() {
     local build_id="$3"
     local error_message="$4"
     
-    if [ "${ENABLE_EMAIL_NOTIFICATIONS:-false}" = "true" ]; then
+    if [ "${ENABLE_EMAIL_NOTIFICATIONS:-false}" = "true" ] && [ -f "lib/scripts/utils/send_email.py" ]; then
         log_info "Sending $email_type email for $platform build $build_id"
-        bash "${SCRIPT_DIR}/email_notifications.sh" "$email_type" "$platform" "$build_id" "$error_message" || log_warn "Failed to send email notification"
+        python3 lib/scripts/utils/send_email.py "$email_type" "$platform" "$build_id" "$error_message" || log_warn "Failed to send email notification"
     fi
 }
 
@@ -144,7 +144,11 @@ main() {
     # Stage 2: Email Notification - Build Started (only if not already sent)
     if [ "${ENABLE_EMAIL_NOTIFICATIONS:-false}" = "true" ] && [ -z "${EMAIL_BUILD_STARTED_SENT:-}" ]; then
         log_info "--- Stage 2: Sending Build Started Email ---"
-        bash "${SCRIPT_DIR}/email_notifications.sh" "build_started" "iOS" "${CM_BUILD_ID:-unknown}" || log_warn "Failed to send build started email."
+        if [ -f "lib/scripts/utils/send_email.py" ]; then
+            python3 lib/scripts/utils/send_email.py "build_started" "iOS" "${CM_BUILD_ID:-unknown}" || log_warn "Failed to send build started email."
+        else
+            log_warn "Email notification script not found"
+        fi
         export EMAIL_BUILD_STARTED_SENT="true"
     elif [ -n "${EMAIL_BUILD_STARTED_SENT:-}" ]; then
         log_info "--- Stage 2: Build Started Email Already Sent (Skipping) ---"

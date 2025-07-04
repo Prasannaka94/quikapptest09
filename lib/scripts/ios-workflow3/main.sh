@@ -1,486 +1,313 @@
 #!/bin/bash
 
-# Main iOS Workflow 3 Orchestration Script
-# Purpose: Universal build support with nuclear collision handling protocols
-# Following iOS-Workflow Pattern: Comprehensive staging and error handling
+# iOS Workflow 3 - Simplified and Robust Build Script
+# Purpose: Handle iOS builds with proper certificate management and error handling
 
 set -euo pipefail
 
-# Get script directory and source utilities
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-UTILS_DIR="$(dirname "$SCRIPT_DIR")/utils"
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
-# Source utilities with fallback
-if [ -f "$UTILS_DIR/common.sh" ]; then
-    source "$UTILS_DIR/common.sh"
-else
-    # Fallback logging functions
-    log_info() { echo -e "\033[0;34mℹ️ INFO: $1\033[0m"; }
-    log_success() { echo -e "\033[0;32m✅ SUCCESS: $1\033[0m"; }
-    log_warn() { echo -e "\033[1;33m⚠️ WARNING: $1\033[0m"; }
-    log_error() { echo -e "\033[0;31m❌ ERROR: $1\033[0m"; }
-fi
+# Logging functions
+log_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
 
-log_info "Starting iOS Workflow 3..."
-log_info "📁 Following iOS-Workflow Pattern: Comprehensive staging and error handling"
-log_info "🎯 Specialization: Universal build support with nuclear collision handling protocols"
+log_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
 
-# Function to send email notifications (if enabled)
+log_warn() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+log_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Function to send email notifications
 send_email() {
     local email_type="$1"
     local platform="$2"
     local build_id="$3"
     local error_message="$4"
     
-    if [ "${ENABLE_EMAIL_NOTIFICATIONS:-false}" = "true" ]; then
+    if [ "${ENABLE_EMAIL_NOTIFICATIONS:-false}" = "true" ] && [ -f "lib/scripts/utils/send_email.py" ]; then
         log_info "Sending $email_type email for $platform build $build_id"
-        log_info "Email notification: $email_type for $platform ($error_message)"
+        python3 lib/scripts/utils/send_email.py "$email_type" "$platform" "$build_id" "$error_message" || log_warn "Failed to send email notification"
     fi
 }
 
-# Function to load environment variables
-load_environment_variables() {
-    log_info "Loading environment variables..."
+# Function to validate environment variables
+validate_environment() {
+    log_info "Validating environment variables..."
     
-    # Validate essential variables
+    # Check essential variables
     if [ -z "${BUNDLE_ID:-}" ]; then
-        log_error "BUNDLE_ID is not set. Exiting."
+        log_error "BUNDLE_ID is not set"
         return 1
     fi
     
-    # Set default values for iOS Workflow 3
-    export OUTPUT_DIR="${OUTPUT_DIR:-output/ios}"
-    export PROJECT_ROOT="${PROJECT_ROOT:-$(pwd)}"
-    export CM_BUILD_DIR="${CM_BUILD_DIR:-$(pwd)}"
-    export PROFILE_TYPE="${PROFILE_TYPE:-app-store}"
-    export WORKFLOW_ID="ios-workflow3"
-    export WORKFLOW_TYPE="workflow3"
-    export UNIVERSAL_BUILD="enabled"
-    export NUCLEAR_PROTOCOLS="enabled"
-    export COLLISION_ELIMINATION="nuclear"
-    export ULTIMATE_ELIMINATION="enabled"
+    if [ -z "${PROFILE_TYPE:-}" ]; then
+        log_warn "PROFILE_TYPE not set, defaulting to app-store"
+        export PROFILE_TYPE="app-store"
+    fi
     
-    log_success "Environment variables loaded successfully"
-    log_info "📋 iOS Workflow 3 Configuration:"
-    log_info "  - Workflow: ios-workflow3"
-    log_info "  - Purpose: Universal build support with nuclear collision handling"
-    log_info "  - Bundle ID: $BUNDLE_ID"
-    log_info "  - Profile Type: $PROFILE_TYPE"
-    log_info "  - Universal Build: ENABLED"
-    log_info "  - Nuclear Protocols: ENABLED"
-    log_info "  - Collision Elimination: Nuclear grade"
-    log_info "  - Output: $OUTPUT_DIR"
+    if [ -z "${APP_NAME:-}" ]; then
+        log_error "APP_NAME is not set"
+        return 1
+    fi
     
+    # Check certificate configuration
+    if [ -z "${CERT_P12_URL:-}" ] && [ -z "${CERT_CER_URL:-}" ]; then
+        log_error "No certificate configuration found"
+        log_error "Please provide either CERT_P12_URL or CERT_CER_URL"
+        return 1
+    fi
+    
+    log_success "Environment validation passed"
     return 0
 }
 
-# Function to validate iOS project structure
-validate_ios_project() {
-    log_info "--- iOS Project Structure Validation ---"
+# Function to setup certificate and provisioning profile
+setup_certificates() {
+    log_info "Setting up certificates and provisioning profiles..."
     
-    # Check for iOS project structure
-    if [ ! -d "ios" ]; then
-        log_error "iOS directory not found"
+    # Create certificates directory
+    mkdir -p ios/certificates
+    
+    # Setup keychain
+    local keychain_name="ios-build.keychain"
+    local keychain_password="${KEYCHAIN_PASSWORD:-build123}"
+    
+    # Delete existing keychain if it exists
+    security delete-keychain "$keychain_name" 2>/dev/null || true
+    
+    # Create new keychain
+    if ! security create-keychain -p "$keychain_password" "$keychain_name"; then
+        log_error "Failed to create keychain"
         return 1
     fi
     
-    if [ ! -f "ios/Runner.xcodeproj/project.pbxproj" ]; then
-        log_error "Xcode project file not found"
-        return 1
-    fi
+    # Configure keychain settings
+    security set-keychain-settings -lut 21600 "$keychain_name"
+    security unlock-keychain -p "$keychain_password" "$keychain_name"
+    security list-keychains -s "$keychain_name"
+    security default-keychain -s "$keychain_name"
     
-    if [ ! -f "pubspec.yaml" ]; then
-        log_error "Flutter project structure not found (missing pubspec.yaml)"
-        return 1
-    fi
+    log_success "Keychain setup completed"
     
-    log_success "✅ iOS project structure validation completed"
-    return 0
-}
-
-# Function to setup nuclear collision protocols
-setup_nuclear_collision_protocols() {
-    log_info "--- Stage 1: Nuclear Collision Protocol Setup ---"
-    
-    log_info "☢️ Activating nuclear collision handling protocols for Workflow 3..."
-    log_info "🎯 Target: Universal build support with maximum collision elimination"
-    log_info "🔬 Strategy: Nuclear-grade collision prevention with universal compatibility"
-    log_info "🌐 Mode: Universal build support for all distribution methods"
-    
-    # Create nuclear backup
-    if [ -f "ios/Runner.xcodeproj/project.pbxproj" ]; then
-        cp "ios/Runner.xcodeproj/project.pbxproj" "ios/Runner.xcodeproj/project.pbxproj.nuclear_backup_$(date +%Y%m%d_%H%M%S)"
-        log_success "✅ Nuclear backup created for Workflow 3"
-    fi
-    
-    # Nuclear bundle ID analysis
-    local main_bundle_count
-    main_bundle_count=$(grep -c "PRODUCT_BUNDLE_IDENTIFIER = ${BUNDLE_ID};" "ios/Runner.xcodeproj/project.pbxproj" 2>/dev/null || echo "0")
-    
-    log_info "☢️ Nuclear Bundle ID Analysis:"
-    log_info "  - Main Bundle ID: $BUNDLE_ID"
-    log_info "  - Current Occurrences: $main_bundle_count"
-    log_info "  - Nuclear Target: 3 (Debug, Release, Profile)"
-    log_info "  - Universal Build: $UNIVERSAL_BUILD"
-    
-    if [ "$main_bundle_count" -gt 3 ]; then
-        log_warn "⚠️ Nuclear collision threat detected ($main_bundle_count > 3)"
-        log_info "☢️ Nuclear elimination protocols will be activated"
-        export NUCLEAR_ACTIVATION="required"
-        export NUCLEAR_BUNDLE_ID_FIX="enabled"
-        export ULTIMATE_COLLISION_ELIMINATOR="enabled"
-    else
-        log_success "✅ Bundle ID configuration within nuclear safety parameters"
-        export NUCLEAR_ACTIVATION="standby"
-    fi
-    
-    log_success "✅ Nuclear collision protocol setup completed"
-    return 0
-}
-
-# Function to handle universal build configuration
-handle_universal_build_configuration() {
-    log_info "--- Stage 2: Universal Build Configuration ---"
-    
-    log_info "🌐 iOS Workflow 3: Universal build support for all distribution methods"
-    log_info "📋 Supported distributions: App Store, Ad Hoc, Enterprise, Development"
-    
-    # Universal profile type analysis
-    local supported_profiles=("app-store" "ad-hoc" "enterprise" "development")
-    log_info "🔄 Universal Profile Support:"
-    log_info "  - Current Profile: $PROFILE_TYPE"
-    log_info "  - Supported Types: ${supported_profiles[*]}"
-    
-    # Profile-specific configuration
-    case "$PROFILE_TYPE" in
-        "app-store")
-            log_info "📦 Configuring for App Store distribution..."
-            export DISTRIBUTION_METHOD="app-store"
-            ;;
-        "ad-hoc")
-            log_info "📦 Configuring for Ad Hoc distribution..."
-            export DISTRIBUTION_METHOD="ad-hoc"
-            ;;
-        "enterprise")
-            log_info "📦 Configuring for Enterprise distribution..."
-            export DISTRIBUTION_METHOD="enterprise"
-            ;;
-        "development")
-            log_info "📦 Configuring for Development..."
-            export DISTRIBUTION_METHOD="development"
-            ;;
-        *)
-            log_warn "⚠️ Unknown profile type: $PROFILE_TYPE, using app-store"
-            export DISTRIBUTION_METHOD="app-store"
-            export PROFILE_TYPE="app-store"
-            ;;
-    esac
-    
-    # Universal certificate detection
-    local cert_methods=()
-    
+    # Handle P12 certificate
     if [ -n "${CERT_P12_URL:-}" ]; then
-        cert_methods+=("P12")
-        export CERT_METHOD="p12_url"
-        log_success "✅ P12 certificate method for universal build"
-    else
-        export CERT_METHOD="standard"
-        log_info "🔐 Standard certificate handling"
-    fi
-    
-    if [ -n "${CERT_CER_URL:-}" ] && [ -n "${CERT_KEY_URL:-}" ]; then
-        cert_methods+=("CER+KEY")
-    fi
-    
-    if [ -n "${APP_STORE_CONNECT_API_KEY_PATH:-}" ]; then
-        cert_methods+=("API")
-    fi
-    
-    log_info "🔐 Universal Certificate Support:"
-    if [ ${#cert_methods[@]} -gt 0 ]; then
-        log_success "✅ Available methods: ${cert_methods[*]}"
-    else
-        log_warn "⚠️ No certificate methods detected - unsigned build"
-    fi
-    
-    log_success "✅ Universal build configuration completed"
-    return 0
-}
-
-# Function to handle Firebase nuclear configuration
-handle_firebase_nuclear_configuration() {
-    log_info "--- Stage 3: Firebase Nuclear Configuration ---"
-    
-    if [ "${PUSH_NOTIFY:-false}" = "true" ] && [ -n "${FIREBASE_CONFIG_IOS:-}" ]; then
-        log_info "🔥 Firebase iOS configuration detected for universal build"
-        export FIREBASE_IOS_ENABLED="true"
+        log_info "Processing P12 certificate from: $CERT_P12_URL"
         
-        # Nuclear Firebase download
-        log_info "📥 Downloading Firebase iOS configuration with nuclear validation..."
-        mkdir -p ios/Runner
+        # Validate URL format
+        if [[ ! "$CERT_P12_URL" =~ ^https?:// ]]; then
+            log_error "Invalid P12 URL format: $CERT_P12_URL"
+            return 1
+        fi
         
-        if wget -O ios/Runner/GoogleService-Info.plist "$FIREBASE_CONFIG_IOS"; then
-            log_success "✅ Firebase iOS configuration downloaded successfully"
+        # Download P12 file
+        local p12_file="ios/certificates/certificate.p12"
+        if ! curl -L -f -s -o "$p12_file" "$CERT_P12_URL"; then
+            log_error "Failed to download P12 certificate"
+            return 1
+        fi
+        
+        # Check if file was downloaded successfully
+        if [ ! -f "$p12_file" ] || [ ! -s "$p12_file" ]; then
+            log_error "P12 file is empty or not downloaded"
+            return 1
+        fi
+        
+        # Install P12 certificate
+        local password="${CERT_PASSWORD:-Password@1234}"
+        if ! security import "$p12_file" -k "$keychain_name" -P "$password" -T /usr/bin/codesign; then
+            log_error "Failed to import P12 certificate"
+            return 1
+        fi
+        
+        # Set key partition list
+        security set-key-partition-list -S apple-tool:,apple: -s -k "$keychain_password" "$keychain_name" || true
+        
+        log_success "P12 certificate installed successfully"
+        
+    # Handle CER + KEY certificate
+    elif [ -n "${CERT_CER_URL:-}" ] && [ -n "${CERT_KEY_URL:-}" ]; then
+        log_info "Processing CER + KEY certificates"
+        
+        # Download CER file
+        local cer_file="ios/certificates/certificate.cer"
+        if ! curl -L -f -s -o "$cer_file" "$CERT_CER_URL"; then
+            log_error "Failed to download CER certificate"
+            return 1
+        fi
+        
+        # Download KEY file
+        local key_file="ios/certificates/certificate.key"
+        if ! curl -L -f -s -o "$key_file" "$CERT_KEY_URL"; then
+            log_error "Failed to download KEY file"
+            return 1
+        fi
+        
+        # Generate P12 from CER and KEY
+        local p12_file="ios/certificates/certificate.p12"
+        local password="${CERT_PASSWORD:-Password@1234}"
+        
+        if ! openssl pkcs12 -export -in "$cer_file" -inkey "$key_file" -out "$p12_file" -password "pass:$password" -name "iOS Distribution Certificate"; then
+            log_error "Failed to generate P12 from CER and KEY"
+            return 1
+        fi
+        
+        # Install generated P12 certificate
+        if ! security import "$p12_file" -k "$keychain_name" -P "$password" -T /usr/bin/codesign; then
+            log_error "Failed to import generated P12 certificate"
+            return 1
+        fi
+        
+        # Set key partition list
+        security set-key-partition-list -S apple-tool:,apple: -s -k "$keychain_password" "$keychain_name" || true
+        
+        log_success "CER + KEY certificates converted and installed successfully"
+    fi
+    
+    # Handle provisioning profile
+    if [ -n "${PROFILE_URL:-}" ]; then
+        log_info "Processing provisioning profile from: $PROFILE_URL"
+        
+        # Download provisioning profile
+        local profile_file="ios/certificates/profile.mobileprovision"
+        if ! curl -L -f -s -o "$profile_file" "$PROFILE_URL"; then
+            log_error "Failed to download provisioning profile"
+            return 1
+        fi
+        
+        # Extract UUID from profile
+        local profile_uuid
+        profile_uuid=$(security cms -D -i "$profile_file" 2>/dev/null | plutil -extract UUID xml1 -o - - 2>/dev/null | sed -n 's/.*<string>\(.*\)<\/string>.*/\1/p' | head -1)
+        
+        if [ -n "$profile_uuid" ]; then
+            # Install provisioning profile
+            local profiles_dir="$HOME/Library/MobileDevice/Provisioning Profiles"
+            mkdir -p "$profiles_dir"
+            local target_file="$profiles_dir/$profile_uuid.mobileprovision"
+            cp "$profile_file" "$target_file"
             
-            # Nuclear validation
-            if [ -f "ios/Runner/GoogleService-Info.plist" ] && [ -s "ios/Runner/GoogleService-Info.plist" ]; then
-                log_success "✅ Firebase configuration passed nuclear validation"
-            else
-                log_error "❌ Firebase configuration failed nuclear validation"
-                return 1
-            fi
+            export MOBILEPROVISION_UUID="$profile_uuid"
+            log_success "Provisioning profile installed with UUID: $profile_uuid"
         else
-            log_error "❌ Failed to download Firebase iOS configuration"
-            return 1
-        fi
-    else
-        log_info "📱 Firebase disabled or not configured for universal build"
-        export FIREBASE_IOS_ENABLED="false"
-    fi
-    
-    log_success "✅ Firebase nuclear configuration completed"
-    return 0
-}
-
-# Function to run universal nuclear build process
-run_universal_nuclear_build() {
-    log_info "--- Stage 4: Universal Nuclear Build Process ---"
-    
-    if [ -f "$SCRIPT_DIR/../ios/main.sh" ]; then
-        log_info "✅ Delegating to main iOS script with universal nuclear enhancement"
-        log_info "☢️ Nuclear collision protocols: ACTIVE"
-        log_info "🌐 Universal build mode: ENABLED"
-        log_info "📦 Distribution method: $DISTRIBUTION_METHOD"
-        log_info "🔥 Firebase: ${FIREBASE_IOS_ENABLED:-false}"
-        
-        # Make the script executable
-        chmod +x "$SCRIPT_DIR/../ios/main.sh"
-        
-        # Call the main iOS build script
-        if "$SCRIPT_DIR/../ios/main.sh"; then
-            log_success "✅ Universal nuclear iOS build process completed successfully"
-            return 0
-        else
-            log_error "❌ Universal nuclear iOS build process failed"
-            return 1
-        fi
-    else
-        log_warn "⚠️ Main iOS script not found, using universal nuclear fallback"
-        
-        # Universal nuclear fallback build
-        log_info "☢️ Running universal nuclear fallback build process..."
-        
-        # Nuclear preparation
-        flutter clean || log_warn "Flutter clean failed"
-        flutter pub get || { log_error "Flutter pub get failed"; return 1; }
-        
-        # Nuclear collision elimination if required
-        if [ "$NUCLEAR_ACTIVATION" = "required" ]; then
-            log_info "☢️ Applying nuclear collision elimination before universal build..."
-            # Nuclear collision elimination would be applied here
-        fi
-        
-        # Universal build
-        if flutter build ios --release --no-codesign; then
-            log_success "✅ Flutter iOS universal build completed"
-            
-            # Check for build artifacts
-            if [ -d "build/ios/Release-iphoneos/Runner.app" ]; then
-                APP_SIZE=$(du -sh "build/ios/Release-iphoneos/Runner.app" | cut -f1)
-                log_success "📱 iOS app bundle created: build/ios/Release-iphoneos/Runner.app ($APP_SIZE)"
-                
-                # Create universal output structure
-                mkdir -p "$OUTPUT_DIR"
-                cp -r "build/ios/Release-iphoneos/Runner.app" "$OUTPUT_DIR/"
-                
-                # Create universal IPA structure for all distribution methods
-                mkdir -p "$OUTPUT_DIR/Payload"
-                cp -r "build/ios/Release-iphoneos/Runner.app" "$OUTPUT_DIR/Payload/"
-                
-                # Create universal IPA
-                local universal_ipa="$OUTPUT_DIR/Runner_Universal_${PROFILE_TYPE}.ipa"
-                (cd "$OUTPUT_DIR" && zip -r "Runner_Universal_${PROFILE_TYPE}.ipa" Payload/)
-                
-                if [ -f "$universal_ipa" ]; then
-                    IPA_SIZE=$(du -sh "$universal_ipa" | cut -f1)
-                    log_success "📱 Universal IPA created: $universal_ipa ($IPA_SIZE)"
-                fi
-                
-                log_success "📦 Universal nuclear build artifacts created"
-                return 0
-            else
-                log_error "❌ iOS app bundle not found after universal nuclear build"
-                return 1
-            fi
-        else
-            log_error "❌ Flutter iOS universal nuclear build failed"
+            log_error "Failed to extract UUID from provisioning profile"
             return 1
         fi
     fi
-}
-
-# Function to validate universal nuclear outputs
-validate_universal_nuclear_outputs() {
-    log_info "--- Stage 5: Universal Nuclear Output Validation ---"
     
-    local validation_passed=true
-    local artifacts_found=false
+    # Validate code signing
+    local identities
+    identities=$(security find-identity -v -p codesigning "$keychain_name" 2>/dev/null)
     
-    # Check for build directory
-    if [ -d "build/ios" ]; then
-        log_success "✅ iOS build directory found"
+    if [ -n "$identities" ]; then
+        log_success "Code signing identities found:"
+        echo "$identities" | while read line; do
+            log_info "   $line"
+        done
     else
-        log_error "❌ iOS build directory not found"
-        validation_passed=false
-    fi
-    
-    # Universal artifact validation
-    if [ -f "$OUTPUT_DIR/Runner.ipa" ]; then
-        IPA_SIZE=$(du -h "$OUTPUT_DIR/Runner.ipa" | cut -f1)
-        log_success "📱 Primary IPA: $OUTPUT_DIR/Runner.ipa ($IPA_SIZE)"
-        artifacts_found=true
-    fi
-    
-    if [ -f "$OUTPUT_DIR/Runner_Universal_${PROFILE_TYPE}.ipa" ]; then
-        UNIVERSAL_IPA_SIZE=$(du -h "$OUTPUT_DIR/Runner_Universal_${PROFILE_TYPE}.ipa" | cut -f1)
-        log_success "📱 Universal IPA: $OUTPUT_DIR/Runner_Universal_${PROFILE_TYPE}.ipa ($UNIVERSAL_IPA_SIZE)"
-        artifacts_found=true
-    fi
-    
-    if [ -d "build/ios/archive/Runner.xcarchive" ]; then
-        ARCHIVE_SIZE=$(du -h "build/ios/archive/Runner.xcarchive" | cut -f1)
-        log_success "📦 Archive: build/ios/archive/Runner.xcarchive ($ARCHIVE_SIZE)"
-        artifacts_found=true
-    fi
-    
-    if [ -d "$OUTPUT_DIR/Runner.app" ]; then
-        APP_SIZE=$(du -h "$OUTPUT_DIR/Runner.app" | cut -f1)
-        log_success "📱 App Bundle: $OUTPUT_DIR/Runner.app ($APP_SIZE)"
-        artifacts_found=true
-    fi
-    
-    if [ "$artifacts_found" = false ]; then
-        log_warn "⚠️ No build artifacts found in expected locations"
-    fi
-    
-    # Nuclear collision validation
-    if [ -f "ios/Runner.xcodeproj/project.pbxproj" ]; then
-        local final_bundle_count
-        final_bundle_count=$(grep -c "PRODUCT_BUNDLE_IDENTIFIER = ${BUNDLE_ID};" "ios/Runner.xcodeproj/project.pbxproj" 2>/dev/null || echo "0")
-        
-        log_info "☢️ Nuclear Collision Results:"
-        log_info "  - Final Bundle ID Count: $final_bundle_count"
-        log_info "  - Nuclear Activation: $NUCLEAR_ACTIVATION"
-        
-        if [ "$final_bundle_count" -le 3 ]; then
-            log_success "✅ Nuclear collision elimination: EFFECTIVE"
-        else
-            log_warn "⚠️ Nuclear collision elimination: Requires additional protocols"
-        fi
-    fi
-    
-    if [ "$validation_passed" = "true" ]; then
-        log_success "✅ Universal nuclear output validation completed successfully"
-        return 0
-    else
-        log_error "❌ Universal nuclear output validation failed"
+        log_error "No code signing identities found"
         return 1
     fi
+    
+    return 0
 }
 
-# Main execution function
+# Function to setup Flutter environment
+setup_flutter() {
+    log_info "Setting up Flutter environment..."
+    
+    # Get Flutter packages
+    flutter pub get
+    
+    # Clean previous builds
+    flutter clean
+    
+    log_success "Flutter environment setup completed"
+}
+
+# Function to build iOS app
+build_ios_app() {
+    log_info "Building iOS app..."
+    
+    # Create output directory
+    mkdir -p output/ios
+    
+    # Build IPA
+    if [ "$PROFILE_TYPE" = "app-store" ]; then
+        log_info "Building for App Store distribution..."
+        flutter build ipa --release \
+            --build-name="${VERSION_NAME:-1.0.0}" \
+            --build-number="${VERSION_CODE:-1}" \
+            --export-options-plist=ios/ExportOptions.plist
+    else
+        log_info "Building for $PROFILE_TYPE distribution..."
+        flutter build ipa --release \
+            --build-name="${VERSION_NAME:-1.0.0}" \
+            --build-number="${VERSION_CODE:-1}"
+    fi
+    
+    # Copy IPA to output directory
+    if [ -f "build/ios/ipa/Runner.ipa" ]; then
+        cp build/ios/ipa/Runner.ipa output/ios/
+        log_success "IPA built successfully: output/ios/Runner.ipa"
+    else
+        log_error "IPA file not found after build"
+        return 1
+    fi
+    
+    return 0
+}
+
+# Main execution
 main() {
-    log_info "🚀 iOS Workflow 3 Starting..."
-    log_info "📋 Following iOS-Workflow Pattern with universal nuclear enhancement"
+    log_info "🚀 Starting iOS Workflow 3 Build"
     
-    # Load environment variables
-    if ! load_environment_variables; then
-        log_error "Environment variable loading failed"
-        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Environment variable loading failed."
-        return 1
+    # Validate environment
+    if ! validate_environment; then
+        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Environment validation failed"
+        exit 1
     fi
     
-    # Validate iOS project structure
-    if ! validate_ios_project; then
-        log_error "iOS project validation failed"
-        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "iOS project validation failed."
-        return 1
-    fi
-    
-    # Email notification - Build started (if enabled)
+    # Send build started email
     if [ "${ENABLE_EMAIL_NOTIFICATIONS:-false}" = "true" ]; then
-        send_email "build_started" "iOS" "${CM_BUILD_ID:-unknown}" "iOS Workflow 3 build started"
+        send_email "build_started" "iOS" "${CM_BUILD_ID:-unknown}" ""
     fi
     
-    # Stage 1: Setup nuclear collision protocols
-    if ! setup_nuclear_collision_protocols; then
-        log_error "Nuclear collision protocol setup failed"
-        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Nuclear collision protocol setup failed."
-        return 1
+    # Setup certificates
+    if ! setup_certificates; then
+        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Certificate setup failed"
+        exit 1
     fi
     
-    # Stage 2: Handle universal build configuration
-    if ! handle_universal_build_configuration; then
-        log_error "Universal build configuration failed"
-        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Universal build configuration failed."
-        return 1
+    # Setup Flutter
+    if ! setup_flutter; then
+        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Flutter setup failed"
+        exit 1
     fi
     
-    # Stage 3: Handle Firebase nuclear configuration
-    if ! handle_firebase_nuclear_configuration; then
-        log_error "Firebase nuclear configuration failed"
-        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Firebase nuclear configuration failed."
-        return 1
+    # Build iOS app
+    if ! build_ios_app; then
+        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "iOS build failed"
+        exit 1
     fi
     
-    # Stage 4: Run universal nuclear build process
-    if ! run_universal_nuclear_build; then
-        log_error "Universal nuclear build process failed"
-        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Universal nuclear build process failed."
-        return 1
-    fi
-    
-    # Stage 5: Validate universal nuclear outputs
-    if ! validate_universal_nuclear_outputs; then
-        log_error "Universal nuclear output validation failed"
-        send_email "build_failed" "iOS" "${CM_BUILD_ID:-unknown}" "Universal nuclear output validation failed."
-        return 1
-    fi
-    
-    # Success summary
-    log_success "🎉 iOS Workflow 3 completed successfully!"
-    log_info "🎯 Purpose: Universal build support with nuclear collision handling"
-    log_info "🌐 Universal Build: ENABLED"
-    log_info "☢️ Nuclear Protocols: ACTIVE"
-    log_info "📦 Distribution Method: $DISTRIBUTION_METHOD"
-    log_info "🔥 Firebase: ${FIREBASE_IOS_ENABLED:-false}"
-    log_info "📊 Following iOS-Workflow Pattern: All universal nuclear stages completed"
-    
-    # Display final summary
-    echo ""
-    log_info "📋 Final Universal Nuclear Summary:"
-    log_success "✅ Universal Build Support: ACTIVE"
-    log_success "✅ Nuclear Collision Protocols: IMPLEMENTED"
-    log_success "✅ All Distribution Methods: SUPPORTED"
-    log_success "✅ Profile Type: $PROFILE_TYPE"
-    log_success "✅ Multi-Certificate Support: AVAILABLE"
-    log_success "🚀 Ready for App Store submission (Universal Build)"
-    log_success "📱 Supports: App Store, Ad Hoc, Enterprise, and Development distributions"
-    
-    # Email notification - Build success
+    # Send success email
     if [ "${ENABLE_EMAIL_NOTIFICATIONS:-false}" = "true" ]; then
-        send_email "build_success" "iOS" "${CM_BUILD_ID:-unknown}" "iOS Workflow 3 completed successfully"
+        send_email "build_success" "iOS" "${CM_BUILD_ID:-unknown}" ""
     fi
     
-    return 0
+    log_success "🎉 iOS Workflow 3 Build completed successfully!"
 }
 
-# Execute main function
-if ! main "$@"; then
-    log_error "🚨 iOS Workflow 3 FAILED"
-    log_error "📋 Check the logs above for specific error details"
-    exit 1
-fi
-
-log_success "🚀 iOS Workflow 3 completed successfully!"
-log_info "📁 Following iOS-Workflow Pattern: Universal nuclear-enhanced workflow completed" 
+# Run main function
+main "$@" 

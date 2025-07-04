@@ -507,17 +507,17 @@ ios_signing_config: &ios_signing_config
 
 # 📱 iOS Distribution Options Block
 ios_distribution_options: &ios_distribution_options
-  ENABLE_DEVICE_SPECIFIC_BUILDS: $ENABLE_DEVICE_SPECIFIC_BUILDS
-  INSTALL_URL: $INSTALL_URL
-  DISPLAY_IMAGE_URL: $DISPLAY_IMAGE_URL
-  FULL_SIZE_IMAGE_URL: $FULL_SIZE_IMAGE_URL
-  THINNING: $THINNING
+  ENABLE_DEVICE_SPECIFIC_BUILDS: ${ENABLE_DEVICE_SPECIFIC_BUILDS:-false}
+  INSTALL_URL: ${INSTALL_URL:-}
+  DISPLAY_IMAGE_URL: ${DISPLAY_IMAGE_URL:-}
+  FULL_SIZE_IMAGE_URL: ${FULL_SIZE_IMAGE_URL:-}
+  THINNING: ${THINNING:-}
 
 # 🍎 iOS Development Options Block
 ios_development_options: &ios_development_options
-  ENABLE_DEBUG_BUILD: $ENABLE_DEBUG_BUILD
-  ENABLE_DEVICE_LOGGING: $ENABLE_DEVICE_LOGGING
-  ENABLE_DEBUG_SYMBOLS: $ENABLE_DEBUG_SYMBOLS
+  ENABLE_DEBUG_BUILD: ${ENABLE_DEBUG_BUILD:-false}
+  ENABLE_DEVICE_LOGGING: ${ENABLE_DEVICE_LOGGING:-false}
+  ENABLE_DEBUG_SYMBOLS: ${ENABLE_DEBUG_SYMBOLS:-false}
 
 workflows:
   android-free:
@@ -949,7 +949,7 @@ workflows:
       cocoapods: 1.16.2
       vars:
         # 🎯 App Configuration
-        WORKFLOW_ID: "ios-workflow"
+        WORKFLOW_ID: "ios-workflow3"
         BUNDLE_ID: $BUNDLE_ID
         PROFILE_TYPE: $PROFILE_TYPE
         APP_NAME: $APP_NAME
@@ -963,11 +963,11 @@ workflows:
         APNS_KEY_ID: $APNS_KEY_ID
         IS_TESTFLIGHT: $IS_TESTFLIGHT
 
-        # 🔐 App Store Connect API Credentials
-        APP_STORE_CONNECT_KEY_IDENTIFIER: "ZFD9GRMS7R"
-        APP_STORE_CONNECT_API_KEY: "https://raw.githubusercontent.com/prasanna91/QuikApp/main/AuthKey_ZFD9GRMS7R.p8"
-        APP_STORE_CONNECT_API_KEY_PATH: "https://raw.githubusercontent.com/prasanna91/QuikApp/main/AuthKey_ZFD9GRMS7R.p8"
-        APP_STORE_CONNECT_ISSUER_ID: "a99a2ebd-ed3e-4117-9f97-f195823774a7"
+        # 🔐 App Store Connect API Credentials (for TestFlight upload)
+        APP_STORE_CONNECT_KEY_IDENTIFIER: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        APP_STORE_CONNECT_API_KEY: $APP_STORE_CONNECT_API_KEY
+        APP_STORE_CONNECT_API_KEY_PATH: $APP_STORE_CONNECT_API_KEY_PATH
+        APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
 
         # 🔧 Feature Flags
         PUSH_NOTIFY: $PUSH_NOTIFY
@@ -1014,6 +1014,10 @@ workflows:
         # 🍎 iOS Signing Configuration
         CERT_P12_URL: $CERT_P12_URL
         CERT_P12_PASSWORD: $CERT_P12_PASSWORD
+        CERT_CER_URL: $CERT_CER_URL
+        CERT_KEY_URL: $CERT_KEY_URL
+        CERT_PASSWORD: $CERT_PASSWORD
+        KEYCHAIN_PASSWORD: $KEYCHAIN_PASSWORD
         PROFILE_URL: $PROFILE_URL
 
         # 📧 Email Configuration
