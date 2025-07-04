@@ -62,11 +62,27 @@ validate_environment() {
         return 1
     fi
     
-    # Check certificate configuration
-    if [ -z "${CERT_P12_URL:-}" ] && [ -z "${CERT_CER_URL:-}" ]; then
-        log_error "No certificate configuration found"
-        log_error "Please provide either CERT_P12_URL or CERT_CER_URL"
-        return 1
+    # Check certificate configuration - make it optional
+    local cert_config_found=false
+    
+    if [ -n "${CERT_P12_URL:-}" ] && [ "$CERT_P12_URL" != "\$CERT_P12_URL" ]; then
+        log_info "P12 certificate configuration found"
+        cert_config_found=true
+    fi
+    
+    if [ -n "${CERT_CER_URL:-}" ] && [ "$CERT_CER_URL" != "\$CERT_CER_URL" ] && [ -n "${CERT_KEY_URL:-}" ] && [ "$CERT_KEY_URL" != "\$CERT_KEY_URL" ]; then
+        log_info "CER + KEY certificate configuration found"
+        cert_config_found=true
+    fi
+    
+    if [ "$cert_config_found" = false ]; then
+        log_warn "⚠️ No certificate configuration found - will attempt unsigned build"
+        log_info "💡 To enable code signing, set either:"
+        log_info "   - CERT_P12_URL + CERT_PASSWORD, or"
+        log_info "   - CERT_CER_URL + CERT_KEY_URL + CERT_PASSWORD"
+        export SKIP_CODE_SIGNING="true"
+    else
+        export SKIP_CODE_SIGNING="false"
     fi
     
     log_success "Environment validation passed"
@@ -76,6 +92,13 @@ validate_environment() {
 # Function to setup certificate and provisioning profile
 setup_certificates() {
     log_info "Setting up certificates and provisioning profiles..."
+    
+    # Check if we should skip code signing
+    if [ "${SKIP_CODE_SIGNING:-false}" = "true" ]; then
+        log_warn "⚠️ Skipping certificate setup - will attempt unsigned build"
+        log_info "💡 Note: Unsigned builds may not work for App Store distribution"
+        return 0
+    fi
     
     # Create certificates directory
     mkdir -p ios/certificates
@@ -102,7 +125,7 @@ setup_certificates() {
     log_success "Keychain setup completed"
     
     # Handle P12 certificate
-    if [ -n "${CERT_P12_URL:-}" ]; then
+    if [ -n "${CERT_P12_URL:-}" ] && [ "$CERT_P12_URL" != "\$CERT_P12_URL" ]; then
         log_info "Processing P12 certificate from: $CERT_P12_URL"
         
         # Validate URL format
@@ -137,7 +160,7 @@ setup_certificates() {
         log_success "P12 certificate installed successfully"
         
     # Handle CER + KEY certificate
-    elif [ -n "${CERT_CER_URL:-}" ] && [ -n "${CERT_KEY_URL:-}" ]; then
+    elif [ -n "${CERT_CER_URL:-}" ] && [ "$CERT_CER_URL" != "\$CERT_CER_URL" ] && [ -n "${CERT_KEY_URL:-}" ] && [ "$CERT_KEY_URL" != "\$CERT_KEY_URL" ]; then
         log_info "Processing CER + KEY certificates"
         
         # Download CER file
@@ -173,10 +196,13 @@ setup_certificates() {
         security set-key-partition-list -S apple-tool:,apple: -s -k "$keychain_password" "$keychain_name" || true
         
         log_success "CER + KEY certificates converted and installed successfully"
+    else
+        log_warn "⚠️ No valid certificate configuration found - skipping certificate setup"
+        return 0
     fi
     
     # Handle provisioning profile
-    if [ -n "${PROFILE_URL:-}" ]; then
+    if [ -n "${PROFILE_URL:-}" ] && [ "$PROFILE_URL" != "\$PROFILE_URL" ]; then
         log_info "Processing provisioning profile from: $PROFILE_URL"
         
         # Download provisioning profile
@@ -203,20 +229,26 @@ setup_certificates() {
             log_error "Failed to extract UUID from provisioning profile"
             return 1
         fi
+    else
+        log_warn "⚠️ No provisioning profile URL found - skipping profile setup"
     fi
     
-    # Validate code signing
-    local identities
-    identities=$(security find-identity -v -p codesigning "$keychain_name" 2>/dev/null)
-    
-    if [ -n "$identities" ]; then
-        log_success "Code signing identities found:"
-        echo "$identities" | while read line; do
-            log_info "   $line"
-        done
+    # Validate code signing only if certificates were installed
+    if [ -n "${CERT_P12_URL:-}" ] || [ -n "${CERT_CER_URL:-}" ]; then
+        local identities
+        identities=$(security find-identity -v -p codesigning "$keychain_name" 2>/dev/null)
+        
+        if [ -n "$identities" ]; then
+            log_success "Code signing identities found:"
+            echo "$identities" | while read line; do
+                log_info "   $line"
+            done
+        else
+            log_error "No code signing identities found"
+            return 1
+        fi
     else
-        log_error "No code signing identities found"
-        return 1
+        log_warn "⚠️ Skipping code signing validation - no certificates installed"
     fi
     
     return 0
@@ -242,26 +274,44 @@ build_ios_app() {
     # Create output directory
     mkdir -p output/ios
     
-    # Build IPA
-    if [ "$PROFILE_TYPE" = "app-store" ]; then
-        log_info "Building for App Store distribution..."
-        flutter build ipa --release \
-            --build-name="${VERSION_NAME:-1.0.0}" \
-            --build-number="${VERSION_CODE:-1}" \
-            --export-options-plist=ios/ExportOptions.plist
-    else
-        log_info "Building for $PROFILE_TYPE distribution..."
-        flutter build ipa --release \
+    # Determine build approach based on code signing availability
+    if [ "${SKIP_CODE_SIGNING:-false}" = "true" ]; then
+        log_warn "⚠️ Building without code signing (unsigned build)"
+        log_info "💡 This build may not be suitable for App Store distribution"
+        
+        # Build without code signing
+        flutter build ios --release --no-codesign \
             --build-name="${VERSION_NAME:-1.0.0}" \
             --build-number="${VERSION_CODE:-1}"
+    else
+        log_info "Building with code signing for $PROFILE_TYPE distribution..."
+        
+        # Build with code signing
+        if [ "$PROFILE_TYPE" = "app-store" ]; then
+            flutter build ipa --release \
+                --build-name="${VERSION_NAME:-1.0.0}" \
+                --build-number="${VERSION_CODE:-1}" \
+                --export-options-plist=ios/ExportOptions.plist
+        else
+            flutter build ipa --release \
+                --build-name="${VERSION_NAME:-1.0.0}" \
+                --build-number="${VERSION_CODE:-1}"
+        fi
     fi
     
-    # Copy IPA to output directory
+    # Copy build artifacts to output directory
     if [ -f "build/ios/ipa/Runner.ipa" ]; then
         cp build/ios/ipa/Runner.ipa output/ios/
         log_success "IPA built successfully: output/ios/Runner.ipa"
+    elif [ -d "build/ios/Release-iphoneos/Runner.app" ]; then
+        # For unsigned builds, we might get a .app instead of .ipa
+        log_info "Unsigned build created: build/ios/Release-iphoneos/Runner.app"
+        cp -r build/ios/Release-iphoneos/Runner.app output/ios/
+        log_success "App bundle copied: output/ios/Runner.app"
     else
-        log_error "IPA file not found after build"
+        log_error "No build artifacts found after build"
+        log_info "Checking build directory contents:"
+        ls -la build/ios/ || true
         return 1
     fi
     
